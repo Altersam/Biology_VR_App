@@ -1,0 +1,1 @@
+{"skip_refresh":true,"code":"var m=UnityEngine.Object.FindFirstObjectByType<BiologyVR.ArteryRoute.Journey.JourneyMission>();m.Enter(11,false);m.mover.TravelTo(11,true);return Newtonsoft.Json.JsonConvert.SerializeObject(new{scene=m.SceneNumber,goal=m.CurrentGoalLabel,wound=m.world.woundSite.position.ToString(),active=m.world.targets.Count(t=>t&&t.gameObject.activeSelf)});"}

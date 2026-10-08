@@ -1,0 +1,23 @@
+{
+  "utc": "2026-10-07T18:21:34.3951066Z",
+  "geometryPreserved": true,
+  "geometryBefore": "E892BA8221CB3A74BC7A3A4FC33C8A0DD3F8191342427AD5A49B9F3AAA9AD291",
+  "geometryAfter": "E892BA8221CB3A74BC7A3A4FC33C8A0DD3F8191342427AD5A49B9F3AAA9AD291",
+  "materialCountBefore": 111,
+  "materialCountAfter": 111,
+  "materials": [
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_Concept_V4/Coral_Endothelium_Concept_V4.mat",
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_Concept_V4/Recovery_Membrane_Concept_V4.mat",
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_Concept_V4/Scene04_intima_Tissue_Concept_V4.mat",
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_Concept_V4/Plaque_DetailedFibrousCap_Concept_V4.mat",
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_Concept_V4/Scene04_adventitia_Tissue_Concept_V4.mat",
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_Concept_V4/Scene04_media_Tissue_Concept_V4.mat",
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_Concept_V4/Wound_Subendothelial_Tissue_Concept_V4.mat",
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_Concept_V4/Scene04_endothelium_Tissue_Concept_V4.mat",
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_Concept_V4/Plaque_EmbeddedCore_Concept_V4.mat"
+  ],
+  "brightness": 1.02,
+  "normalStrength": 0.85,
+  "cartoonBands": 0.8,
+  "oldVersionPreserved": true
+}

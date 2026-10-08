@@ -1,0 +1,41 @@
+ЗАГРУЖАЙТЕ ЭТУ ПАПКУ В НОВЫЙ РЕПОЗИТОРИЙ Biology_VR_App.
+Существующий Altersam/Biology_VR выбирать не нужно.
+
+1. Установите GitHub Desktop: https://desktop.github.com/
+   Откройте программу и войдите в свой аккаунт Altersam.
+
+2. В этой папке дважды нажмите 1_PREPARE_UPLOAD.cmd.
+   Скрипт подготовит локальный Git и Git LFS.
+   Он НЕ делает commit, НЕ подключается к GitHub и НЕ загружает файлы.
+
+3. В GitHub Desktop: File → Add local repository → Choose.
+   Выберите ЭТУ папку Biology_VR_App, не вложенную unity и не старый репозиторий.
+   Нажмите Add repository.
+
+4. В поле Summary напишите: Initial Biology VR app.
+   Нажмите Commit to main. Дождитесь окончания: ресурсов много.
+
+5. Нажмите Publish repository.
+   Name: Biology_VR_App
+   Снимите Keep this code private, чтобы репозиторий был Public.
+   Нажмите Publish repository и дождитесь завершения.
+
+6. Откройте НОВЫЙ репозиторий:
+   https://github.com/Altersam/Biology_VR_App
+   Settings → Pages → Source: Deploy from a branch.
+   Branch: main. Folder: /(root). Нажмите Save.
+
+7. Через несколько минут сайт появится по адресу:
+   https://altersam.github.io/Biology_VR_App/
+   Игра напрямую:
+   https://altersam.github.io/Biology_VR_App/play/
+
+ГОТОВО. Старый сайт https://altersam.github.io/Biology_VR/ сохраняется.
+
+APK ДЛЯ ШЛЕМОВ (ПО ЖЕЛАНИЮ):
+В новом репозитории Releases → Create a new release → Tag: v0.1.
+Перетащите APK из папки ReleaseFiles и нажмите Publish release.
+APK не загружаются с исходниками через Git: они уже исключены из Git.
+
+В папке собраны Unity-проект, готовая WebGL-игра, стартовая страница и APK.
+Ничего из Library, Temp или старого проекта копировать дополнительно не нужно.

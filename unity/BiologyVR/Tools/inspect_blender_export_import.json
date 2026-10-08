@@ -1,0 +1,1 @@
+{"skip_refresh":false,"code":"UnityEditor.AssetDatabase.Refresh(); var asset=UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.GameObject>(\"Assets/BiologyVR/ArteryJourney/Generated/VisualRework/BiologyVR_Artery_VisualRework.fbx\"); return new {imported=asset!=null,path=\"Assets/BiologyVR/ArteryJourney/Generated/VisualRework/BiologyVR_Artery_VisualRework.fbx\"};"}

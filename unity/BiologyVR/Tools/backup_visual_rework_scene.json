@@ -1,0 +1,1 @@
+{"skip_refresh":true,"code":"var src=\"Assets/BiologyVR/ArteryJourney/Scenes/ArteryNarrativeVR.unity\"; var dst=\"Assets/BiologyVR/ArteryJourney/Scenes/ArteryNarrativeVR_VisualRework.unity\"; var ok=UnityEditor.AssetDatabase.CopyAsset(src,dst); UnityEditor.AssetDatabase.SaveAssets(); return new {copied=ok,path=dst};"}

@@ -1,0 +1,1 @@
+{"skip_refresh":true,"code":"var m=UnityEngine.Object.FindFirstObjectByType<BiologyVR.ArteryRoute.Journey.JourneyMission>();var c=m.mover.viewCamera;return string.Join(\"\\n\",Physics.RaycastAll(c.transform.position,c.transform.forward,35,~0,QueryTriggerInteraction.Collide).OrderBy(h=>h.distance).Take(20).Select(h=>h.distance.ToString(\"0.00\")+\" \"+h.collider.name));"}

@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Wound_Subendothelial_Tissue_Concept_V4
+  m_Shader: {fileID: 4800000, guid: c967da0cbd3e0d14e8a19a6f17d96486, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 2800000, guid: f1c2f805d4724974ab6b094c085f48ba, type: 3}
+        m_Scale: {x: 0.89940727, y: 0.60714287}
+        m_Offset: {x: -0.44970363, y: 73.838005}
+    - _DetailMap:
+        m_Texture: {fileID: 2800000, guid: cee2d3b9d05a9a04eb2d49300572a87b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 2800000, guid: 412daa64ff5dfdd41b547fd23c25f56d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AllowWallCutaway: 1
+    - _CartoonBands: 0.8
+    - _NormalStrength: 0.85
+    - _PatchMask: 1
+    - _PulseAmplitude: 0
+    - _Reveal: 1
+    - _RimStrength: 0.03
+    - _SectionReveal: 0
+    - _SheenStrength: 0.08
+    - _Smoothness: 0.23
+    - _Tone: 1
+    - _VisualExposure: 1.02
+    m_Colors:
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _PatchColor: {r: 0.72, g: 0.34, b: 0.31, a: 1}
+    - _ToneCentre: {r: 0, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

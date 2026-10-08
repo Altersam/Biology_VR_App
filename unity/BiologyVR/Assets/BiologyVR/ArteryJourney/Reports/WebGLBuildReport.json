@@ -1,0 +1,10 @@
+{
+  "utc": "2026-10-08T14:41:55.176007Z",
+  "result": "Succeeded",
+  "errors": 6,
+  "warnings": 7,
+  "path": "C:\\Users\\alter\\AppData\\Local\\Temp\\opencode\\BiologyVR_Bio_v_0_1\\Builds\\WebGL\\play",
+  "compression": "gzip with decompression fallback",
+  "threads": false,
+  "browserVerified": false
+}

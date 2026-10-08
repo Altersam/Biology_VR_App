@@ -1,0 +1,1 @@
+{"skip_refresh":true,"code":"var t=UnityEngine.Object.FindFirstObjectByType<BiologyVR.ArteryRoute.Journey.JourneyMission>().world.Find(\"wound\");var rs=t.GetComponentsInChildren<UnityEngine.Renderer>(true);return string.Join(\"\\n\",rs.Select(r=>r.name+\" mat=\"+(r.sharedMaterial?r.sharedMaterial.name:\"none\")+\" bounds=\"+r.bounds.size));"}

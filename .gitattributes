@@ -1,0 +1,4 @@
+* text=auto
+# WebGL data must be ordinary files, never Git LFS pointers.
+play/** -filter -diff -merge -text
+# Unity binary/LFS rules are scoped inside unity/BiologyVR/.gitattributes.

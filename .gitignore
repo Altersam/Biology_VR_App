@@ -1,0 +1,7 @@
+# APKs are attached to GitHub Releases, not committed to source history.
+/ReleaseFiles/
+*.apk
+*.aab
+*.zip
+.DS_Store
+Thumbs.db

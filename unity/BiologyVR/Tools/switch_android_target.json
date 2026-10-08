@@ -1,0 +1,1 @@
+{"skip_refresh":true,"code":"return UnityEditor.EditorUserBuildSettings.SwitchActiveBuildTarget(UnityEditor.BuildTargetGroup.Android,UnityEditor.BuildTarget.Android).ToString();"}

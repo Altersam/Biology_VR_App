@@ -1,0 +1,1 @@
+{"skip_refresh":true,"code":"if(UnityEditor.EditorApplication.isPlaying) return \"Exit Play Mode first\"; var p=\"Assets/BiologyVR/ArteryJourney/Scenes/ArteryNarrativeVR_VisualRework.unity\"; UnityEditor.SceneManagement.EditorSceneManager.OpenScene(p); return UnityEngine.SceneManagement.SceneManager.GetActiveScene().path;"}

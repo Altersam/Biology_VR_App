@@ -1,0 +1,13 @@
+{
+  "utc": "2026-10-08T14:47:18.5292796Z",
+  "result": "Succeeded",
+  "unityResult": "Succeeded",
+  "apkExists": true,
+  "errors": 6,
+  "warnings": 12,
+  "sizeBytes": 89505864,
+  "seconds": 136.986832,
+  "path": "C:/Users/alter/AppData/Local/Temp/opencode/BiologyVR_Bio_v_0_1/Builds/MetaQuest/BiologyVR_MetaQuest.apk",
+  "device": "Meta Quest",
+  "headsetVerified": false
+}
