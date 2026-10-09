@@ -24,6 +24,7 @@ namespace BiologyVR.ArteryRoute.Editor
                 if(EditorApplication.isPlaying)throw new InvalidOperationException("Exit Play Mode first");
                 if(!BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.WebGL,BuildTarget.WebGL))throw new InvalidOperationException("Install WebGL Build Support in Unity Hub");
                 PlayerSettings.productName="Biology VR";
+                PlayerSettings.companyName="BiologyVR";PlayerSettings.bundleVersion="0.2.0";
                 ArteryInterfaceFont.Apply();
                 PlayerSettings.WebGL.compressionFormat=WebGLCompressionFormat.Gzip;
                 PlayerSettings.WebGL.decompressionFallback=true;
@@ -33,6 +34,7 @@ namespace BiologyVR.ArteryRoute.Editor
                 if(general){general.InitManagerOnStart=false;EditorUtility.SetDirty(general);}
                 if(EditorUserBuildSettings.activeBuildTarget!=BuildTarget.WebGL)
                     if(!EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.WebGL,BuildTarget.WebGL))throw new InvalidOperationException("WebGL target switch failed");
+                EditorUserBuildSettings.selectedBuildTargetGroup=BuildTargetGroup.WebGL;
                 AssetDatabase.SaveAssets();EditorSceneManager.SaveOpenScenes();
                 string folder=Path.GetFullPath("Builds/WebGL/play");Directory.CreateDirectory(folder);
                 var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=new[]{UniversalMobileBuild.ScenePath},locationPathName=folder,target=BuildTarget.WebGL,options=BuildOptions.None});

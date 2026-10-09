@@ -39,7 +39,7 @@ namespace BiologyVR.ArteryRoute.Editor
             PlayerSettings.Android.applicationEntry=AndroidApplicationEntry.Activity;
             PlayerSettings.Android.splitApplicationBinary=false;
             PlayerSettings.Android.optimizedFramePacing=true;
-            PlayerSettings.bundleVersion="1.0.1";PlayerSettings.Android.bundleVersionCode=2;
+            PlayerSettings.bundleVersion="0.2.0";PlayerSettings.Android.bundleVersionCode=3;
             PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.Android,false);
             PlayerSettings.SetGraphicsAPIs(BuildTarget.Android,new[]{GraphicsDeviceType.OpenGLES3});
             EditorUserBuildSettings.buildAppBundle=false;
@@ -96,6 +96,7 @@ namespace BiologyVR.ArteryRoute.Editor
             if(!BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.Android,BuildTarget.Android))throw new InvalidOperationException("Android module installed? Restart Unity to load its build extensions.");
             if(EditorUserBuildSettings.activeBuildTarget!=BuildTarget.Android)
                 if(!EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android,BuildTarget.Android))throw new InvalidOperationException("Android target switch failed");
+            EditorUserBuildSettings.selectedBuildTargetGroup=BuildTargetGroup.Android;
             ConfigurePico();
             string folder=Path.GetFullPath("Builds/Pico4Enterprise");Directory.CreateDirectory(folder);
             var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=new[]{ScenePath},locationPathName=Path.Combine(folder,"BiologyVR_Pico4Enterprise.apk"),target=BuildTarget.Android,options=BuildOptions.Development});
@@ -116,7 +117,7 @@ namespace BiologyVR.ArteryRoute.Editor
         public static void ReopenAtAsciiAlias()
         {
             if(EditorApplication.isPlaying)throw new InvalidOperationException("Exit Play Mode first");
-            string original=Path.GetFullPath("."),alias=Path.Combine(Path.GetTempPath(),"opencode","BiologyVR_Bio_v_0_1");
+            string original=Path.GetFullPath("."),alias=Path.Combine(Path.GetPathRoot(original),"BiologyVR_bio_v02_build");
             if(!Directory.Exists(alias))throw new InvalidOperationException("Create the ASCII junction with Tools/create_ascii_build_alias.ps1 first");
             if(original.Any(c=>c>127))EditorPrefs.SetString("BiologyVR.Pico.OriginalProjectPath",original);
             AssetDatabase.SaveAssets();EditorSceneManager.SaveOpenScenes();EditorApplication.OpenProject(alias);
@@ -179,8 +180,8 @@ namespace BiologyVR.ArteryRoute.Editor
         {
             var android=UnityEditor.Build.NamedBuildTarget.Android;
             PlayerSettings.SetApplicationIdentifier(android,"com.biologyvr.arteryjourney");
-            PlayerSettings.bundleVersion="1.0.0";
-            PlayerSettings.Android.bundleVersionCode=1;
+            PlayerSettings.bundleVersion="0.2.0";
+            PlayerSettings.Android.bundleVersionCode=3;
             PlayerSettings.Android.minSdkVersion=AndroidSdkVersions.AndroidApiLevel32;
             PlayerSettings.Android.targetArchitectures=AndroidArchitecture.ARM64;
             PlayerSettings.Android.androidIsGame=true;

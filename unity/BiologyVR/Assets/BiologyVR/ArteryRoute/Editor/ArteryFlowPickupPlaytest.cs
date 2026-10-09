@@ -127,6 +127,7 @@ namespace BiologyVR.ArteryRoute.Editor
             keys=new KeyboardState();yield return Wait(.15f);Check(mission.StepIndex==1,"Held F with actual mouse tracking scans the moving gas embolus");
             yield return AimAt(world.Find("attract-mode").transform.position);yield return Press(Key.E,.1f);Check(mission.StepIndex==2,"Aimed E selects the existing attraction mode");
             yield return CaptureEmbolus();yield return Wait(.25f);Check(!mission.Complete&&world.EmbolusStability==0,"Desktop capture outside the zone cannot auto-deposit");
+            if(cursorMode){Directory.CreateDirectory(ArteryVisualV6.Reports);ScreenCapture.CaptureScreenshot(ArteryVisualV6.Reports+"/06_BioTool_Actual_PC_Input.png");yield return Wait(.12f);}
             var release=world.bubble.position;keys=new KeyboardState();yield return Wait(.12f);
             Check(!world.EmbolusCaptured&&mission.StepIndex==2&&Vector3.Distance(release,world.bubble.position)<.6f,"Releasing E preserves nearby pose and retries only capture");
             yield return CaptureEmbolus();yield return Wait(.15f);
@@ -171,7 +172,9 @@ namespace BiologyVR.ArteryRoute.Editor
             Check(mission.StepIndex==1&&target.grabbed&&target.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>().isSelected,"Native LMB holds RBC through actual desktop XRI interactor");
             var before=target.transform.position;pointer+=new Vector2(Screen.width*.09f,0);yield return Wait(.35f);
             Check(Vector3.Distance(before,target.transform.position)>.1f&&Quaternion.Angle(rotation,camera.transform.rotation)<.01f,"Mouse cursor drags the held object without rotating the camera");
-            yield return Press(Key.F,1.05f);Check(mission.StepIndex==2,"F scans the dragged object under the cursor");
+            keys=new KeyboardState(Key.F);yield return Wait(.4f);
+            Directory.CreateDirectory(ArteryVisualV6.Reports);ScreenCapture.CaptureScreenshot(ArteryVisualV6.Reports+"/05_Scanner_Actual_PC_Input.png");
+            yield return Wait(.65f);keys=new KeyboardState();yield return Wait(.12f);Check(mission.StepIndex==2,"F scans the dragged object under the cursor");
             pendingScroll=new Vector2(0,-JourneyDesktopControls.WheelUnitsPerStep);yield return Wait(.3f);buttons=0;yield return Wait(.9f);
             Check(!target.grabbed&&!target.GetComponent<JourneyFlowPickup>().Rejoining,"Mouse release returns RBC smoothly to real flow");
         }

@@ -1,0 +1,24 @@
+{
+  "utc": "2026-10-08T20:12:11.9603827Z",
+  "geometryPreserved": true,
+  "geometryBefore": "8F00FDF1267F537EB3E42B4C3EE4C513153AA1D12CC8AEF0C10E7AF5E0E8A62C",
+  "geometryAfter": "8F00FDF1267F537EB3E42B4C3EE4C513153AA1D12CC8AEF0C10E7AF5E0E8A62C",
+  "wallPanelGrid": "7 x 3",
+  "visualReliefMeters": 0.07,
+  "protectedInspectionPlaqueWound": true,
+  "zoneCount": 7,
+  "decorativeRendererCount": 24,
+  "newColliders": 0,
+  "materials": [
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_BioWorld_V5/Coral_Endothelium_BioWorld_V5.mat",
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_BioWorld_V5/Wound_Subendothelial_Tissue_BioWorld_V5.mat",
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_BioWorld_V5/Scene04_media_Tissue_BioWorld_V5.mat",
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_BioWorld_V5/Scene04_adventitia_Tissue_BioWorld_V5.mat",
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_BioWorld_V5/Plaque_EmbeddedCore_BioWorld_V5.mat",
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_BioWorld_V5/Scene04_endothelium_Tissue_BioWorld_V5.mat",
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_BioWorld_V5/Scene04_intima_Tissue_BioWorld_V5.mat",
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_BioWorld_V5/Recovery_Membrane_BioWorld_V5.mat",
+    "Assets/BiologyVR/ArteryJourney/Generated/Artery_BioWorld_V5/Plaque_DetailedFibrousCap_BioWorld_V5.mat"
+  ],
+  "hardwareVerified": false
+}

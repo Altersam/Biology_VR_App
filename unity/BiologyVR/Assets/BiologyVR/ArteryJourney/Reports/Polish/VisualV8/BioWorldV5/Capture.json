@@ -1,0 +1,6 @@
+{
+  "utc": "2026-10-08T20:17:31.5337554Z",
+  "version": "BioWorldV5",
+  "method": "Unity URP camera; staged scenes only; environment-only frame disables cells/UI/instruments temporarily",
+  "hardwareVRTested": false
+}

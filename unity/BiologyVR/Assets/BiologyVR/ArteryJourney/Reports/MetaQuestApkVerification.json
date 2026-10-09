@@ -1,12 +1,13 @@
 {
-  "utc": "2026-10-08T14:47:49.533034+00:00",
+  "utc": "2026-10-09T05:50:46.364233+00:00",
   "passed": true,
-  "path": "Z:\\YandexDisk\\ПетПроекты\\Biology_VR\\3д\\Unity\\Bio_v.0.1\\Builds\\MetaQuest\\BiologyVR_MetaQuest.apk",
-  "size_bytes": 89505864,
-  "sha256": "b4e944be72b4a42578ccb409965e2ddeafe3b9390103b391c2d03c22aa2460f3",
+  "path": "Z:\\YandexDisk\\ПетПроекты\\Biology_VR\\3д\\Unity\\bio_v0.2\\Builds\\MetaQuest\\BiologyVR_MetaQuest.apk",
+  "size_bytes": 88034621,
+  "sha256": "4d884fa7a2c7e630fe4548cf3ba25755d4c49ac639a7a21e1e2ff9f0cc0de5c8",
   "checks": {
     "manifest_readable": true,
     "application_id": true,
+    "version_0_2_0": true,
     "arm64_only": true,
     "unity_il2cpp": true,
     "openxr_loader": true,
@@ -23,13 +24,13 @@
     "lib/arm64-v8a/libUnityOpenXRHands.so",
     "lib/arm64-v8a/lib_burst_generated.so",
     "lib/arm64-v8a/libc++_shared.so",
+    "lib/arm64-v8a/libil2cpp.so",
     "lib/arm64-v8a/libmain.so",
     "lib/arm64-v8a/libopenxr_loader.so",
     "lib/arm64-v8a/libswappywrapper.so",
-    "lib/arm64-v8a/libunity.so",
-    "lib/arm64-v8a/libil2cpp.so"
+    "lib/arm64-v8a/libunity.so"
   ],
-  "badging": "package: name='com.biologyvr.arteryjourney' versionCode='2' versionName='1.0.1' platformBuildVersionName='14' platformBuildVersionCode='34' compileSdkVersion='34' compileSdkVersionCodename='14'\ninstall-location:'auto'\nsdkVersion:'29'\ntargetSdkVersion:'34'\nuses-permission: name='android.permission.INTERNET'\nuses-permission: name='org.khronos.openxr.permission.OPENXR'\nuses-permission: name='org.khronos.openxr.permission.OPENXR_SYSTEM'\napplication-label:'Biology VR'\napplication-icon-160:'res/mipmap-anydpi-v26/app_icon.xml'\napplication-icon-65534:'res/mipmap-anydpi-v26/app_icon.xml'\napplication: label='Biology VR' icon='res/mipmap-anydpi-v26/app_icon.xml'\napplication-debuggable\nlaunchable-activity: name='com.unity3d.player.UnityPlayerActivity'  label='' icon=''\nfeature-group: label=''\n  uses-gl-es: '0x30000'\n  uses-feature-not-required: name='android.hardware.touchscreen'\n  uses-feature-not-required: name='android.hardware.touchscreen.multitouch'\n  uses-feature-not-required: name='android.hardware.touchscreen.multitouch.distinct'\n  uses-feature: name='android.hardware.vr.headtracking' version='1'\nmain\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--'\ndensities: '160' '65534'\nnative-code: 'arm64-v8a'\n",
+  "badging": "package: name='com.biologyvr.arteryjourney' versionCode='3' versionName='0.2.0' platformBuildVersionName='14' platformBuildVersionCode='34' compileSdkVersion='34' compileSdkVersionCodename='14'\ninstall-location:'auto'\nsdkVersion:'29'\ntargetSdkVersion:'34'\nuses-permission: name='android.permission.INTERNET'\nuses-permission: name='org.khronos.openxr.permission.OPENXR'\nuses-permission: name='org.khronos.openxr.permission.OPENXR_SYSTEM'\napplication-label:'Biology VR'\napplication-icon-160:'res/mipmap-anydpi-v26/app_icon.xml'\napplication-icon-65534:'res/mipmap-anydpi-v26/app_icon.xml'\napplication: label='Biology VR' icon='res/mipmap-anydpi-v26/app_icon.xml'\napplication-debuggable\nlaunchable-activity: name='com.unity3d.player.UnityPlayerActivity'  label='' icon=''\nfeature-group: label=''\n  uses-gl-es: '0x30000'\n  uses-feature-not-required: name='android.hardware.touchscreen'\n  uses-feature-not-required: name='android.hardware.touchscreen.multitouch'\n  uses-feature-not-required: name='android.hardware.touchscreen.multitouch.distinct'\n  uses-feature: name='android.hardware.vr.headtracking' version='1'\nmain\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--'\ndensities: '160' '65534'\nnative-code: 'arm64-v8a'\n",
   "signature": "Verifies\nVerified using v1 scheme (JAR signing): false\nVerified using v2 scheme (APK Signature Scheme v2): true\nVerified using v3 scheme (APK Signature Scheme v3): false\nVerified using v3.1 scheme (APK Signature Scheme v3.1): false\nVerified using v4 scheme (APK Signature Scheme v4): false\nVerified for SourceStamp: false\nNumber of signers: 1\n",
   "headset_verified": false
 }

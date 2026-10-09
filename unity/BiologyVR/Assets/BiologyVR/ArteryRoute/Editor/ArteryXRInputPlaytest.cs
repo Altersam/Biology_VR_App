@@ -97,7 +97,9 @@ namespace BiologyVR.ArteryRoute.Editor
                 Require(mission.StepIndex==1&&rbc.GetComponent<XRGrabInteractable>().isSelected,"Right grip actually selects RBC and advances Grab");
                 Aim(true,rbc.transform.position);Trigger(true,true);yield return new EditorWaitForSeconds(.18f);Trigger(true,false);yield return new EditorWaitForSeconds(.2f);
                 Require(mission.StepIndex==1,"Early Scanner release does not complete scan");
-                Aim(true,rbc.transform.position);Trigger(true,true);yield return new EditorWaitForSeconds(1.0f);Trigger(true,false);yield return new EditorWaitForSeconds(.15f);
+                Aim(true,rbc.transform.position);Trigger(true,true);yield return new EditorWaitForSeconds(.4f);
+                Directory.CreateDirectory(ArteryVisualV6.Reports);ArteryPolishReview.Capture(mission.mover.viewCamera,"BioWorldV6/07_Scanner_Actual_XR_Input.png");
+                yield return new EditorWaitForSeconds(.6f);Trigger(true,false);yield return new EditorWaitForSeconds(.15f);
                 Require(mission.StepIndex==2,"Held real Scanner trigger completes raycast scan");
                 centre=rbc.transform.position;Pose(true,centre+Vector3.left*.07f,Quaternion.identity);yield return new EditorWaitForSeconds(.2f);Grip(true,true);yield return new EditorWaitForSeconds(.4f);
                 Require(rbc.GetComponent<XRGrabInteractable>().interactorsSelecting.Count==2,"Both grips select the same RBC");

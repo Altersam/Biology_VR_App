@@ -1,0 +1,14 @@
+{
+  "utc": "2026-10-09T05:51:29.5189366Z",
+  "result": "Succeeded",
+  "unityResult": "Succeeded",
+  "apkExists": true,
+  "errors": 0,
+  "warnings": 12,
+  "sizeBytes": 102963647,
+  "unityReportedSizeBytes": 1155908958,
+  "seconds": 20.8725938,
+  "path": "Z:/BiologyVR_bio_v02_build/Builds/Pico4Enterprise/BiologyVR_Pico4Enterprise.apk",
+  "device": "Pico 4 Enterprise",
+  "headsetVerified": false
+}

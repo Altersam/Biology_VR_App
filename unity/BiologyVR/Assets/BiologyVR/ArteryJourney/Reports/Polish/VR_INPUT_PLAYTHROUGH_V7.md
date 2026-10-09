@@ -1,6 +1,6 @@
 # V8 Sequential XR Input Playthrough
 
-Generated UTC: 2026-10-08T12:53:48.7975642Z
+Generated UTC: 2026-10-08T20:52:38.3254711Z
 
 Status: FULL SIMULATOR PASS
 
@@ -10,7 +10,7 @@ XR Input System simulator layouts; controller states queued into actual action b
 
 PASS: Existing Scanner/BioTool actions enabled
 
-Diagnostic: step=1 ready=True RBC selected=True grabbed=True runtime right grip=1 button=True deviceEnabled=True focused=False controller=(0.45, -0.14, 2.51) RBC=(0.43, -0.15, 2.58) bounds=Center: (0.43, -0.15, 2.58), Extents: (0.13, 0.13, 0.13) collider=True grab=True
+Diagnostic: step=1 ready=True RBC selected=True grabbed=True runtime right grip=1 button=True deviceEnabled=True focused=False controller=(0.45, -0.14, 2.56) RBC=(0.43, -0.15, 2.64) bounds=Center: (0.43, -0.15, 2.64), Extents: (0.13, 0.13, 0.13) collider=True grab=True
 
 RBC target enabled=True mission matches=True selecting=Near-Far Interactor
 
@@ -24,21 +24,21 @@ RBC lastAcceptedGrabId=rbc
 
 Interactor Gaze Interactor XRGazeInteractor enabled=False hover=False selected=False targets= selectActive=False pos=(0.00, 0.15, 0.00)
 
-Interactor Poke Interactor XRPokeInteractor enabled=True hover=False selected=False targets= selectActive=True pos=(0.03, -0.14, 2.51)
+Interactor Poke Interactor XRPokeInteractor enabled=True hover=False selected=False targets= selectActive=True pos=(0.03, -0.14, 2.56)
 
-Interactor Near-Far Interactor NearFarInteractor enabled=True hover=False selected=False targets= selectActive=False pos=(0.03, -0.14, 2.51)
+Interactor Near-Far Interactor NearFarInteractor enabled=True hover=False selected=False targets= selectActive=False pos=(0.03, -0.14, 2.56)
 
-Interactor Teleport Interactor XRRayInteractor enabled=False hover=False selected=False targets= selectActive=False pos=(0.03, -0.16, 2.47)
+Interactor Teleport Interactor XRRayInteractor enabled=False hover=False selected=False targets= selectActive=False pos=(0.03, -0.16, 2.53)
 
-Interactor Poke Interactor XRPokeInteractor enabled=True hover=False selected=False targets= selectActive=True pos=(0.45, -0.14, 2.51)
+Interactor Poke Interactor XRPokeInteractor enabled=True hover=False selected=False targets= selectActive=True pos=(0.45, -0.14, 2.56)
 
-Interactor Near-Far Interactor NearFarInteractor enabled=True hover=False selected=True targets=Research target — rbc selectActive=True pos=(0.45, -0.14, 2.51)
+Interactor Near-Far Interactor NearFarInteractor enabled=True hover=False selected=True targets=Research target — rbc selectActive=True pos=(0.45, -0.14, 2.56)
 
-Interactor Teleport Interactor XRRayInteractor enabled=False hover=False selected=False targets= selectActive=False pos=(0.45, -0.16, 2.47)
+Interactor Teleport Interactor XRRayInteractor enabled=False hover=False selected=False targets= selectActive=False pos=(0.45, -0.16, 2.53)
 
 Interactor Climb Teleport ClimbTeleportInteractor enabled=True hover=False selected=False targets= selectActive=False pos=(0.00, -1.21, 0.00)
 
-Interactor Desktop mouse XRI hand JourneyDesktopInteractor enabled=True hover=False selected=False targets= selectActive=False pos=(-0.95, 0.75, 1.00)
+Interactor Desktop mouse XRI hand JourneyDesktopInteractor enabled=True hover=False selected=False targets= selectActive=False pos=(-0.95, -0.44, 1.00)
 
 PASS: Right grip actually selects RBC and advances Grab
 
@@ -94,7 +94,7 @@ PASS: Scanner objective expected for leukocyte
 
 Contact leukocyte: Research target — leukocyte / SphereCollider layerInspector=True
 
-Scan leukocyte: step=9 enabled=True lock=leukocyte progress=1 blocker=none aim=(-0.34, 0.06, 0.22) target=(-0.07, -0.41, 5.57) contact=(-0.07, -0.41, 5.57)
+Scan leukocyte: step=9 enabled=True lock=leukocyte progress=1 blocker=none aim=(-0.34, 0.06, 0.22) target=(-0.06, -0.40, 5.65) contact=(-0.06, -0.40, 5.65)
 
 PASS: Scanner completed leukocyte
 
@@ -338,7 +338,7 @@ PASS: Releasing BioTool before charge finishes does not capture embolus
 
 PASS: Moving BioTool capture objective expected for embolus
 
-Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(23.15, 2.98, 92.89) target=(20.81, 2.35, 97.59)
+Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(23.15, 2.98, 92.89) target=(20.81, 2.34, 97.60)
 
 PASS: BioTool captured moving target embolus
 
@@ -412,7 +412,7 @@ PASS: Scanner objective expected for epitope
 
 Contact epitope: Research target — epitope / SphereCollider layerInspector=True
 
-Scan epitope: step=5 enabled=True lock=none progress=1 blocker=none aim=(42.17, 14.36, 124.00) target=(43.64, 14.19, 125.05) contact=(43.64, 14.19, 125.05)
+Scan epitope: step=5 enabled=True lock=none progress=1 blocker=none aim=(42.17, 14.35, 124.00) target=(43.64, 14.19, 125.05) contact=(43.64, 14.19, 125.05)
 
 PASS: Scanner completed epitope
 
@@ -526,7 +526,7 @@ PASS: BioTool target exists: pressure-stable
 
 PASS: BioTool target contact enabled: pressure-stable
 
-Tool pressure-stable: locked=pressure-stable charge=0 radius=0,8017082 pressure=120 aim=(67.76, 4.06, 138.05) contact=(68.76, 3.89, 139.76)
+Tool pressure-stable: locked=pressure-stable charge=0 radius=0,801867 pressure=120 aim=(67.76, 4.06, 138.05) contact=(68.76, 3.89, 139.76)
 
 PASS: BioTool completed pressure-stable
 
@@ -538,7 +538,7 @@ PASS: BioTool target exists: pressure-return
 
 PASS: BioTool target contact enabled: pressure-return
 
-Tool pressure-return: locked=pressure-return charge=0 radius=0,8017082 pressure=120 aim=(67.69, 4.09, 138.07) contact=(67.94, 4.23, 139.90)
+Tool pressure-return: locked=pressure-return charge=0 radius=0,801867 pressure=120 aim=(67.69, 4.09, 138.07) contact=(67.94, 4.23, 139.90)
 
 PASS: BioTool completed pressure-return
 
@@ -568,7 +568,7 @@ PASS: BioTool target exists: leak
 
 PASS: BioTool target contact enabled: leak
 
-Tool leak: locked=none charge=0 radius=0,8017082 pressure=120 aim=(90.69, 2.08, 177.26) contact=(91.35, 2.99, 183.40)
+Tool leak: locked=none charge=0 radius=0,801867 pressure=120 aim=(90.69, 2.08, 177.26) contact=(91.35, 2.99, 183.40)
 
 PASS: BioTool completed leak
 
@@ -578,7 +578,7 @@ PASS: BioTool target exists: pressure-low
 
 PASS: BioTool target contact enabled: pressure-low
 
-Tool pressure-low: locked=pressure-low charge=0 radius=0,8017082 pressure=120 aim=(90.78, 2.08, 177.23) contact=(91.66, 2.36, 178.39)
+Tool pressure-low: locked=pressure-low charge=0 radius=0,801867 pressure=120 aim=(90.78, 2.08, 177.23) contact=(91.66, 2.36, 178.39)
 
 PASS: BioTool completed pressure-low
 
@@ -608,7 +608,7 @@ PASS: BioTool target exists: platelet
 
 PASS: BioTool target contact enabled: platelet
 
-Tool platelet: locked=platelet charge=0 radius=0,8017082 pressure=120 aim=(90.67, 2.05, 177.18) contact=(91.70, 2.91, 183.55)
+Tool platelet: locked=platelet charge=0 radius=0,801867 pressure=120 aim=(90.67, 2.05, 177.18) contact=(91.70, 2.91, 183.55)
 
 PASS: BioTool completed platelet
 
@@ -652,7 +652,7 @@ PASS: BioTool target exists: thrombin
 
 PASS: BioTool target contact enabled: thrombin
 
-Tool thrombin: locked=thrombin charge=0 radius=0,8017082 pressure=120 aim=(90.67, 2.02, 177.18) contact=(91.69, 1.87, 182.99)
+Tool thrombin: locked=thrombin charge=0 radius=0,801867 pressure=120 aim=(90.67, 2.02, 177.18) contact=(91.69, 1.87, 182.99)
 
 PASS: BioTool completed thrombin
 
@@ -782,7 +782,7 @@ PASS: BioTool target exists: open-flow
 
 PASS: BioTool target contact enabled: open-flow
 
-Tool open-flow: locked=open-flow charge=0 radius=0,8017082 pressure=120 aim=(90.77, 2.07, 177.13) contact=(92.28, 2.53, 178.41)
+Tool open-flow: locked=open-flow charge=0 radius=0,801867 pressure=120 aim=(90.77, 2.07, 177.13) contact=(92.28, 2.53, 178.41)
 
 PASS: BioTool completed open-flow
 
@@ -806,7 +806,7 @@ PASS: BioTool target exists: cleanup-mode
 
 PASS: BioTool target contact enabled: cleanup-mode
 
-Tool cleanup-mode: locked=cleanup-mode charge=0 radius=0,8017082 pressure=120 aim=(90.67, 2.03, 177.18) contact=(91.43, 2.01, 182.64)
+Tool cleanup-mode: locked=cleanup-mode charge=0 radius=0,801867 pressure=120 aim=(90.67, 2.03, 177.18) contact=(91.43, 2.01, 182.64)
 
 PASS: BioTool completed cleanup-mode
 
@@ -832,7 +832,7 @@ PASS: BioTool target exists: plasmin
 
 PASS: BioTool target contact enabled: plasmin
 
-Tool plasmin: locked=plasmin charge=0 radius=0,8017082 pressure=120 aim=(90.68, 2.03, 177.17) contact=(92.01, 1.93, 183.32)
+Tool plasmin: locked=plasmin charge=0 radius=0,801867 pressure=120 aim=(90.68, 2.03, 177.17) contact=(92.01, 1.93, 183.32)
 
 PASS: BioTool completed plasmin
 
@@ -844,7 +844,7 @@ PASS: BioTool target exists: repair
 
 PASS: BioTool target contact enabled: repair
 
-Tool repair: locked=healed-wall charge=0 radius=0,8017082 pressure=120 aim=(90.66, 2.05, 177.18) contact=(91.35, 2.99, 183.40)
+Tool repair: locked=healed-wall charge=0 radius=0,801867 pressure=120 aim=(90.66, 2.05, 177.18) contact=(91.35, 2.99, 183.40)
 
 PASS: BioTool completed repair
 
@@ -908,7 +908,7 @@ PASS: BioTool target exists: neutralized
 
 PASS: BioTool target contact enabled: neutralized
 
-Tool neutralized: locked=infected-cell charge=0 radius=0,8017082 pressure=120 aim=(119.00, 16.38, 233.02) contact=(121.05, 17.54, 235.62)
+Tool neutralized: locked=infected-cell charge=0 radius=0,801867 pressure=120 aim=(119.00, 16.38, 233.02) contact=(121.05, 17.54, 235.62)
 
 PASS: BioTool completed neutralized
 
@@ -918,7 +918,7 @@ PASS: BioTool target exists: t-cell
 
 PASS: BioTool target contact enabled: t-cell
 
-Tool t-cell: locked=none charge=0 radius=0,8017082 pressure=120 aim=(119.04, 16.28, 232.99) contact=(121.20, 16.98, 235.38)
+Tool t-cell: locked=none charge=0 radius=0,801867 pressure=120 aim=(119.04, 16.28, 232.99) contact=(121.20, 16.97, 235.38)
 
 PASS: BioTool completed t-cell
 
@@ -938,7 +938,7 @@ PASS: BioTool target exists: check-pressure
 
 PASS: BioTool target contact enabled: check-pressure
 
-Tool check-pressure: locked=check-pressure charge=0 radius=0,8017082 pressure=120 aim=(118.95, 16.27, 233.04) contact=(119.59, 15.61, 234.81)
+Tool check-pressure: locked=check-pressure charge=0 radius=0,801867 pressure=120 aim=(118.95, 16.27, 233.04) contact=(119.59, 15.61, 234.81)
 
 PASS: BioTool completed check-pressure
 
@@ -948,7 +948,7 @@ PASS: BioTool target exists: check-temperature
 
 PASS: BioTool target contact enabled: check-temperature
 
-Tool check-temperature: locked=check-temperature charge=0 radius=0,8017082 pressure=120 aim=(118.97, 16.32, 233.04) contact=(119.66, 16.25, 234.70)
+Tool check-temperature: locked=check-temperature charge=0 radius=0,801867 pressure=120 aim=(118.97, 16.32, 233.04) contact=(119.66, 16.25, 234.70)
 
 PASS: BioTool completed check-temperature
 
@@ -958,7 +958,7 @@ PASS: BioTool target exists: check-flow
 
 PASS: BioTool target contact enabled: check-flow
 
-Tool check-flow: locked=check-flow charge=0 radius=0,8017082 pressure=120 aim=(118.97, 16.37, 233.03) contact=(119.73, 16.88, 234.58)
+Tool check-flow: locked=check-flow charge=0 radius=0,801867 pressure=120 aim=(118.97, 16.37, 233.03) contact=(119.73, 16.88, 234.58)
 
 PASS: BioTool completed check-flow
 
@@ -984,7 +984,7 @@ PASS: BioTool target exists: check-hemostasis
 
 PASS: BioTool target contact enabled: check-hemostasis
 
-Tool check-hemostasis: locked=check-hemostasis charge=0 radius=0,8017082 pressure=120 aim=(119.03, 16.36, 233.01) contact=(120.32, 16.75, 234.22)
+Tool check-hemostasis: locked=check-hemostasis charge=0 radius=0,801867 pressure=120 aim=(119.03, 16.36, 233.01) contact=(120.32, 16.75, 234.22)
 
 PASS: BioTool completed check-hemostasis
 

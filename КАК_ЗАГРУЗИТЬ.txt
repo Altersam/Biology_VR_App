@@ -1,41 +1,33 @@
-ЗАГРУЖАЙТЕ ЭТУ ПАПКУ В НОВЫЙ РЕПОЗИТОРИЙ Biology_VR_App.
-Существующий Altersam/Biology_VR выбирать не нужно.
+ОБНОВЛЕНИЕ ГОТОВО: bio_v0.2 / Coral V6 / версия 0.2.0.
+Все новые файлы уже находятся в этой папке Biology_VR_App.
 
-1. Установите GitHub Desktop: https://desktop.github.com/
-   Откройте программу и войдите в свой аккаунт Altersam.
+1. Откройте GitHub Desktop.
+2. В Current repository выберите Biology_VR_App.
+3. Во вкладке Changes проверьте изменения.
+4. Summary: Update to bio_v0.2 Coral V6
+5. Нажмите Commit to main.
+6. Нажмите Push origin и дождитесь завершения.
 
-2. В этой папке дважды нажмите 1_PREPARE_UPLOAD.cmd.
-   Скрипт подготовит локальный Git и Git LFS.
-   Он НЕ делает commit, НЕ подключается к GitHub и НЕ загружает файлы.
+Повторно создавать репозиторий или нажимать Publish repository не нужно.
+Ничего из bio_v0.2 копировать вручную не нужно — всё уже перенесено.
 
-3. В GitHub Desktop: File → Add local repository → Choose.
-   Выберите ЭТУ папку Biology_VR_App, не вложенную unity и не старый репозиторий.
-   Нажмите Add repository.
+После обновления GitHub Pages:
+https://altersam.github.io/Biology_VR_App/
+Игра напрямую:
+https://altersam.github.io/Biology_VR_App/play/
 
-4. В поле Summary напишите: Initial Biology VR app.
-   Нажмите Commit to main. Дождитесь окончания: ресурсов много.
+Если браузер показывает прежний вариант, нажмите Ctrl+F5.
+Settings → Pages: Deploy from a branch → main → /(root).
 
-5. Нажмите Publish repository.
-   Name: Biology_VR_App
-   Снимите Keep this code private, чтобы репозиторий был Public.
-   Нажмите Publish repository и дождитесь завершения.
+APK ДЛЯ ШЛЕМОВ:
+ReleaseFiles содержит свежие APK 0.2.0 для Meta Quest и Pico 4 Enterprise.
+В https://github.com/Altersam/Biology_VR_App откройте Releases → Draft a new release.
+Tag: v0.2.0. Прикрепите обе APK из ReleaseFiles и нажмите Publish release.
+APK исключены из обычного Git commit — это правильно.
 
-6. Откройте НОВЫЙ репозиторий:
-   https://github.com/Altersam/Biology_VR_App
-   Settings → Pages → Source: Deploy from a branch.
-   Branch: main. Folder: /(root). Нажмите Save.
+Если эта папка открывается на новом компьютере без Git LFS, запустите
+1_PREPARE_UPLOAD.cmd один раз, затем добавьте папку через Add local repository.
+Для обычного обновления уже настроенного репозитория этот шаг не нужен.
 
-7. Через несколько минут сайт появится по адресу:
-   https://altersam.github.io/Biology_VR_App/
-   Игра напрямую:
-   https://altersam.github.io/Biology_VR_App/play/
-
-ГОТОВО. Старый сайт https://altersam.github.io/Biology_VR/ сохраняется.
-
-APK ДЛЯ ШЛЕМОВ (ПО ЖЕЛАНИЮ):
-В новом репозитории Releases → Create a new release → Tag: v0.1.
-Перетащите APK из папки ReleaseFiles и нажмите Publish release.
-APK не загружаются с исходниками через Git: они уже исключены из Git.
-
-В папке собраны Unity-проект, готовая WebGL-игра, стартовая страница и APK.
-Ничего из Library, Temp или старого проекта копировать дополнительно не нужно.
+Существующий репозиторий Altersam/Biology_VR и сайт концепта не изменены.
+Агент обновил локальные файлы, но commit и push не выполнял.

@@ -82,6 +82,16 @@ namespace BiologyVR.ArteryRoute.Editor
             Debug.Log("Current scene dependency audit passed: "+kept.Count+" assets");
         }
 
+        [MenuItem("Biology VR/Open Prepared Unity Project")]
+        public static void OpenPreparedProject()
+        {
+            if(EditorApplication.isPlaying)throw new InvalidOperationException("Exit Play Mode first");
+            var request=Newtonsoft.Json.Linq.JObject.Parse(File.ReadAllText("Tools/prepared_project.json"));
+            string path=(string)request["path"];
+            if(!File.Exists(Path.Combine(path,"ProjectSettings","ProjectVersion.txt")))throw new InvalidOperationException("Prepared Unity project is missing");
+            AssetDatabase.SaveAssets();EditorSceneManager.SaveOpenScenes();EditorApplication.OpenProject(path);
+        }
+
         [MenuItem("Biology VR/Open Verified Bio v0.1 Copy")]
         public static void OpenCopy()
         {

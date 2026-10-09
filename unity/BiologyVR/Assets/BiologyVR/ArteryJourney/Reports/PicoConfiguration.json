@@ -1,0 +1,27 @@
+{
+  "utc": "2026-10-09T05:51:08.3525529Z",
+  "device": "Pico 4 Enterprise",
+  "androidSupported": true,
+  "minSdk": 29,
+  "targetSdk": 34,
+  "graphics": "OpenGLES3",
+  "architecture": "ARM64",
+  "picoSdk": "1.4.1",
+  "enabledFeatures": [
+    "OpenXRCompositionLayersFeature",
+    "PICOFeature",
+    "PICO4ControllerProfile"
+  ],
+  "validation": [
+    {
+      "message": "The OpenXR Package Settings asset has duplicate settings and must be regenerated.",
+      "error": false
+    }
+  ],
+  "interactivePoolIndices": [
+    1,
+    10,
+    9
+  ],
+  "headsetVerified": false
+}

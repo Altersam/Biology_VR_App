@@ -30,6 +30,7 @@ def main():
         checks = {
             "manifest_readable": code == 0 and xmlcode == 0,
             "application_id": "package: name='com.biologyvr.arteryjourney'" in badging,
+            "version_0_2_0": "versionName='0.2.0'" in badging and "versionCode='3'" in badging,
             "min_sdk_29": "sdkVersion:'29'" in badging,
             "target_sdk_34": "targetSdkVersion:'34'" in badging,
             "arm64_only": "native-code: 'arm64-v8a'" in badging and all("/arm64-v8a/" in name for name in native),

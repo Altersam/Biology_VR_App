@@ -1,5 +1,5 @@
 {
-  "utc": "2026-10-08T14:43:51.831462+00:00",
+  "utc": "2026-10-09T05:41:47.880209+00:00",
   "loaded": true,
   "passed": true,
   "method": "Chromium WebGL load over plain HTTP without Content-Encoding/COOP/COEP; canvas focus and Tab keyboard events; not a full browser playthrough",
@@ -20,7 +20,7 @@
     },
     {
       "type": "log",
-      "text": "[UnityCache] 'http://127.0.0.1:63865/play/Build/play.data.unityweb' successfully downloaded and stored in the browser cache"
+      "text": "[UnityCache] 'http://127.0.0.1:59899/play/Build/play.data.unityweb' successfully downloaded and stored in the browser cache"
     },
     {
       "type": "log",
@@ -240,7 +240,7 @@
     },
     {
       "type": "log",
-      "text": "UnloadTime: 0.700000 ms\n"
+      "text": "UnloadTime: 0.600000 ms\n"
     },
     {
       "type": "warning",
@@ -248,7 +248,7 @@
     },
     {
       "type": "log",
-      "text": "Audio context resumed after 0.679 seconds."
+      "text": "Audio context resumed after 0.552 seconds."
     },
     {
       "type": "log",

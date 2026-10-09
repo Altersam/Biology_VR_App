@@ -6,10 +6,11 @@ ARM64, IL2CPP, OpenXR, OpenGLES3, Single Pass Instanced.
 Pico runtime исключается из этой отдельной Android-сборки.
 
 Файл: `Builds/MetaQuest/BiologyVR_MetaQuest.apk`.
-Финальная сборка UTC **2026-10-08T14:47:18.5292796Z**, **89 505 864 bytes**.
+Актуальная сборка Coral V6 **0.2.0**, versionCode **3**, UTC
+**2026-10-09T05:47:50.1622173Z**, **88 034 621 bytes**.
 Artifact verification PASS: Quest manifest, ARM64/IL2CPP/OpenXR, valid signature,
 без Pico manifest/native libraries. Включён Inter с кириллицей для интерфейса.
-SHA-256: `b4e944be72b4a42578ccb409965e2ddeafe3b9390103b391c2d03c22aa2460f3`.
+SHA-256: `4d884fa7a2c7e630fe4548cf3ba25755d4c49ac639a7a21e1e2ff9f0cc0de5c8`.
 Повторная сборка: меню **Biology VR → Build Meta Quest APK**.
 Для Android используйте ASCII-путь проекта (локальный junction или clone
 в C:\Projects\Biology_VR\unity\BiologyVR).
@@ -46,6 +47,5 @@ powershell -NoProfile -ExecutionPolicy Bypass -File ".\Tools\install_quest_apk.p
 Физическая проверка изображения, контроллеров и производительности Quest
 требует подключённого устройства; standalone APK-проверка её не заменяет.
 
-В BuildReport оставлены 6 сообщений от MCP editor test-файла без .meta;
-они не относятся к игровому player и не скрыты в отчёте. Сборка Succeeded,
-отдельная проверка настоящего APK PASS.
+Актуальный BuildReport: Succeeded, **0 errors**, 10 warnings.
+Отдельная проверка настоящего APK PASS; это не физический headset test.

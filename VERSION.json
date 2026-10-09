@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "unity": "6000.1.9f1",
+  "art": "Coral V6",
+  "updated_utc": "2026-10-09T05:58:56.629727+00:00",
+  "releases": [
+    {
+      "file": "BiologyVR_MetaQuest.apk",
+      "bytes": 88034621,
+      "sha256": "4d884fa7a2c7e630fe4548cf3ba25755d4c49ac639a7a21e1e2ff9f0cc0de5c8"
+    },
+    {
+      "file": "BiologyVR_Pico4Enterprise.apk",
+      "bytes": 102963647,
+      "sha256": "8cfbb22c2b83fe1ed7ce9e4bbffeaba159b75121d781421530c32cf49db5c6f4"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "utc": "2026-10-09T05:54:32.318306+00:00",
+  "passed": true,
+  "path": "Z:\\YandexDisk\\ПетПроекты\\Biology_VR\\3д\\Unity\\bio_v0.2\\Builds\\Pico4Enterprise\\BiologyVR_Pico4Enterprise.apk",
+  "size_bytes": 102963647,
+  "sha256": "8cfbb22c2b83fe1ed7ce9e4bbffeaba159b75121d781421530c32cf49db5c6f4",
+  "checks": {
+    "manifest_readable": true,
+    "application_id": true,
+    "version_0_2_0": true,
+    "min_sdk_29": true,
+    "target_sdk_34": true,
+    "arm64_only": true,
+    "unity_runtime": true,
+    "il2cpp_runtime": true,
+    "openxr_runtime": true,
+    "pico_vr_manifest": true,
+    "pico_sdk_manifest": true,
+    "controller_manifest": true,
+    "signature_valid": true
+  },
+  "native_libraries": [
+    "lib/arm64-v8a/lib_burst_generated.so",
+    "lib/arm64-v8a/libc++_shared.so",
+    "lib/arm64-v8a/libCameraRenderingPlugin.so",
+    "lib/arm64-v8a/libPICO_TOBAPI.so",
+    "lib/arm64-v8a/libUnityARFoundationAndroidXR.so",
+    "lib/arm64-v8a/libUnityOpenXR.so",
+    "lib/arm64-v8a/libUnityOpenXRHands.so",
+    "lib/arm64-v8a/libil2cpp.so",
+    "lib/arm64-v8a/libmain.so",
+    "lib/arm64-v8a/libopenxr_loader.so",
+    "lib/arm64-v8a/libopenxr_pico.so",
+    "lib/arm64-v8a/libpvrcapturelib.so",
+    "lib/arm64-v8a/libpxrplatformloader.so",
+    "lib/arm64-v8a/libswappywrapper.so",
+    "lib/arm64-v8a/libunity.so"
+  ],
+  "badging": "package: name='com.biologyvr.arteryjourney' versionCode='3' versionName='0.2.0' platformBuildVersionName='14' platformBuildVersionCode='34' compileSdkVersion='34' compileSdkVersionCodename='14'\ninstall-location:'auto'\nsdkVersion:'29'\ntargetSdkVersion:'34'\nuses-permission: name='android.permission.INTERNET'\nuses-permission: name='com.pvr.tobactivate.permission.AUTH_CHECK'\napplication-label:'Biology VR'\napplication-icon-160:'res/mipmap-anydpi-v26/app_icon.xml'\napplication-icon-65534:'res/mipmap-anydpi-v26/app_icon.xml'\napplication: label='Biology VR' icon='res/mipmap-anydpi-v26/app_icon.xml'\napplication-debuggable\nlaunchable-activity: name='com.unity3d.player.UnityPlayerActivity'  label='' icon=''\nfeature-group: label=''\n  uses-gl-es: '0x30000'\n  uses-feature-not-required: name='android.hardware.touchscreen'\n  uses-feature-not-required: name='android.hardware.touchscreen.multitouch'\n  uses-feature-not-required: name='android.hardware.touchscreen.multitouch.distinct'\nmain\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--'\ndensities: '160' '65534'\nnative-code: 'arm64-v8a'\n",
+  "signature": "Verifies\nVerified using v1 scheme (JAR signing): false\nVerified using v2 scheme (APK Signature Scheme v2): true\nVerified using v3 scheme (APK Signature Scheme v3): false\nVerified using v3.1 scheme (APK Signature Scheme v3.1): false\nVerified using v4 scheme (APK Signature Scheme v4): false\nVerified for SourceStamp: false\nNumber of signers: 1\n",
+  "headset_verified": false
+}

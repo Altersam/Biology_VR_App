@@ -1,0 +1,22 @@
+[
+  {
+    "file": "ArteryNarrativeVR_before_CoralV6.unity",
+    "sha256": "9d73deaff4e45717a531b7dd4917fb52834bc4d83592898a990161b8d1576eb8",
+    "verified": true
+  },
+  {
+    "file": "ArteryVisualV2.shader.txt",
+    "sha256": "84cd3056ba7ff00f31a7f3b9d4584e1a288a94dc3cc1ef1f303a14f9a5de35b4",
+    "verified": true
+  },
+  {
+    "file": "ArteryVisualEnvironmentV8.cs.txt",
+    "sha256": "8686eed467fb793d399b943759cae1388f823f57176cb49af4ae9115b8204867",
+    "verified": true
+  },
+  {
+    "file": "JourneyArteryPresentation.cs.txt",
+    "sha256": "a994351a7f5b07e1408e933cf09dc70ea72e7d897f5270c23405ee284580022a",
+    "verified": true
+  }
+]

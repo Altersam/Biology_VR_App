@@ -1,0 +1,14 @@
+{
+  "utc": "2026-10-08T20:41:54.4870658Z",
+  "method": "01 is fresh authored player camera with PC overlay, no scene Enter/Accept or forced facing; 02-04 are camera-only art review views, no mission staging",
+  "playerPosition": "(-2.3554865E-05, 0.149999976, -0.00014556828)",
+  "playerRotation": "(-0.0009997374, 0.07416362, 7.434894E-05, 0.9972456)",
+  "editorStats": {
+    "batches": 280,
+    "drawCalls": 280,
+    "triangles": 129705,
+    "vertices": 101866
+  },
+  "statsScope": "Editor only, not Quest/Pico GPU/FPS",
+  "hardwareVerified": false
+}

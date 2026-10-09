@@ -1,0 +1,22 @@
+{
+  "size": 2048,
+  "style": "warm concept-inspired cartoon",
+  "version": "V5",
+  "physical_chart_m": [
+    3.5,
+    5.6
+  ],
+  "cells_per_tile": [
+    7,
+    3
+  ],
+  "elongated_along": "V / flow",
+  "variation": "independent width/length +/- 16-17%, warped boundaries, small orientation jitter",
+  "seed": 8,
+  "maps": [
+    "sRGB Base",
+    "linear tangent Normal",
+    "linear AO/dome/nucleus detail"
+  ],
+  "noise": "none"
+}

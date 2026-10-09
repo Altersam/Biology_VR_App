@@ -21,6 +21,13 @@ Shader "BiologyVR/Artery Visual V2"
         _VisualExposure("Tissue brightness",Range(.5,1.2))=1
         _SheenStrength("Membrane sheen strength",Range(0,.2))=.16
         _RimStrength("Soft rim strength",Range(0,.08))=.035
+        _OrganicRelief("Visual-only endothelial panel depth",Range(0,.12))=0
+        _ProtectedArcs("Inspection / plaque / wound arcs and radius",Vector)=(0,0,0,0)
+        _CircumferenceTiles("Continuous circular panel tiles",Float)=0
+        _ZoneTint("Warm story-zone variation",Color)=(1,1,1,1)
+        _DepthColor("Distant warm arterial shade",Color)=(.78,.52,.42,1)
+        _DepthStrength("Simple depth gradient",Range(0,.5))=.16
+        _PulseBpm("Visual heartbeat BPM",Range(40,120))=72
     }
     SubShader
     {
@@ -32,6 +39,7 @@ Shader "BiologyVR/Artery Visual V2"
             HLSLPROGRAM
             #pragma vertex Vert
             #pragma fragment Frag
+            #pragma target 3.5
             #pragma multi_compile_instancing
             #pragma multi_compile_fog
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
@@ -44,6 +52,7 @@ Shader "BiologyVR/Artery Visual V2"
             float4 _BaseMap_ST,_ToneCentre;half4 _BaseColor,_EmissionColor,_PatchColor;
             half _Smoothness,_NormalStrength,_Reveal,_PulseAmplitude,_Tone,_PatchMask,_AllowWallCutaway,_SectionReveal;
             half _CartoonBands,_VisualExposure,_SheenStrength,_RimStrength;
+            half _OrganicRelief,_CircumferenceTiles,_DepthStrength,_PulseBpm;float4 _ProtectedArcs;half4 _ZoneTint,_DepthColor;
             CBUFFER_END
             float4 _InspectionOriginWS,_InspectionUpWS,_InspectionForwardWS,_InspectionRightWS,_InspectionHalfSize;
             float _InspectionReveal;
@@ -52,13 +61,16 @@ Shader "BiologyVR/Artery Visual V2"
             V Vert(A i)
             {
                 V o=(V)0;UNITY_SETUP_INSTANCE_ID(i);UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+                float2 panelUV=i.uv;
+                if(_CircumferenceTiles>.001)
+                    panelUV.x=i.uv.x*3.5/max(.01,length(i.p.xyz-i.centre)*6.2831853)*_CircumferenceTiles;
                 // Identical vertex motion to the fallback; no UV/mesh/collider edits.
-                float pulse=_PulseAmplitude*(.5+.5*sin(_Time.y*7.5398));
+                float pulse=_PulseAmplitude*(.5+.5*sin(_Time.y*_PulseBpm*.10471976));
                 float weight=1-smoothstep(4,12,distance(TransformObjectToWorld(i.centre),_ToneCentre.xyz));
                 i.p.xyz+=(i.p.xyz-i.centre)*(pulse+(_Tone-1)*weight);
                 VertexPositionInputs p=GetVertexPositionInputs(i.p.xyz);VertexNormalInputs n=GetVertexNormalInputs(i.n,i.t);
                 o.p=p.positionCS;o.ws=p.positionWS;o.n=n.normalWS;o.t=n.tangentWS;o.b=n.bitangentWS;
-                o.uv=TRANSFORM_TEX(i.uv,_BaseMap);o.localUV=i.uv;o.fog=ComputeFogFactor(p.positionCS.z);return o;
+                o.uv=TRANSFORM_TEX(panelUV,_BaseMap);o.localUV=i.uv;o.fog=ComputeFogFactor(p.positionCS.z);return o;
             }
             half4 Frag(V i):SV_Target
             {
@@ -78,7 +90,7 @@ Shader "BiologyVR/Artery Visual V2"
                 half3 n=normalize(i.t*nm.x+i.b*nm.y+i.n*nm.z),v=GetWorldSpaceNormalizeViewDir(i.ws);
                 if(dot(n,v)<0)n=-n;
                 Light l=GetMainLight();half w=saturate((dot(n,l.direction)+.42)/1.42);
-                half3 base=SAMPLE_TEXTURE2D(_BaseMap,sampler_BaseMap,i.uv).rgb*_BaseColor.rgb;
+                half3 base=SAMPLE_TEXTURE2D(_BaseMap,sampler_BaseMap,i.uv).rgb*_BaseColor.rgb*_ZoneTint.rgb;
                 half3 detail=SAMPLE_TEXTURE2D(_DetailMap,sampler_DetailMap,i.uv).rgb;
                 half macro=.5+.5*sin(i.uv.y*.43+sin(i.uv.x*.55)*.3);
                 base*=lerp(half3(1.07,.91,.92),half3(1.04,1.09,1.02),macro);
@@ -92,8 +104,8 @@ Shader "BiologyVR/Artery Visual V2"
                 col+=sheen*half3(1,.93,.83)+base*pow(1-saturate(dot(n,v)),4)*w*_RimStrength;
                 half edge=pow(1-saturate(dot(n,v)),8)*.10;
                 col=lerp(col,col*half3(.64,.34,.42),edge)+_EmissionColor.rgb;
-                half depth=smoothstep(22,68,distance(i.ws,_WorldSpaceCameraPos));
-                col=lerp(col,half3(.78,.52,.42),depth*.16);
+                half depth=smoothstep(18,85,distance(i.ws,_WorldSpaceCameraPos));
+                col=lerp(col,_DepthColor.rgb,depth*_DepthStrength);
                 return half4(MixFog(col*_VisualExposure,i.fog),1);
             }
             ENDHLSL

@@ -137,6 +137,8 @@ namespace BiologyVR.ArteryRoute.Editor
         public static void BeforeConcept()=>BeginCapture("BeforeConceptV4");
         [MenuItem("Biology VR/Concept V4/Capture After")]
         public static void AfterConcept()=>BeginCapture("ConceptV4");
+        [MenuItem("Biology VR/BioWorld V5/Capture Review")]
+        public static void AfterBioWorld()=>BeginCapture("BioWorldV5");
         static void BeginCapture(string version)
         {if(!EditorApplication.isPlaying||captureRunning)throw new InvalidOperationException("Fresh Play Mode and no other capture required");captureRunning=true;EditorCoroutineUtility.StartCoroutineOwnerless(Capture(version));}
         static IEnumerator Capture(string version)

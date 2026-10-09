@@ -1,9 +1,9 @@
 {
-  "utc": "2026-10-08T12:43:23.9982008Z",
+  "utc": "2026-10-08T20:43:55.0063958Z",
   "passed": true,
   "method": "Native MouseState position/buttons/scroll and KeyboardState; Scene03 fresh start, isolated Enter(scene,false) fixtures for Scene07/12/10/14; no success APIs",
   "checks": [
-    "Native grab diagnostic: active=True grip=True holding=True hover=none targetSelected=True grabbed=True step=1 pointer=(909.87, 406.08) screen=1784x977 target=(0.43, -0.14, 2.49) camera=(0.00, 0.15, 0.00) mousePressed=False enabled=True currentMatches=True",
+    "Native grab diagnostic: active=True grip=True holding=True hover=none targetSelected=True grabbed=True step=1 pointer=(905.88, 406.55) screen=1783x975 target=(0.43, -0.14, 2.56) camera=(0.00, 0.15, 0.00) mousePressed=False enabled=True currentMatches=True",
     "PASS: Native LMB holds RBC through actual desktop XRI interactor",
     "PASS: Mouse cursor drags the held object without rotating the camera",
     "PASS: F scans the dragged object under the cursor",

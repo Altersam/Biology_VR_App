@@ -1,5 +1,5 @@
 {
-  "utc": "2026-10-08T14:45:00.9707578Z",
+  "utc": "2026-10-09T05:43:07.0749842Z",
   "device": "Meta Quest 2 / Pro / 3 / 3S",
   "supportedDevices": [
     "quest2",
@@ -22,14 +22,6 @@
   "validation": [
     {
       "message": "The OpenXR Package Settings asset has duplicate settings and must be regenerated.",
-      "error": false
-    },
-    {
-      "message": "[Optional] Switch to use InputSystem.XR.PoseControl instead of OpenXR.Input.PoseControl, which will be deprecated in a future release.",
-      "error": false
-    },
-    {
-      "message": "[Optional] Switch to use StickControl thumbsticks instead of Vector2Control, but may break existing projects that have code dependencies to the Vector2Control type. StickControl allows more input options for thumbstick-based control, such as acting as both a combined 2D vector, two independent axes or a four-way Dpad with 4 independent buttons.",
       "error": false
     },
     {

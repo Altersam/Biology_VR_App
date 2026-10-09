@@ -1,0 +1,119 @@
+Shader "BiologyVR/Artery Visual V2"
+{
+    Properties
+    {
+        _BaseMap("Endothelial illustration",2D)="white"{}
+        _NormalMap("Shallow membrane relief",2D)="bump"{}
+        _DetailMap("AO / dome / nucleus",2D)="white"{}
+        _BaseColor("Tissue tint",Color)=(1,1,1,1)
+        _EmissionColor("Study feedback",Color)=(0,0,0,1)
+        _Smoothness("Soft sheen",Range(0,1))=.28
+        _NormalStrength("Membrane normal",Range(0,2))=.8
+        _Reveal("Healing reveal",Range(0,1))=1
+        _PulseAmplitude("Existing radial pulse",Range(0,.03))=.006
+        _Tone("Existing local tone",Range(.5,1.5))=1
+        _ToneCentre("Existing tone anchor",Vector)=(0,0,0,0)
+        _PatchColor("Anatomy colour",Color)=(1,.6,.45,1)
+        _PatchMask("Anatomy mask",Range(0,1))=0
+        _AllowWallCutaway("Existing inspection window",Float)=0
+        _SectionReveal("Existing plaque cutaway",Range(0,1))=0
+        _CartoonBands("Soft cartoon amount",Range(0,1))=0
+        _VisualExposure("Tissue brightness",Range(.5,1.2))=1
+        _SheenStrength("Membrane sheen strength",Range(0,.2))=.16
+        _RimStrength("Soft rim strength",Range(0,.08))=.035
+        _OrganicRelief("Visual-only endothelial panel depth",Range(0,.12))=0
+        _ProtectedArcs("Inspection / plaque / wound arcs and radius",Vector)=(0,0,0,0)
+        _CircumferenceTiles("Continuous circular panel tiles",Float)=0
+        _ZoneTint("Warm story-zone variation",Color)=(1,1,1,1)
+    }
+    SubShader
+    {
+        Tags {"RenderPipeline"="UniversalPipeline" "RenderType"="Opaque"}
+        Cull Off
+        Pass
+        {
+            Tags {"LightMode"="UniversalForward"}
+            HLSLPROGRAM
+            #pragma vertex Vert
+            #pragma fragment Frag
+            #pragma target 3.5
+            #pragma multi_compile_instancing
+            #pragma multi_compile_fog
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Packing.hlsl"
+            TEXTURE2D(_BaseMap);SAMPLER(sampler_BaseMap);
+            TEXTURE2D(_NormalMap);SAMPLER(sampler_NormalMap);
+            TEXTURE2D(_DetailMap);SAMPLER(sampler_DetailMap);
+            CBUFFER_START(UnityPerMaterial)
+            float4 _BaseMap_ST,_ToneCentre;half4 _BaseColor,_EmissionColor,_PatchColor;
+            half _Smoothness,_NormalStrength,_Reveal,_PulseAmplitude,_Tone,_PatchMask,_AllowWallCutaway,_SectionReveal;
+            half _CartoonBands,_VisualExposure,_SheenStrength,_RimStrength;
+            half _OrganicRelief,_CircumferenceTiles;float4 _ProtectedArcs;half4 _ZoneTint;
+            CBUFFER_END
+            float4 _InspectionOriginWS,_InspectionUpWS,_InspectionForwardWS,_InspectionRightWS,_InspectionHalfSize;
+            float _InspectionReveal;
+            struct A {float4 p:POSITION;float3 n:NORMAL;float4 t:TANGENT;float2 uv:TEXCOORD0;float3 centre:TEXCOORD1;UNITY_VERTEX_INPUT_INSTANCE_ID};
+            struct V {float4 p:SV_POSITION;float3 ws:TEXCOORD0;half3 n:TEXCOORD1;half3 t:TEXCOORD2;half3 b:TEXCOORD3;float2 uv:TEXCOORD4;half fog:TEXCOORD5;float2 localUV:TEXCOORD6;UNITY_VERTEX_OUTPUT_STEREO};
+            V Vert(A i)
+            {
+                V o=(V)0;UNITY_SETUP_INSTANCE_ID(i);UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+                float2 panelUV=i.uv;
+                if(_CircumferenceTiles>.001)
+                    panelUV.x=i.uv.x*3.5/max(.01,length(i.p.xyz-i.centre)*6.2831853)*_CircumferenceTiles;
+                // Identical vertex motion to the fallback; no UV/mesh/collider edits.
+                float pulse=_PulseAmplitude*(.5+.5*sin(_Time.y*7.5398));
+                float weight=1-smoothstep(4,12,distance(TransformObjectToWorld(i.centre),_ToneCentre.xyz));
+                i.p.xyz+=(i.p.xyz-i.centre)*(pulse+(_Tone-1)*weight);
+                if(_OrganicRelief>.0001)
+                {
+                    float arc=i.uv.y*5.6;
+                    float protectedDistance=min(abs(arc-_ProtectedArcs.x),min(abs(arc-_ProtectedArcs.y),abs(arc-_ProtectedArcs.z)));
+                    float safe=smoothstep(_ProtectedArcs.w,_ProtectedArcs.w+1.2,protectedDistance);
+                    float dome=SAMPLE_TEXTURE2D_LOD(_DetailMap,sampler_DetailMap,TRANSFORM_TEX(panelUV,_BaseMap),0).g;
+                    i.p.xyz+=normalize(i.n)*(_OrganicRelief*dome*safe);
+                }
+                VertexPositionInputs p=GetVertexPositionInputs(i.p.xyz);VertexNormalInputs n=GetVertexNormalInputs(i.n,i.t);
+                o.p=p.positionCS;o.ws=p.positionWS;o.n=n.normalWS;o.t=n.tangentWS;o.b=n.bitangentWS;
+                o.uv=TRANSFORM_TEX(panelUV,_BaseMap);o.localUV=i.uv;o.fog=ComputeFogFactor(p.positionCS.z);return o;
+            }
+            half4 Frag(V i):SV_Target
+            {
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+                // Exact fallback clip semantics preserve real inspection/wound contacts.
+                if(_AllowWallCutaway>.5&&_InspectionReveal>.001)
+                {
+                    float3 d=i.ws-_InspectionOriginWS.xyz;
+                    float2 chart=float2(dot(d,_InspectionUpWS.xyz)/_InspectionHalfSize.x,dot(d,_InspectionForwardWS.xyz)/_InspectionHalfSize.y);
+                    float2 rounded=abs(chart/max(.001,_InspectionReveal))-.84;
+                    float edge=length(max(rounded,0))+min(max(rounded.x,rounded.y),0)-.16;
+                    if(abs(dot(d,_InspectionRightWS.xyz))<.7)clip(edge);
+                }
+                if(_Reveal<.9999)clip(_Reveal-i.localUV.y+.0001);
+                if(_SectionReveal>.001)clip(length((i.localUV-.5)*float2(2.9,3.5))-_SectionReveal*.72);
+                half3 nm=UnpackNormalScale(SAMPLE_TEXTURE2D(_NormalMap,sampler_NormalMap,i.uv),_NormalStrength);
+                half3 n=normalize(i.t*nm.x+i.b*nm.y+i.n*nm.z),v=GetWorldSpaceNormalizeViewDir(i.ws);
+                if(dot(n,v)<0)n=-n;
+                Light l=GetMainLight();half w=saturate((dot(n,l.direction)+.42)/1.42);
+                half3 base=SAMPLE_TEXTURE2D(_BaseMap,sampler_BaseMap,i.uv).rgb*_BaseColor.rgb*_ZoneTint.rgb;
+                half3 detail=SAMPLE_TEXTURE2D(_DetailMap,sampler_DetailMap,i.uv).rgb;
+                half macro=.5+.5*sin(i.uv.y*.43+sin(i.uv.x*.55)*.3);
+                base*=lerp(half3(1.07,.91,.92),half3(1.04,1.09,1.02),macro);
+                half patch=(1-smoothstep(.50,1,length((i.localUV-.5)*2)))*_PatchMask;
+                base=lerp(base,_PatchColor.rgb*(.86+.25*dot(base,half3(.2126,.7152,.0722))),patch);
+                half band=.59+.25*smoothstep(.16,.34,w)+.20*smoothstep(.54,.78,w);
+                half cartoon=.64+.22*smoothstep(.19,.29,w)+.16*smoothstep(.60,.72,w);
+                band=lerp(band,cartoon,_CartoonBands);
+                half3 col=base*band*detail.r+base*SampleSH(n)*.18;
+                half sheen=pow(saturate(dot(n,normalize(v+l.direction))),28)*_Smoothness*_SheenStrength;
+                col+=sheen*half3(1,.93,.83)+base*pow(1-saturate(dot(n,v)),4)*w*_RimStrength;
+                half edge=pow(1-saturate(dot(n,v)),8)*.10;
+                col=lerp(col,col*half3(.64,.34,.42),edge)+_EmissionColor.rgb;
+                half depth=smoothstep(22,68,distance(i.ws,_WorldSpaceCameraPos));
+                col=lerp(col,half3(.78,.52,.42),depth*.16);
+                return half4(MixFog(col*_VisualExposure,i.fog),1);
+            }
+            ENDHLSL
+        }
+    }
+}

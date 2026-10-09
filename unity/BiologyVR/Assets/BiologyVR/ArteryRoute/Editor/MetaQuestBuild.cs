@@ -34,7 +34,7 @@ namespace BiologyVR.ArteryRoute.Editor
             if(EditorApplication.isPlaying)throw new InvalidOperationException("Exit Play Mode first");
             UniversalMobileBuild.ConfigureAndroidPlayer();
             PlayerSettings.productName="Biology VR";PlayerSettings.companyName="BiologyVR";
-            PlayerSettings.bundleVersion="1.0.1";PlayerSettings.Android.bundleVersionCode=2;
+            PlayerSettings.bundleVersion="0.2.0";PlayerSettings.Android.bundleVersionCode=3;
             PlayerSettings.Android.minSdkVersion=AndroidSdkVersions.AndroidApiLevel29;
             PlayerSettings.Android.targetSdkVersion=AndroidSdkVersions.AndroidApiLevel34;
             PlayerSettings.Android.applicationEntry=AndroidApplicationEntry.Activity;
