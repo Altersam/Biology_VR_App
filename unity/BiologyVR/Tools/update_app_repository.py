@@ -41,7 +41,7 @@ def main():
             relative=source.relative_to(ROOT);expected.add(relative.as_posix())
             target=project/relative;target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
             copied.append((source,target))
-    for name in ('.gitignore','.gitattributes','README.md','READY_TO_OPEN_RU.md','WORKING_VERSION_RU.md','ARTERY_CORAL_V6_RU.md','GITHUB_UPLOAD_RU.md','META_QUEST_RU.md','PICO4_ENTERPRISE_RU.md','ACTIVE_TOOLS_AND_HOLOGRAMS_RU.md','CLEAN_HOLOGRAPHIC_FIRST_PASS_RU.md','HOLOGRAPHIC_SECOND_PASS_RU.md','BIOMEDICAL_LIVING_PASS_RU.md','GROWING_PLAQUE_CHALLENGE_RU.md','INFLUX_EMBOLI_AND_CONTROLS_RU.md'):
+    for name in ('.gitignore','.gitattributes','README.md','READY_TO_OPEN_RU.md','WORKING_VERSION_RU.md','ARTERY_CORAL_V6_RU.md','GITHUB_UPLOAD_RU.md','META_QUEST_RU.md','PICO4_ENTERPRISE_RU.md','ACTIVE_TOOLS_AND_HOLOGRAMS_RU.md','CLEAN_HOLOGRAPHIC_FIRST_PASS_RU.md','HOLOGRAPHIC_SECOND_PASS_RU.md','BIOMEDICAL_LIVING_PASS_RU.md','GROWING_PLAQUE_CHALLENGE_RU.md','INFLUX_EMBOLI_AND_CONTROLS_RU.md','PICO4_BUILD_0_3_0_RU.md','PICO4_APK_0_3_0.json'):
         if (ROOT/name).is_file():
             shutil.copy2(ROOT/name,project/name);copied.append((ROOT/name,project/name))
     # These are managed subtrees. Obsolete files are preserved in the verified backup.

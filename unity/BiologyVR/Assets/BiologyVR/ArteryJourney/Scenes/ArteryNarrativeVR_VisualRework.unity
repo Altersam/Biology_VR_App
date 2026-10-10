@@ -41017,7 +41017,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 889a1561a61447447bab5413a0eff012, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mobileBloodCells: 48
+  mobileBloodCells: 180
   disablePostProcessing: 1
   disableRealtimeShadows: 1
 --- !u!4 &520265089

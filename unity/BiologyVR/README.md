@@ -62,6 +62,7 @@ Scene06 — растущая масса из 30 дробимых элемент�
 и соответствующий монитор: **GROWING_PLAQUE_CHALLENGE_RU.md**.
 Актуальная итерация: **INFLUX_EMBOLI_AND_CONTROLS_RU.md** — липиды из потока,
 шесть эмболов, режимы на правых A/B, Continue на левой Y и усиленные эффекты.
+Проверенный локальный APK PICO 4 версии 0.3.0: **PICO4_BUILD_0_3_0_RU.md**.
 
 Инструкция GitHub/Pages: **GITHUB_UPLOAD_RU.md**. Содержимое Builds публикуется
 отдельно: APK через GitHub Releases, WebGL через Pages, исходники — Git + Git LFS.

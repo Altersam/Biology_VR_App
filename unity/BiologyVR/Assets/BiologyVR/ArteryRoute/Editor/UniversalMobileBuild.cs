@@ -39,7 +39,7 @@ namespace BiologyVR.ArteryRoute.Editor
             PlayerSettings.Android.applicationEntry=AndroidApplicationEntry.Activity;
             PlayerSettings.Android.splitApplicationBinary=false;
             PlayerSettings.Android.optimizedFramePacing=true;
-            PlayerSettings.bundleVersion="0.2.0";PlayerSettings.Android.bundleVersionCode=3;
+            PlayerSettings.bundleVersion="0.3.0";PlayerSettings.Android.bundleVersionCode=4;
             PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.Android,false);
             PlayerSettings.SetGraphicsAPIs(BuildTarget.Android,new[]{GraphicsDeviceType.OpenGLES3});
             EditorUserBuildSettings.buildAppBundle=false;
@@ -99,7 +99,7 @@ namespace BiologyVR.ArteryRoute.Editor
             EditorUserBuildSettings.selectedBuildTargetGroup=BuildTargetGroup.Android;
             ConfigurePico();
             string folder=Path.GetFullPath("Builds/Pico4Enterprise");Directory.CreateDirectory(folder);
-            var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=new[]{ScenePath},locationPathName=Path.Combine(folder,"BiologyVR_Pico4Enterprise.apk"),target=BuildTarget.Android,options=BuildOptions.Development});
+            var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=new[]{ScenePath},locationPathName=Path.Combine(folder,"BiologyVR_Pico4Enterprise.apk"),target=BuildTarget.Android,options=BuildOptions.None});
             bool apkExists=File.Exists(report.summary.outputPath)&&new FileInfo(report.summary.outputPath).Length>0;
             LastResult=JsonConvert.SerializeObject(new{utc=DateTime.UtcNow,result=report.summary.result==BuildResult.Succeeded&&apkExists?"Succeeded":"Failed",unityResult=report.summary.result.ToString(),apkExists,errors=report.summary.totalErrors,warnings=report.summary.totalWarnings,sizeBytes=apkExists?(ulong)new FileInfo(report.summary.outputPath).Length:0,unityReportedSizeBytes=report.summary.totalSize,seconds=report.summary.totalTime.TotalSeconds,path=report.summary.outputPath,device="Pico 4 Enterprise",headsetVerified=false},Formatting.Indented);
             File.WriteAllText(JourneyGeometry.Root+"/Reports/PicoBuildReport.json",LastResult);Debug.Log(LastResult);
@@ -232,7 +232,7 @@ namespace BiologyVR.ArteryRoute.Editor
             {
                 var root=new GameObject("Quest + Pico mobile performance profile");profile=root.AddComponent<QuestPicoPerformanceProfile>();
             }
-            profile.mobileBloodCells=48;profile.disablePostProcessing=true;profile.disableRealtimeShadows=true;
+            profile.mobileBloodCells=180;profile.disablePostProcessing=true;profile.disableRealtimeShadows=true;
             EditorUtility.SetDirty(profile.gameObject);
         }
     }
