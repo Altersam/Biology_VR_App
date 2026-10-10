@@ -1,0 +1,18 @@
+{
+  "utc": "2026-10-10T17:06:23.801534Z",
+  "geometryPreserved": true,
+  "geometryBefore": "5D2722F2CD3706368EDF3EFC5FEA0751255264E41AFA2D297652DDF554BADA5E",
+  "geometryAfter": "5D2722F2CD3706368EDF3EFC5FEA0751255264E41AFA2D297652DDF554BADA5E",
+  "source": "Unity-authored biomedical meshes; source GLBs retained as history",
+  "scannerMeshes": 2,
+  "bioMeshes": 5,
+  "scannerTriangles": 2168,
+  "bioTriangles": 3136,
+  "textureSamples": 0,
+  "newPhysicsObjects": 0,
+  "scannerAimPreserved": true,
+  "bioToolAimPreserved": true,
+  "modes": "IMPULSE/CAPTURE/TONUS/BIO",
+  "switchInput": "C / right A",
+  "hardwareVerified": false
+}

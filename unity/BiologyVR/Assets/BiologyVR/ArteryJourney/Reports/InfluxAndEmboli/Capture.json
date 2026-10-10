@@ -1,0 +1,16 @@
+{
+  "utc": "2026-10-10T20:49:55.113587+00:00",
+  "pcVerifiedUtc": "2026-10-10T17:55:45.7596241Z",
+  "plaqueVerifiedUtc": "2026-10-10T17:58:48.3910541Z",
+  "xrSequential": "FULL SIMULATOR PASS",
+  "method": "Actual Unity mouse/keyboard/controller gameplay captures",
+  "frames": [
+    "01_Flow_Fed_Lipids.png",
+    "02_Lipid_Fragmentation.png",
+    "03_Six_Gas_Bubbles.png",
+    "04_Capture_Tether_And_Lock.png",
+    "05_Scanner_Actual_Input.png",
+    "06_All_Six_Completed.png"
+  ],
+  "hardwareVerified": false
+}

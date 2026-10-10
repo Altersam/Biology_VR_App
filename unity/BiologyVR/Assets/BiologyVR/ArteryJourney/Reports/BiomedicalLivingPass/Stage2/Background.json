@@ -1,0 +1,95 @@
+{
+  "utc": "2026-10-10T09:38:42.7286678Z",
+  "geometryPreserved": true,
+  "geometryBefore": "30853A4B18096C48C4D27C4E4B936642B712DA32F637AA69E99387E3D0902198",
+  "geometryAfter": "30853A4B18096C48C4D27C4E4B936642B712DA32F637AA69E99387E3D0902198",
+  "pool": 360,
+  "interactiveSlots": 5,
+  "backgroundVisualSlots": 355,
+  "initialAuthoringSpecies": {
+    "erythrocyte": 265,
+    "leukocyte": 12,
+    "platelet": 36,
+    "globulin": 9,
+    "lipoprotein": 9,
+    "fibrinogen": 9,
+    "plasma-ion": 9,
+    "albumin": 6
+  },
+  "continuousRandomPalette": [
+    {
+      "id": "erythrocyte",
+      "weight": 54,
+      "minDiameter": 0.18,
+      "maxDiameter": 0.3
+    },
+    {
+      "id": "leukocyte",
+      "weight": 4,
+      "minDiameter": 0.18,
+      "maxDiameter": 0.28
+    },
+    {
+      "id": "platelet",
+      "weight": 8,
+      "minDiameter": 0.07,
+      "maxDiameter": 0.12
+    },
+    {
+      "id": "albumin",
+      "weight": 2,
+      "minDiameter": 0.035,
+      "maxDiameter": 0.065
+    },
+    {
+      "id": "globulin",
+      "weight": 3,
+      "minDiameter": 0.045,
+      "maxDiameter": 0.075
+    },
+    {
+      "id": "lipoprotein",
+      "weight": 3,
+      "minDiameter": 0.045,
+      "maxDiameter": 0.075
+    },
+    {
+      "id": "fibrinogen",
+      "weight": 3,
+      "minDiameter": 0.04,
+      "maxDiameter": 0.08
+    },
+    {
+      "id": "plasma-ion",
+      "weight": 3,
+      "minDiameter": 0.025,
+      "maxDiameter": 0.045
+    },
+    {
+      "id": "platelet",
+      "weight": 4,
+      "minDiameter": 0.16,
+      "maxDiameter": 0.22
+    },
+    {
+      "id": "erythrocyte-O2",
+      "weight": 10,
+      "minDiameter": 0.18,
+      "maxDiameter": 0.3
+    },
+    {
+      "id": "erythrocyte-CO2",
+      "weight": 6,
+      "minDiameter": 0.18,
+      "maxDiameter": 0.3
+    }
+  ],
+  "physicsAdded": 0,
+  "poolGrowth": 0,
+  "circulation": "unlimited / local upstream-downstream + persistent route and all branches",
+  "nearCellsNeverRecentered": true,
+  "randomSpeciesOnReuse": true,
+  "rareWhiteCells": true,
+  "plateletGroups": true,
+  "hardwareVerified": false
+}

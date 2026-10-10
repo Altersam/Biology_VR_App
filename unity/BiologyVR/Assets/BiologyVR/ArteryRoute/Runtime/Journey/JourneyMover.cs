@@ -27,7 +27,7 @@ namespace BiologyVR.ArteryRoute.Journey
         InputAction continueInput;
         void OnEnable()
         {
-            if(continueInput==null)continueInput=new InputAction("Continue completed artery stage",InputActionType.Button,"<XRController>{RightHand}/secondaryButton");
+            if(continueInput==null)continueInput=new InputAction("Continue completed artery stage Y",InputActionType.Button,"<XRController>{LeftHand}/secondaryButton");
             continueInput.Enable();
         }
         void OnDisable(){continueInput?.Disable();lastNext=false;}
@@ -41,7 +41,7 @@ namespace BiologyVR.ArteryRoute.Journey
         void Tracking()
         {
             xr=XRSettings.isDeviceActive;UsingTrackedInput=xr;
-            foreach(var device in InputSystem.devices)if(device.layout=="XRSimulatedHMD")UsingTrackedInput=true;
+            foreach(var device in InputSystem.devices)if(device.enabled&&device.layout=="XRSimulatedHMD")UsingTrackedInput=true;
             if(tracker)tracker.enabled=UsingTrackedInput;
             headOffset=origin.transform.InverseTransformPoint(viewCamera.transform.position);
         }
@@ -58,12 +58,12 @@ namespace BiologyVR.ArteryRoute.Journey
         public void ToggleOverlay(){if(teachingOverlay)teachingOverlay.gameObject.SetActive(!teachingOverlay.gameObject.activeSelf);}
         void Update()
         {
-            bool tracked=XRSettings.isDeviceActive;foreach(var device in InputSystem.devices)if(device.layout=="XRSimulatedHMD")tracked=true;
+            bool tracked=XRSettings.isDeviceActive;foreach(var device in InputSystem.devices)if(device.enabled&&device.layout=="XRSimulatedHMD")tracked=true;
             if(xr!=XRSettings.isDeviceActive||tracked!=UsingTrackedInput)Tracking();
             var k=Keyboard.current;
             if(k!=null){if(k.rightArrowKey.wasPressedThisFrame)Continue();if(k.spaceKey.wasPressedThisFrame)TogglePause();if(k.oKey.wasPressedThisFrame)ToggleOverlay();
                 if(k.pageDownKey.wasPressedThisFrame)mission.DebugSetScene(Mathf.Min(15,mission.SceneNumber+1));}
-            InputDevices.GetDeviceAtXRNode(XRNode.RightHand).TryGetFeatureValue(UnityEngine.XR.CommonUsages.secondaryButton,out bool physicalNext);
+            InputDevices.GetDeviceAtXRNode(XRNode.LeftHand).TryGetFeatureValue(UnityEngine.XR.CommonUsages.secondaryButton,out bool physicalNext);
             bool next=physicalNext||(continueInput!=null&&continueInput.IsPressed());if(next&&!lastNext)Continue();lastNext=next;
             if(Moving&&!paused){time+=Time.deltaTime;float a=Mathf.Clamp01(time/duration);TransitionProgress=a;Distance=Mathf.Lerp(from,to,a*a*(3-2*a));Place();if(a>=1){Moving=false;TransitionProgress=1f;Arrived?.Invoke();}}
             if(!UsingTrackedInput&&Mouse.current!=null&&Mouse.current.rightButton.isPressed){var d=Mouse.current.delta.ReadValue();yaw+=d.x*.12f;pitch=Mathf.Clamp(pitch-d.y*.12f,-70,70);viewCamera.transform.localRotation=Quaternion.Euler(pitch,yaw,0);}

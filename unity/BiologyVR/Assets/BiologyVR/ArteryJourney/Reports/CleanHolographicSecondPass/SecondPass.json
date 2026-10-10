@@ -1,0 +1,14 @@
+{
+  "utc": "2026-10-10T07:13:18.2929601Z",
+  "geometryPreserved": true,
+  "geometryBefore": "35A976C64DEE9A324B25C37C2B25BE7BF1D19AA4C7592ED171D49A314FB25226",
+  "geometryAfter": "35A976C64DEE9A324B25C37C2B25BE7BF1D19AA4C7592ED171D49A314FB25226",
+  "aimTransformsPreserved": true,
+  "inputActionsPreserved": true,
+  "targets": 67,
+  "bloodPool": 360,
+  "changes": "stronger readable glass / foreground UI / larger typography / active device rim indicators",
+  "physicsAdded": 0,
+  "postEffectsAdded": false,
+  "hardwareVerified": false
+}

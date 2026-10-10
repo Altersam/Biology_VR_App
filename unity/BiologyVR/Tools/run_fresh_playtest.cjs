@@ -8,6 +8,7 @@ function call(method,file){return JSON.parse(execFileSync(process.execPath,[help
 (async()=>{
   call('set_play_mode_status','stop_ws.json');
   for(let i=0;i<20;i++){await delay(750);if(!call('get_play_mode_status').result.isPlaying)break;}
+  call('load_scene','reload_master_ws.json');
   try{call('set_play_mode_status','play_ws.json');}catch(error){/* Domain reload interrupts the transport. */}
   let ready=false;
   for(let i=0;i<40;i++){

@@ -14,7 +14,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(!world||!world.mission)return;
             bool active=world.mission.SceneNumber==7;
             dock.gameObject.SetActive(active);
-            tether.enabled=active&&world.EmbolusCaptured;
+            tether.enabled=active&&world.EmbolusCaptured&&!world.mission.GetComponent<JourneyInstrumentRig>();
             if(!active)return;
             var p=world.mover.path;float s=p.Anchor(7)+1.9f;
             dock.SetPositionAndRotation(p.Offset(s,.88f,-.25f),p.Frame(s));
@@ -27,7 +27,7 @@ namespace BiologyVR.ArteryRoute.Journey
                 tether.enabled=JourneyToolFeedback.ClipBeamStart(world.mover.viewCamera,ref start,world.bubble.position);
                 if(tether.enabled){tether.SetPosition(0,start);tether.SetPosition(1,world.bubble.position);}
             }
-            if(label){label.text=world.mission.Complete?"Эмбол нейтрализован":world.EmbolusCaptured?$"Удерживай поле • стабилизация {world.EmbolusStability:P0}":"Стабилизационная зона";label.transform.SetPositionAndRotation(dock.position+world.mover.viewCamera.transform.up*.37f,world.mover.viewCamera.transform.rotation);}
+            if(label){label.text=world.mission.Complete?"Все эмболы нейтрализованы":world.EmbolusCaptured?$"Удерживай поле • стабилизация {world.EmbolusStability:P0}":world.embolusWave?$"Ловушка • помещено {world.embolusWave.StabilizedCount}/6":"Стабилизационная зона";label.transform.SetPositionAndRotation(dock.position+world.mover.viewCamera.transform.up*.37f,world.mover.viewCamera.transform.rotation);}
         }
     }
 }

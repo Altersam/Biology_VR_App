@@ -1,0 +1,17 @@
+{
+  "utc": "2026-10-10T17:34:51.4805666Z",
+  "style": "Clean educational holography — readability second pass",
+  "thinRoundedFrames": true,
+  "heavySourceRimsVisible": false,
+  "glassAlpha": 0.3,
+  "contentAlpha": 0.24,
+  "foregroundReadableUI": true,
+  "overview": "header / short theory / illustration / task / navigation",
+  "fullReferenceRetained": true,
+  "theoryWidthMetres": 0.64,
+  "theoryHeightMetres": 0.82,
+  "theoryPosition": "(-0.43, 0.03, 1.70)",
+  "metrics": 5,
+  "materials": "shared lightweight clipped overlay UI + one URP Unlit pulse line",
+  "hardwareVerified": false
+}

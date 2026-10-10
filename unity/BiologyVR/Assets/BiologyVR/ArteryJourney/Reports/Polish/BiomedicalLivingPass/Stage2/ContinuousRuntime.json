@@ -1,0 +1,28 @@
+{
+  "utc": "2026-10-10T09:40:48.4401317Z",
+  "runSeed": 137018548,
+  "simulatedSeconds": 242.703354,
+  "minAhead": 85,
+  "minBehind": 84,
+  "RecycledCells": 788,
+  "RandomSpeciesChanges": 567,
+  "BranchPassages": [
+    57,
+    52,
+    52
+  ],
+  "types": [
+    197,
+    12,
+    31,
+    5,
+    7,
+    7,
+    13,
+    11,
+    13,
+    35,
+    24
+  ],
+  "hardwareFPSMeasured": false
+}

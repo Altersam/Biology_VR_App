@@ -83,6 +83,12 @@ namespace BiologyVR.ArteryRoute.Journey
             Set(targetLabel, current == null ? "ЦЕЛЬ • этап завершён" : "ЦЕЛЬ • " + TargetName(current.target));
             Set(toolHint, mission.FreeResearchUnlocked&&scene==18?"Свободное исследование: сканер F / левый Trigger\nНаведи сканер на модель и открой справку":ToolHint(current));
             if(!mission.mover.UsingTrackedInput&&toolHint)toolHint.text=DesktopHint(current);
+            if(scene==3&&current?.action==StudyAction.Scan)Set(toolHint,mission.mover.UsingTrackedInput?"Сначала достань объект из потока: удерживай Grip\nЗатем левый Trigger — сканирование; Hb/гем — у взятого эритроцита":"ЛКМ удерживать — достань объект из кровотока\nУдерживай F — изучи; Hb/гем — у взятого эритроцита");
+            if(scene==9&&current?.action==StudyAction.Mark)
+            {
+                Set(toolHint,mission.mover.UsingTrackedInput?"Правый Trigger — быстрый импульс; удерживать — очередь\nНаводи на вирионы • правая A — режим":"E — выстрел; удерживай — автоматическая очередь\nМышь — прицел • ПКМ — осмотр • C — режим");
+                Set(progress,$"Волна {mission.Progress}/{current.required} • серия {mission.world.AssaultCombo} • целей {mission.world.IncomingViruses.Count}");
+            }
             Set(info, scene==16&&mission.Complete?mission.ResultGrades:$"<b>{mission.LearningTerm}</b>\n\n{mission.LearningNote}" +
                 (string.IsNullOrEmpty(mission.Formula) ? "" : "\n\n" + mission.Formula) +
                 $"\n\nПрофессор: «{mission.ProfessorLine}»");
@@ -238,6 +244,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public void ContinueJourney() { if (continueButton && continueButton.interactable && mission) mission.Continue(); }
         public void ToggleBriefing()
         {
+            var screens=GetComponent<JourneyHolographicScreens>();if(screens){screens.TogglePractice();return;}
             if (!briefingRoot) return;
             briefingRoot.SetActive(!briefingRoot.activeSelf);
             Set(briefingButtonLabel, briefingRoot.activeSelf ? "Закрыть справку" : "Справка  [Tab]");
@@ -269,7 +276,7 @@ namespace BiologyVR.ArteryRoute.Journey
 
         static string ToolHint(StudyGoal current)
         {
-            if (current == null) return "Продолжить: → / правая B    •    Справка: Tab";
+            if (current == null) return "Продолжить: → / левая Y    •    Справка: Tab";
             if(current.action==StudyAction.Grab)return "Захват: поднеси руку к объекту и удерживай Grip\nУвеличение: возьми двумя руками и разведи их";
             if (current.action == StudyAction.Scan) return "Сканер: наведи и удерживай левый Trigger / F\nРаннее отпускание прерывает сканирование";
             if (current.action == StudyAction.Radius || current.action == StudyAction.Pressure || current.action == StudyAction.Balance)
@@ -286,7 +293,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(current.target=="tone")return "Наведи мышь на регулятор и удерживай E\nКолесо — тонус; удержи умеренное сужение";
             if(current.action==StudyAction.Grab)return "Мышь — указатель • ЛКМ удерживать — взять\nКолесо — глубина • ПКМ + мышь — осмотр";
             if(current.action==StudyAction.Scan)return "Наведи мышь и удерживай F — Scanner\nЛКМ удерживать — перенести • G — взять/отпустить";
-            if(current.action==StudyAction.Enlarge)return "Z — учебное увеличение\nЗатем эритроцит плавно вернётся в поток";
+            if(current.action==StudyAction.Enlarge)return "Z — учебное увеличение\nУдерживай эритроцит для изучения Hb и гема";
             if(current.target=="oxygen")return "G — взять/отпустить O₂ • колесо — ближе/дальше\nНаведи O₂ на гем и отпусти рядом с точкой связывания";
             return "E — BioTool по указателю; для заряда удерживай\nЛКМ — перенос • колесо — глубина • ПКМ — осмотр";
         }

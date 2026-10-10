@@ -1,0 +1,11 @@
+{
+  "utc": "2026-10-10T09:02:12.7463668Z",
+  "realMeshesRebuilt": true,
+  "geometryPreserved": true,
+  "geometryBefore": "01B44BA872EF1C67B91D9DD5E7AB9F74BE1F60BA11CC1D9AAB2D95371EC2C417",
+  "geometryAfter": "01B44BA872EF1C67B91D9DD5E7AB9F74BE1F60BA11CC1D9AAB2D95371EC2C417",
+  "aimAndInputPreserved": true,
+  "sharedOpaqueVertexPalette": true,
+  "physicsAdded": 0,
+  "hardwareVerified": false
+}

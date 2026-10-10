@@ -23,15 +23,21 @@ namespace BiologyVR.ArteryRoute.Editor
         static bool[] simulatorEnabled;
         static XRSimulatedHMDState hs;
         static float runtimeGrip;static bool runtimeGripButton;
-        static readonly List<string> notes=new List<string>();static bool running;
+        static readonly List<string> notes=new List<string>();static bool running,previewOnly,plaqueFixture;
         [MenuItem("Biology VR/Playtest Scene03 Through XR Input")]
         public static void Run()
+        {Start(false);}
+        [MenuItem("Biology VR/Preview Biomedical Devices Through XR Input")]
+        public static void PreviewDevices()=>Start(true);
+        [MenuItem("Biology VR/Test Plaque Challenge Through XR Input")]
+        public static void PlaqueOnly()=>Start(false,true);
+        static void Start(bool preview,bool plaque=false)
         {
             if(!EditorApplication.isPlaying)throw new InvalidOperationException("Start a fresh Play Mode session first");
             if(running)throw new InvalidOperationException("XR playtest already running");
             mission=UnityEngine.Object.FindFirstObjectByType<JourneyMission>();
             if(mission.SceneNumber!=3||mission.StepIndex!=0)throw new InvalidOperationException("Fresh Scene03 required; this test does not reset/complete mission state");
-            running=true;EditorCoroutineUtility.StartCoroutineOwnerless(GuardedPlay());
+            previewOnly=preview;plaqueFixture=plaque;running=true;EditorCoroutineUtility.StartCoroutineOwnerless(GuardedPlay());
         }
         static IEnumerator GuardedPlay()
         {
@@ -56,6 +62,8 @@ namespace BiologyVR.ArteryRoute.Editor
         }
         static void WriteReport()
         {
+            if(plaqueFixture){Directory.CreateDirectory(PlaqueChallengeBuilder.Reports);File.WriteAllText(PlaqueChallengeBuilder.Reports+"/XR_Plaque_Input.md","# Actual XR plaque fixture\n\nUTC: "+DateTime.UtcNow.ToString("O")+"\n\n"+string.Join("\n\n",notes));return;}
+            if(previewOnly){Directory.CreateDirectory(BiomedicalLivingPass.Reports+"/Stage1");File.WriteAllText(BiomedicalLivingPass.Reports+"/Stage1/XR_Input_Preview.md","# Controller-mounted device preview\n\nUTC: "+DateTime.UtcNow.ToString("O")+"\n\n"+string.Join("\n\n",notes));return;}
             bool full=notes.Contains("PASS: Six actual final measurements produce mission result and grades");
             File.WriteAllText(ArteryPolishReview.Reports+"/VR_INPUT_PLAYTHROUGH_V7.md","# V8 Sequential XR Input Playthrough\n\nGenerated UTC: "+DateTime.UtcNow.ToString("O")+"\n\nStatus: "+(running?"RUNNING":full&&!notes.Any(n=>n.StartsWith("BLOCKED"))?"FULL SIMULATOR PASS":"FINISHED — inspect checks/blocker")+"\n\n## Scene03→16 and VERY FAR\n\n"+string.Join("\n\n",notes)+"\n\n## Scope\n\nOnly completed PASS sequences above establish verification for this run. No debug enter/force-next/mission Accept is called by this driver. Scene05 retains ray-target parameter controls. Scanner/BioTool are controller-mounted visuals, not physically grabbable instruments. Physical Quest/Pico, thermal/FPS, pooling/difficulty overhaul and joystick comfort remain unverified. VERY FAR uses tracked HMD state excursions, not a mission reset. Scenes12–16 are verified only when their actual hand/tool/measurement sequences above pass.\n");
         }
@@ -81,7 +89,46 @@ namespace BiologyVR.ArteryRoute.Editor
                 InputSystem.onBeforeUpdate+=QueueRuntimeStates;InputSystem.onAfterUpdate+=ObserveRuntimeState;
                 input.useExplicitAimSources=true;
                 yield return new EditorWaitForSeconds(.45f);
+                if(plaqueFixture)
+                {
+                    mission.Enter(6,false);yield return GameSeconds(.25f);
+                    yield return ToolAction("plaque-flow");yield return Scan("plaque");yield return GameSeconds(2.8f);yield return ToolAction("pulse-mode");yield return PulseGrowingMass();
+                    Require(mission.Complete&&w.plaqueChallenge.Cleared,"Actual XR pulse challenge completes without success APIs");yield break;
+                }
+                var screens=mission.GetComponent<JourneyHolographicScreens>();
+                if(screens)
+                {
+                    var view=mission.mover.viewCamera.transform;Pose(true,view.position+view.rotation*new Vector3(-.55f,-.50f,.55f),view.rotation);yield return GameSeconds(.10f);
+                    Require(!screens.hud.panelRoot.GetComponent<Canvas>().enabled&&screens.theoryText.text.Contains(mission.LearningNote),"Tracked view opens main theory without the old side-panel overlay");
+                    var keyboard=InputSystem.AddDevice<Keyboard>();
+                    try
+                    {
+                        InputSystem.QueueStateEvent(keyboard,new KeyboardState(Key.Tab));yield return GameSeconds(.08f);InputSystem.QueueStateEvent(keyboard,new KeyboardState());yield return GameSeconds(.12f);
+                        Aim(false,screens.theoryRoot.position);yield return GameSeconds(.15f);float top=screens.theoryScroll.verticalNormalizedPosition;
+                        rs.primary2DAxis=new Vector2(0,-.9f);yield return GameSeconds(.45f);rs.primary2DAxis=Vector2.zero;yield return GameSeconds(.10f);
+                        Require(screens.theoryScroll.verticalNormalizedPosition<top-.1f&&screens.ScrollInputs>0,"Actual right XR thumbstick scrolls the aimed holographic theory panel");
+                        Directory.CreateDirectory(ArteryPolishReview.Reports+"/ActiveInstruments");ArteryPolishReview.Capture(mission.mover.viewCamera,"ActiveInstruments/08_Holographic_Theory_Actual_XR_Scroll.png");
+                        InputSystem.QueueStateEvent(keyboard,new KeyboardState(Key.Tab));yield return GameSeconds(.08f);InputSystem.QueueStateEvent(keyboard,new KeyboardState());yield return GameSeconds(.08f);
+                    }
+                    finally{InputSystem.RemoveDevice(keyboard);}
+                }
                 Require(input.scanAction.action.enabled&&input.toolAction.action.enabled,"Existing Scanner/BioTool actions enabled");
+                var tools=mission.GetComponent<JourneyInstrumentRig>();
+                if(tools)
+                {
+                    int step=mission.StepIndex;
+                    foreach(var expected in new[]{BioToolMode.Capture,BioToolMode.Tonus,BioToolMode.Bio,BioToolMode.Impulse})
+                    {
+                        rs=rs.WithButton(ControllerButton.PrimaryButton,true);yield return GameSeconds(.08f);
+                        rs=rs.WithButton(ControllerButton.PrimaryButton,false);yield return GameSeconds(.08f);
+                        Require(tools.modes.CurrentMode==expected&&mission.StepIndex==step,"Actual right A selects "+expected+" without Continue or mission success");
+                    }
+                    foreach(var expected in new[]{BioToolMode.Bio,BioToolMode.Tonus,BioToolMode.Capture,BioToolMode.Impulse})
+                    {rs=rs.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.08f);rs=rs.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.08f);Require(tools.modes.CurrentMode==expected&&mission.StepIndex==step&&mission.SceneNumber==3,"Actual right B selects previous mode without Continue: "+expected);}
+                    Require(tools.scannerVR.gameObject.activeInHierarchy&&tools.bioVR.gameObject.activeInHierarchy&&!tools.scannerPC.gameObject.activeInHierarchy&&!tools.bioPC.gameObject.activeInHierarchy,"Tracked input displays only VR tool views");
+                    Require(tools.scannerVR.GetComponentsInChildren<Collider>(true).Length==0&&tools.bioVR.GetComponentsInChildren<Collider>(true).Length==0,"Biomedical tool views add no physical contacts");
+                    notes.Add("Installed device mesh triangles: Scanner="+tools.scannerVR.GetComponentsInChildren<MeshFilter>(true).Sum(f=>f.sharedMesh.triangles.Length/3)+"; BioTool="+tools.bioVR.GetComponentsInChildren<MeshFilter>(true).Sum(f=>f.sharedMesh.triangles.Length/3));
+                }
                 var rbc=w.Find("rbc");Vector3 centre=rbc.GetComponent<SphereCollider>().bounds.center;
                 Pose(false,centre+Vector3.right*.02f,Quaternion.identity);Pose(true,centre+Vector3.left*.4f,Quaternion.identity);
                 yield return new EditorWaitForSeconds(.3f);Grip(false,true);yield return new EditorWaitForSeconds(.45f);
@@ -95,6 +142,20 @@ namespace BiologyVR.ArteryRoute.Editor
                     if(theme!=null&&theme.GetValue(behaviour)==null)notes.Add("Uninitialized affordance theme: "+behaviour.name+" / "+behaviour.GetType().Name+" active="+behaviour.isActiveAndEnabled);
                 }
                 Require(mission.StepIndex==1&&rbc.GetComponent<XRGrabInteractable>().isSelected,"Right grip actually selects RBC and advances Grab");
+                if(previewOnly)
+                {
+                    var camera=mission.mover.viewCamera.transform;
+                    Pose(false,camera.position+camera.rotation*new Vector3(.45f,-.10f,1.8f),camera.rotation);yield return GameSeconds(.35f);
+                    Aim(true,rbc.transform.position);Trigger(true,true);yield return GameSeconds(.35f);
+                    Directory.CreateDirectory(ArteryPolishReview.Reports+"/BiomedicalLivingPass/Stage1");
+                    ArteryPolishReview.Capture(mission.mover.viewCamera,"BiomedicalLivingPass/Stage1/01_Scanner_In_Hand.png");Trigger(true,false);yield return GameSeconds(.12f);
+                    Grip(false,false);Pose(true,camera.position+camera.rotation*new Vector3(-.40f,-.36f,.60f),camera.rotation);
+                    Aim(false,camera.position+camera.forward*3);int before=mission.AcceptedActions;Trigger(false,true);yield return GameSeconds(.30f);
+                    Require(mission.AcceptedActions==before,"Device visual preview does not complete a wrong biological objective");
+                    ArteryPolishReview.Capture(mission.mover.viewCamera,"BiomedicalLivingPass/Stage1/02_BioTool_In_Hand.png");
+                    Trigger(false,false);yield return GameSeconds(.1f);ArteryPolishReview.Capture(mission.mover.viewCamera,"BiomedicalLivingPass/Stage1/03_Devices_And_UI.png");
+                    Require(tools&&tools.ActiveBioTool.prongs.Length==4,"Rebuilt BioTool retains four animated working elements");yield break;
+                }
                 Aim(true,rbc.transform.position);Trigger(true,true);yield return new EditorWaitForSeconds(.18f);Trigger(true,false);yield return new EditorWaitForSeconds(.2f);
                 Require(mission.StepIndex==1,"Early Scanner release does not complete scan");
                 Aim(true,rbc.transform.position);Trigger(true,true);yield return new EditorWaitForSeconds(.4f);
@@ -113,12 +174,17 @@ namespace BiologyVR.ArteryRoute.Editor
                 Grip(false,false);yield return new EditorWaitForSeconds(.6f);
                 Aim(true,rbc.GetComponent<SphereCollider>().bounds.center);yield return GameSeconds(.12f);Trigger(true,true);yield return GameSeconds(1f);Trigger(true,false);yield return GameSeconds(.2f);
                 Require(mission.StepIndex==3,"Scanning the wrong visible target does not complete Hb objective");
+                Pose(false,rbc.GetComponent<Collider>().bounds.center,Quaternion.identity);yield return GameSeconds(.12f);Grip(false,true);yield return GameSeconds(.25f);
+                Require(rbc.grabbed,"RBC re-extracted from flow for Hb/heme study");
                 foreach(string id in new[]{"hemoglobin","heme"}){yield return Scan(id);}
                 Require(mission.StepIndex==5,"Hb and heme actually scanned through device trigger");
+                Grip(false,false);yield return GameSeconds(.15f);
+                var heldHeme=w.Find("heme");Pose(true,heldHeme.GetComponent<Collider>().bounds.center,Quaternion.identity);yield return GameSeconds(.12f);Grip(true,true);yield return GameSeconds(.25f);
                 var oxygen=w.Find("oxygen");Pose(false,oxygen.transform.position,Quaternion.identity);yield return new EditorWaitForSeconds(.2f);Grip(false,true);yield return new EditorWaitForSeconds(.35f);
                 Require(mission.StepIndex==6,"Physically gripping oxygen detaches it");
                 Pose(false,w.Find("heme").transform.position,Quaternion.identity);yield return new EditorWaitForSeconds(.35f);Grip(false,false);yield return new EditorWaitForSeconds(.3f);
                 Require(mission.StepIndex==7,"Placing and releasing O2 near heme binds it");
+                Grip(true,false);yield return GameSeconds(.18f);
                 yield return Scan("co2");
                 var white=w.Find("leukocyte");var whitePickup=white.GetComponent<JourneyFlowPickup>();
                 var whitePosition=white.transform.position;yield return GameSeconds(.3f);
@@ -138,8 +204,8 @@ namespace BiologyVR.ArteryRoute.Editor
                 ArteryPolishReview.Capture(mission.mover.viewCamera,"V7Input/Scene03_Player_WithHUD.png");
                 var origin=mission.mover.origin.transform;Quaternion originRotation=origin.rotation,headRotation=mission.mover.viewCamera.transform.localRotation;
                 var scanner=input.scanner;var tool=input.bioTool;var blood=w.GetComponent<JourneyBloodFlow>();var cell=blood.cells.First(c=>c&&c.gameObject.activeInHierarchy);Vector3 cellBefore=cell.position;
-                rs=rs.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.15f);rs=rs.WithButton(ControllerButton.SecondaryButton,false);
-                Require(mission.SceneNumber==4&&mission.mover.Moving,"Actual right secondary-button InputAction starts completed 03→04 travel");
+                ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.15f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);
+                Require(mission.SceneNumber==4&&mission.mover.Moving,"Actual left Y InputAction starts completed 03→04 travel");
                 Require(w.locationRoots[mission.mover.path.locationIds[0]].activeInHierarchy&&w.IsEpisodeCompleted(3),"Completed Scene03 location stays active during transition");
                 yield return GameSeconds(10f);
                 Require(mission.SceneNumber==4&&mission.Ready,"03→04 smooth travel arrives without debug enter/force-next");
@@ -161,29 +227,30 @@ namespace BiologyVR.ArteryRoute.Editor
                 ArteryPolishReview.Capture(mission.mover.viewCamera,"V7Input/Scene04_HMD_LookAtWall_WithHUD.png");
                 var hud=mission.GetComponent<JourneyHud>();
                 Require(hud&&hud.vitals&&hud.vitals.gameObject.activeInHierarchy&&hud.vitals.rectTransform.parent==hud.panelRoot,"Vitals remain on compact HUD outside optional experiment module");
-                rs=rs.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);rs=rs.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
-                Require(mission.SceneNumber==5&&mission.mover.Moving,"Real right secondary-button continues completed Scene04");yield return GameSeconds(10f);Require(mission.SceneNumber==5&&mission.Ready,"Transition 04→05 arrives through normal travel");
+                ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
+                Require(mission.SceneNumber==5&&mission.mover.Moving,"Real left Y continues completed Scene04");yield return GameSeconds(10f);Require(mission.SceneNumber==5&&mission.Ready,"Transition 04→05 arrives through normal travel");
                 foreach(string id in new[]{"flow","flow-model"})yield return ToolAction(id);
                 Require(mission.StepIndex==2,"Scene05 flow measurement and holographic model activation use BioTool trigger");
                 yield return ToolAction("small-radius");yield return ToolAction("large-radius");yield return ToolAction("pressure");yield return ToolAction("normal-flow");
                 Require(mission.Complete&&w.IsEpisodeCompleted(5)&&Mathf.Abs(mission.ModelRadius-1)<.01f&&Mathf.Abs(mission.ModelPressure-120)<.01f,"Scene05 radius/pressure experiment completes and returns to normal flow");
                 ArteryPolishReview.Capture(mission.mover.viewCamera,"V7Input/Scene05_Player_WithHUD.png");
-                rs=rs.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);rs=rs.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
-                Require(mission.SceneNumber==6&&mission.mover.Moving,"Real right secondary-button continues completed Scene05");yield return GameSeconds(10f);Require(mission.SceneNumber==6&&mission.Ready,"Transition 05→06 arrives through normal travel");
-                yield return ToolAction("plaque-flow");yield return Scan("plaque");yield return GameSeconds(2.8f);Require(w.plaqueDetail&&w.plaqueDetail.Ready,"Scene06 plaque formation completes before pulse mode");yield return ToolAction("pulse-mode");Require(mission.StepIndex==3,"Scene06 plaque inspection and pulse mode use real instruments");
-                for(int zone=0;zone<3;zone++)yield return PulseZone(zone);
-                Require(mission.Complete&&w.IsEpisodeCompleted(6)&&w.plaqueState.ProcessedCount==3&&w.plaqueState.CapHits==0,"Three distinct lipid zones pulse without cap hits through BioTool");
+                ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
+                Require(mission.SceneNumber==6&&mission.mover.Moving,"Real left Y continues completed Scene05");yield return GameSeconds(10f);Require(mission.SceneNumber==6&&mission.Ready,"Transition 05→06 arrives through normal travel");
+                yield return ToolAction("plaque-flow");yield return Scan("plaque");yield return GameSeconds(2.8f);Require(w.plaqueChallenge?w.plaqueChallenge.Ready:w.plaqueDetail&&w.plaqueDetail.Ready,"Scene06 plaque formation completes before pulse mode");yield return ToolAction("pulse-mode");Require(mission.StepIndex==3,"Scene06 plaque inspection and pulse mode use real instruments");
+                if(w.plaqueChallenge)yield return PulseGrowingMass();else for(int zone=0;zone<3;zone++)yield return PulseZone(zone);
+                Require(mission.Complete&&w.IsEpisodeCompleted(6)&&(w.plaqueChallenge?w.plaqueChallenge.Cleared:w.plaqueState.ProcessedCount==3&&w.plaqueState.CapHits==0),"Distinct real lipid contacts are fully treated through BioTool input");
                 yield return GameSeconds(.8f);
                 ArteryPolishReview.Capture(mission.mover.viewCamera,"V7Input/Scene06_Player_WithHUD.png");
                 var plaqueRoot=w.locationRoots[mission.mover.path.locationIds[6-3]];
-                var cap=plaqueRoot.GetComponentsInChildren<MeshFilter>(true).First(f=>f.name=="Plaque_Cap");
+                var cap=w.plaqueChallenge?w.plaqueChallenge.repairResidue.GetComponent<MeshFilter>():plaqueRoot.GetComponentsInChildren<MeshFilter>(true).First(f=>f.name=="Plaque_Cap");
                 var capMesh=cap.sharedMesh;var capVertices=capMesh.vertices;var capPosition=cap.transform.position;
                 Quaternion previousOriginRotation=origin.rotation,previousHeadRotation=mission.mover.viewCamera.transform.localRotation;
-                rs=rs.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);rs=rs.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
-                Require(mission.SceneNumber==7&&mission.mover.Moving,"Real right secondary-button continues completed Scene06");yield return GameSeconds(10f);Require(mission.SceneNumber==7&&mission.Ready,"Transition 06→07 arrives through normal travel");
-                Require(plaqueRoot.activeInHierarchy&&w.IsEpisodeCompleted(6)&&w.plaqueState.ProcessedCount==3&&cap.sharedMesh==capMesh&&cap.sharedMesh.vertices.SequenceEqual(capVertices)&&Vector3.Distance(capPosition,cap.transform.position)<.001f,"Completed plaque retains root, treated zones, mesh instance/vertices and pose across 06→07");
-                Require(w.plaqueState.Zones.All(z=>!z.Contact.enabled)&&cap.GetComponent<Renderer>().enabled,"Completed plaque remains visible with dormant lipid contacts");
+                ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
+                Require(mission.SceneNumber==7&&mission.mover.Moving,"Real left Y continues completed Scene06");yield return GameSeconds(10f);Require(mission.SceneNumber==7&&mission.Ready,"Transition 06→07 arrives through normal travel");
+                Require(plaqueRoot.activeInHierarchy&&w.IsEpisodeCompleted(6)&&(w.plaqueChallenge?w.plaqueChallenge.Cleared:w.plaqueState.ProcessedCount==3)&&cap.sharedMesh==capMesh&&cap.sharedMesh.vertices.SequenceEqual(capVertices)&&Vector3.Distance(capPosition,cap.transform.position)<.001f,"Completed plaque retains root, treatment state, mesh instance/vertices and pose across 06→07");
+                Require((w.plaqueChallenge?w.plaqueChallenge.lipids.All(z=>!z.contact.enabled):w.plaqueState.Zones.All(z=>!z.Contact.enabled))&&cap.GetComponent<Renderer>().enabled,"Completed plaque retains restored wall and dormant lipid contacts");
                 Require(Quaternion.Angle(previousOriginRotation,origin.rotation)<.01f&&Quaternion.Angle(previousHeadRotation,mission.mover.viewCamera.transform.localRotation)<.01f&&input.scanner==scanner&&input.bioTool==tool,"Head/origin rotation and instrument instances persist across 06→07");
+                if(w.embolusWave){Directory.CreateDirectory(ArteryPolishReview.Reports+"/InfluxAndEmboli");ArteryPolishReview.Capture(mission.mover.viewCamera,"InfluxAndEmboli/01_Six_Bubbles_Actual_XR_Arrival.png");}
                 yield return TrackScan("embolus");yield return ToolAction("attract-mode");
                 Aim(false,w.bubble.position);yield return GameSeconds(.12f);Trigger(false,true);yield return GameSeconds(.1f);Trigger(false,false);yield return GameSeconds(.12f);
                 Require(mission.StepIndex==2&&!w.EmbolusCaptured,"Releasing BioTool before charge finishes does not capture embolus");
@@ -197,11 +264,13 @@ namespace BiologyVR.ArteryRoute.Editor
                 Vector3 driftPosition=w.bubble.position;yield return GameSeconds(.4f);Require(Vector3.Distance(driftPosition,w.bubble.position)>.02f,"Released embolus drifts again with the flow");
                 yield return TrackToolCapture("embolus");Require(w.EmbolusCaptured&&mission.StepIndex==3,"Released embolus can be re-captured through trigger input");
                 yield return CarryEmbolusToTrap();Trigger(false,false);yield return GameSeconds(.18f);
-                Require(mission.Complete&&w.IsEpisodeCompleted(7)&&!w.EmbolusCaptured&&!w.bubble.gameObject.activeInHierarchy,"Held field transports and stabilizes embolus physically inside trap");
+                if(w.embolusWave)while(!mission.Complete){yield return TrackToolCapture("embolus");yield return CarryEmbolusToTrap();Trigger(false,false);yield return GameSeconds(.18f);}
+                Require(mission.Complete&&w.IsEpisodeCompleted(7)&&!w.EmbolusCaptured&&(w.embolusWave?w.embolusWave.Complete:!w.bubble.gameObject.activeInHierarchy),"Held field physically captures and deposits every gas embolus inside trap");
+                if(w.embolusWave)ArteryPolishReview.Capture(mission.mover.viewCamera,"InfluxAndEmboli/04_Six_Bubbles_Actual_XR_Complete.png");
                 LookWithHead(w.trap.position);yield return GameSeconds(.12f);
                 ArteryPolishReview.Capture(mission.mover.viewCamera,"V7Input/Scene07_Player_WithHUD.png");
-                rs=rs.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);rs=rs.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
-                Require(mission.SceneNumber==8&&mission.mover.Moving,"Real right secondary-button continues completed Scene07");yield return GameSeconds(10f);Require(mission.SceneNumber==8&&mission.Ready,"Transition 07→08 arrives through normal travel");
+                ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
+                Require(mission.SceneNumber==8&&mission.mover.Moving,"Real left Y continues completed Scene07");yield return GameSeconds(10f);Require(mission.SceneNumber==8&&mission.Ready,"Transition 07→08 arrives through normal travel");
                 yield return Scan("virus-study");
                 var virus=w.Find("virus-study");var virusGrab=virus.GetComponent<XRGrabInteractable>();Require(virusGrab,"Study virus has authored XRI grab support");
                 Aim(false,virus.transform.position);yield return GameSeconds(.12f);Trigger(false,true);yield return GameSeconds(.2f);Trigger(false,false);yield return GameSeconds(.18f);
@@ -219,19 +288,21 @@ namespace BiologyVR.ArteryRoute.Editor
                 foreach(string id in new[]{"genome","capsid","epitope"})yield return Scan(id);
                 Require(mission.Complete&&w.IsEpisodeCompleted(8),"All Scene08 parts scanned without tool enlargement/debug completion");
                 ArteryPolishReview.Capture(mission.mover.viewCamera,"V7Input/Scene08_Player_WithHUD.png");
-                rs=rs.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);rs=rs.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
-                Require(mission.SceneNumber==9&&mission.mover.Moving,"Real right secondary-button continues completed Scene08");yield return GameSeconds(4f);Require(mission.SceneNumber==9&&mission.Ready,"Same-site transition 08→09 arrives through normal travel");
+                ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
+                Require(mission.SceneNumber==9&&mission.mover.Moving,"Real left Y continues completed Scene08");yield return GameSeconds(4f);Require(mission.SceneNumber==9&&mission.Ready,"Same-site transition 08→09 arrives through normal travel");
                 yield return ToolAction("immune-mode");
                 var wrongWaveTarget=w.Find("phagocyte");Aim(false,wrongWaveTarget.GetComponent<Collider>().bounds.center);yield return GameSeconds(.12f);Trigger(false,true);yield return GameSeconds(.3f);Trigger(false,false);yield return GameSeconds(.18f);
                 Require(w.MarkedViruses==0&&mission.StepIndex==1,"Charging BioTool at the phagocyte cannot mark an unrelated incoming virion");
-                for(int mark=0;mark<8;mark++)yield return MarkIncomingVirus(mark);
-                Require(mission.StepIndex==2&&w.MarkedViruses==8,"Eight individual incoming virions marked through actual charged trigger input");
+                yield return GameSeconds(.55f);
+                Require(w.IncomingViruses.Count>=6,"Rapid immune assault starts with a six-target burst");
+                for(int mark=0;mark<JourneyMission.AssaultVirusCount;mark++)yield return MarkIncomingVirus(mark);
+                Require(mission.StepIndex==2&&w.MarkedViruses==JourneyMission.AssaultVirusCount,"Twenty-four individual incoming virions hit through actual rapid-fire trigger input");
                 var phagocytePosition=w.phagocyte.position;
-                yield return ToolAction("phagocyte");Require(mission.Complete&&w.IsEpisodeCompleted(9)&&mission.ViralLoad==0&&w.EngulfedViruses==8,"Scene09 handoff completes only after eight actual phagocyte ingestions");
+                yield return ToolAction("phagocyte");Require(mission.Complete&&w.IsEpisodeCompleted(9)&&mission.ViralLoad==0&&w.EngulfedViruses==JourneyMission.AssaultVirusCount,"Scene09 handoff completes only after all twenty-four actual phagocyte ingestions");
                 Require(Vector3.Distance(phagocytePosition,w.phagocyte.position)<.01f,"Scene09 phagocyte stays in its current episode instead of moving to the future wound");
                 ArteryPolishReview.Capture(mission.mover.viewCamera,"V7Input/Scene09_Player_WithHUD.png");
-                rs=rs.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);rs=rs.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
-                Require(mission.SceneNumber==10&&mission.mover.Moving,"Real right secondary-button continues completed Scene09");yield return GameSeconds(10f);Require(mission.SceneNumber==10&&mission.Ready,"Transition 09→10 arrives through normal travel");
+                ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
+                Require(mission.SceneNumber==10&&mission.mover.Moving,"Real left Y continues completed Scene09");yield return GameSeconds(10f);Require(mission.SceneNumber==10&&mission.Ready,"Transition 09→10 arrives through normal travel");
                 yield return ToolAction("pressure-low");yield return ToolAction("tone-mode");
                 Require(mission.StepIndex==2&&mission.PressureSystolic==92,"Scene10 pressure loss measured before opening vascular control");
                 yield return AdjustToneWithHand();
@@ -243,8 +314,8 @@ namespace BiologyVR.ArteryRoute.Editor
                 var tone=w.VesselTone;var toneRoot=w.locationRoots[mission.mover.path.locationIds[10-3]];Quaternion toneHead=mission.mover.viewCamera.transform.localRotation,toneOrigin=origin.rotation;
                 LookWithHead(mission.mover.path.Centre(mission.mover.path.Anchor(10)+4));yield return GameSeconds(.12f);ArteryPolishReview.Capture(mission.mover.viewCamera,"V7Input/Scene10_Manual_Tone_Complete_WithHUD.png");
                 toneHead=mission.mover.viewCamera.transform.localRotation;
-                rs=rs.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);rs=rs.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
-                Require(mission.SceneNumber==11&&mission.mover.Moving,"Real right secondary-button continues completed Scene10");yield return GameSeconds(10f);Require(mission.SceneNumber==11&&mission.Ready,"Transition 10→11 arrives through normal travel");
+                ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
+                Require(mission.SceneNumber==11&&mission.mover.Moving,"Real left Y continues completed Scene10");yield return GameSeconds(10f);Require(mission.SceneNumber==11&&mission.Ready,"Transition 10→11 arrives through normal travel");
                 var toneProperties=new MaterialPropertyBlock();w.toneWall[0].GetPropertyBlock(toneProperties);
                 Require(toneRoot.activeInHierarchy&&Mathf.Abs(w.VesselTone-tone)<.001f&&Mathf.Abs(toneProperties.GetFloat("_Tone")-tone)<.001f,"Treated tone root and shader radius persist on entering wound diagnosis");
                 Require(Quaternion.Angle(toneHead,mission.mover.viewCamera.transform.localRotation)<.01f&&Quaternion.Angle(toneOrigin,origin.rotation)<.01f&&input.scanner==scanner&&input.bioTool==tool,"10→11 preserves head/origin rotation and original instrument instances");
@@ -255,7 +326,7 @@ namespace BiologyVR.ArteryRoute.Editor
                 Require(woundRoot.activeInHierarchy&&Vector3.Distance(woundPosition,w.woundSite.position)<.001f&&w.woundState.LeakStrength>.95f&&w.woundState.ActiveCellCount>0,"Diagnosed wound remains in the same physical location and keeps leaking until treated");
                 LookWithHead(w.woundSite.position);yield return GameSeconds(.12f);ArteryPolishReview.Capture(mission.mover.viewCamera,"V7Input/Scene11_Wound_Diagnosis_WithHUD.png");
                 var sameWound=w.woundSite;var sameLeakCells=w.woundState.Cells.ToArray();
-                rs=rs.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);rs=rs.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);yield return GameSeconds(4f);
+                ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);yield return GameSeconds(4f);
                 Require(mission.SceneNumber==12&&mission.Ready&&w.woundSite==sameWound&&w.woundState.Cells.SequenceEqual(sameLeakCells),"Scene12 continues same wound and leak instances from Scene11");
                 var puzzle=w.hemostasisPuzzle;Require(puzzle&&puzzle.platelets.Length>=6,"Six physical platelet XRI pieces authored at existing wound");
                 yield return PlaceWoundPiece(puzzle.platelets[0],puzzle.Slot(0)+puzzle.world.woundState.Outward*(-1.1f));
@@ -275,7 +346,7 @@ namespace BiologyVR.ArteryRoute.Editor
                 Require(mission.Complete&&w.IsEpisodeCompleted(12)&&puzzle.Connections==3&&w.FibrinGrowth>.99f&&w.woundState.LeakStrength<.001f,"Scene12 requires three spatial fibrin connections and closes same leaking wound");
                 ArteryPolishReview.Capture(mission.mover.viewCamera,"V7Input/Scene12_Spatial_Fibrin_Complete.png");
                 var placedPositions=puzzle.platelets.Take(6).Select(p=>p.transform.position).ToArray();
-                rs=rs.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);rs=rs.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);yield return GameSeconds(4f);
+                ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);yield return GameSeconds(4f);
                 Require(mission.SceneNumber==13&&mission.Ready&&w.woundSite==sameWound&&puzzle.Attached==6&&puzzle.Connections==3,"Scene13 inherits same six-platelet plug and three fibrin links without reset");
                 Require(puzzle.platelets.Take(6).Select((p,i)=>Vector3.Distance(p.transform.position,placedPositions[i])<.001f).All(v=>v),"Hand-placed platelet transforms persist across 12→13");yield return Scan("clot");
                 for(int i=0;i<4;i++)yield return PlaceWoundPiece(puzzle.platelets[i],puzzle.Slot(i)-w.woundState.Outward*1.2f);
@@ -291,7 +362,7 @@ namespace BiologyVR.ArteryRoute.Editor
                 yield return GameSeconds(.9f);Require(mission.StepIndex==4&&mission.ClotBalance>.5f&&mission.ClotBalance<.72f&&!w.occlusion.activeInHierarchy,"Physical correction returns to OPTIMAL with open lumen");yield return ToolAction("open-flow");
                 Require(mission.Complete&&w.IsEpisodeCompleted(13),"Scene13 balance completed by actual piece removal/replacement without slider");
                 var recoveryPlateletPositions=puzzle.platelets.Take(6).Select(p=>p.transform.position).ToArray();
-                rs=rs.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);rs=rs.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);yield return GameSeconds(4f);
+                ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);yield return GameSeconds(4f);
                 Require(mission.SceneNumber==14&&mission.Ready&&w.woundSite==sameWound&&puzzle.Attached==6&&puzzle.Connections==3,"Scene14 inherits optimal same-wound plug and network without resetting them");
                 Require(puzzle.platelets.Take(6).Select((p,i)=>Vector3.Distance(p.transform.position,recoveryPlateletPositions[i])<.001f).All(v=>v),"Scene13 platelet positions are retained at recovery entry");
                 for(int i=0;i<3;i++)yield return ScanOwnedDebris(w.recoveryDebris[i]);
@@ -307,7 +378,7 @@ namespace BiologyVR.ArteryRoute.Editor
                 Require(mission.Complete&&w.IsEpisodeCompleted(14)&&w.RepairGrowth>.99f&&w.woundSite==sameWound&&w.woundState.ActiveCellCount==0,"Actual recovery process closes and scans the same original wound");
                 LookWithHead(w.woundSite.position);yield return GameSeconds(.12f);ArteryPolishReview.Capture(mission.mover.viewCamera,"V7Input/Scene14_Actual_Endothelial_Recovery.png");
                 var recoveredWall=w.repairPatch;var recoveredRoot=w.locationRoots[mission.mover.path.locationIds[14-3]];Quaternion recoveryHead=mission.mover.viewCamera.transform.localRotation,recoveryOrigin=origin.rotation;
-                rs=rs.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);rs=rs.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);yield return GameSeconds(10f);
+                ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);yield return GameSeconds(10f);
                 Require(mission.SceneNumber==15&&mission.Ready&&w.woundSite==sameWound&&w.repairPatch==recoveredWall&&w.RepairGrowth>.99f,"Final-focus travel preserves repaired original wound and wall instance");
                 Require(Quaternion.Angle(recoveryHead,mission.mover.viewCamera.transform.localRotation)<.01f&&Quaternion.Angle(recoveryOrigin,origin.rotation)<.01f&&input.scanner==scanner&&input.bioTool==tool,"14→15 preserves origin/gaze and original tools");
                 LookWithHead(w.infected.position);yield return GameSeconds(.12f);yield return Scan("infected-cell");Require(mission.StepIndex==1,"Final exam starts by finding/scanning an actual infected cell before wave actions");
@@ -321,7 +392,7 @@ namespace BiologyVR.ArteryRoute.Editor
                 for(int i=0;i<3;i++)yield return CleanupResidual(w.residualTargets[i]);yield return GameSeconds(1.3f);
                 Require(mission.Complete&&mission.Victory&&w.ResidualsCleared&&mission.ViralLoad==0&&!w.infected.gameObject.activeInHierarchy,"Actual final immune actions eliminate source and three residual complexes before victory");
                 ArteryPolishReview.Capture(mission.mover.viewCamera,"V7Input/Scene15_Actual_Immune_Victory.png");
-                rs=rs.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);rs=rs.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
+                ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
                 Require(mission.SceneNumber==16&&mission.Ready&&!mission.Complete&&w.HomeostasisChecks==0,"Homeostasis requires new real measurements instead of auto-completing on entry");
                 foreach(string id in new[]{"check-pressure","check-temperature","check-flow"})yield return ToolAction(id);
                 yield return Scan("check-wall");yield return Scan("check-virus");yield return ToolAction("check-hemostasis");
@@ -356,14 +427,20 @@ namespace BiologyVR.ArteryRoute.Editor
         static IEnumerator Scan(string id)
         {
             int before=mission.StepIndex;Require(mission.Current!=null&&mission.Current.action==StudyAction.Scan&&mission.Current.target==id,"Scanner objective expected for "+id);
-            var moving=mission.world.Find(id).GetComponent<JourneyFlowPickup>();
+            var moving=mission.world.Find(id).GetComponent<JourneyFlowPickup>();bool caught=false;
+            if(mission.SceneNumber==3&&moving&&!moving.Held)
+            {
+                var item=mission.world.Find(id);Pose(false,item.GetComponent<Collider>().bounds.center,Quaternion.identity);yield return GameSeconds(.12f);Grip(false,true);yield return GameSeconds(.25f);
+                Require(item.grabbed,"Actual XR grip extracts "+id+" from blood before scanning");caught=true;
+            }
             if(moving&&moving.InStudyFlow&&!moving.Held){yield return TrackScan(id);yield break;}
-            var target=mission.world.Find(id);var contact=target.GetComponentsInChildren<Collider>().First(c=>c.enabled);
+            var target=mission.world.Find(id);var contact=id=="plaque"&&mission.world.plaqueChallenge?mission.world.plaqueChallenge.diagnosisContact:target.GetComponentsInChildren<Collider>().First(c=>c.enabled);
             notes.Add("Contact "+id+": "+contact.name+" / "+contact.GetType().Name+" layerInspector="+(mission.world.layerInspection!=null));
             if(mission.SceneNumber==4)Require(contact is MeshCollider&&contact.name.StartsWith("Scene04_Band_"),"Scanner uses actual wall shell contact for "+id);
             Aim(true,contact.bounds.center);yield return GameSeconds(.12f);Trigger(true,true);yield return GameSeconds(1.05f);
             var input=mission.GetComponent<JourneyInput>();notes.Add("Scan "+id+": step="+mission.StepIndex+" enabled="+input.isActiveAndEnabled+" lock="+(input.LockedTarget?input.LockedTarget.targetId:"none")+" progress="+input.ScanProgress+" blocker="+(input.AimObstruction?input.AimObstruction.name:"none")+" aim="+input.scanner.position+" target="+target.transform.position+" contact="+contact.bounds.center);
             Trigger(true,false);yield return GameSeconds(.18f);Require(mission.StepIndex==before+1,"Scanner completed "+id);
+            if(caught){Grip(false,false);yield return GameSeconds(.8f);Require(!moving.Held&&!moving.Rejoining,"Extracted "+id+" returns smoothly into moving blood pool");}
         }
         static IEnumerator ToolAction(string id)
         {
@@ -409,7 +486,8 @@ namespace BiologyVR.ArteryRoute.Editor
             Quaternion rotation=Quaternion.LookRotation(w.trap.position-mission.mover.viewCamera.transform.position,mission.mover.path.Up(mission.mover.Distance));
             Vector3 aimOffset=Vector3.Scale(rc.InverseTransformPoint(input.bioTool.position),rc.lossyScale);
             float began=Time.time;double deadline=EditorApplication.timeSinceStartup+16;
-            while(!mission.Complete&&Time.time-began<5f)
+            int before=mission.StepIndex;
+            while(mission.StepIndex==before&&Time.time-began<7f)
             {
                 float t=Mathf.SmoothStep(0,1,Mathf.Clamp01((Time.time-began)/1.25f));
                 Vector3 fieldPoint=Vector3.Lerp(start,w.trap.position,t);
@@ -419,14 +497,42 @@ namespace BiologyVR.ArteryRoute.Editor
                 yield return null;
             }
             notes.Add("Transport result: bubble="+w.bubble.position+" trap="+w.trap.position+" stability="+w.EmbolusStability);
-            Require(mission.Complete&&w.EmbolusStability>=1,"Only sustained in-trap placement completes geometric deposit");
+            Require(mission.StepIndex==before+1&&w.EmbolusStability>=1,"Only sustained in-trap placement completes geometric deposit");
         }
         static IEnumerator PulseZone(int index)
         {
             var zone=mission.world.plaqueState.Zones[index];var contact=zone.Contact;Require(contact&&contact.enabled,"Lipid zone contact enabled: "+index);
-            var input=mission.GetComponent<JourneyInput>();Aim(false,contact.ClosestPoint(input.bioTool.position));yield return GameSeconds(.12f);Trigger(false,true);yield return GameSeconds(.30f);Trigger(false,false);yield return GameSeconds(.18f);
+            var input=mission.GetComponent<JourneyInput>();Aim(false,contact.ClosestPoint(input.bioTool.position));yield return GameSeconds(.12f);
+            var activeTools=mission.GetComponent<JourneyInstrumentRig>();
+            if(activeTools&&index==0){LookWithHead(contact.bounds.center);yield return GameSeconds(.12f);Aim(false,contact.ClosestPoint(input.bioTool.position));yield return GameSeconds(.12f);}
+            float spin=activeTools?activeTools.ActiveBioTool.RotationDegrees:0;int shots=activeTools?activeTools.ImpulseBursts:0;
+            var crownPositions=activeTools?activeTools.ActiveBioTool.prongs.Select(p=>p.localPosition).ToArray():null;
+            Trigger(false,true);yield return GameSeconds(.30f);
+            if(activeTools&&index==0)
+            {
+                Require(activeTools.modes.CurrentMode==BioToolMode.Impulse&&activeTools.ActiveBioTool.RotationDegrees>spin+10,"IMPULSE rotates original four GLB BioTool prongs during actual charge");
+                Require(activeTools.ActiveBioTool.prongs.Where((p,i)=>Vector3.Distance(p.localPosition,crownPositions[i])>.005f).Count()==4,"All four BioTool prong pivots orbit the common device axis, rather than spinning in place");
+                Require(activeTools.ImpulseBursts>shots&&activeTools.PulseVisible&&!activeTools.CaptureBeamVisible,"Accepted actual precision pulse produces a travelling impulse ring, not a capture tether");
+                Directory.CreateDirectory(ArteryPolishReview.Reports+"/ActiveInstruments");
+                ArteryPolishReview.Capture(mission.mover.viewCamera,"ActiveInstruments/02_Impulse_Actual_XR_Input.png");
+            }
+            Trigger(false,false);yield return GameSeconds(.18f);
             notes.Add("Pulse zone "+index+": locked="+(input.LockedTarget?input.LockedTarget.targetId:"none")+" selected="+mission.world.plaqueState.SelectedZoneIndex+" progress="+mission.Progress+" step="+mission.StepIndex+" contact="+contact.bounds.center+" aim="+input.bioTool.position);
             Require(mission.Progress==index+1||mission.StepIndex==4,"BioTool processed lipid zone "+index);
+        }
+        static IEnumerator PulseGrowingMass()
+        {
+            var challenge=mission.world.plaqueChallenge;LookWithHead(challenge.site.position);yield return GameSeconds(.15f);
+            int before=challenge.DestroyedCount;Trigger(false,true);float started=Time.time;
+            while(!challenge.Cleared&&Time.time-started<35)
+            {
+                var cell=challenge.lipids.Where(p=>p.contact.enabled).OrderBy(p=>(p.contact.bounds.center-mission.mover.viewCamera.transform.position).sqrMagnitude).FirstOrDefault();
+                if(cell)Aim(false,cell.contact.bounds.center);yield return GameSeconds(.04f);
+            }
+            Trigger(false,false);yield return GameSeconds(.3f);
+            notes.Add("Plaque XR diagnostic: before="+before+" destroyed="+challenge.DestroyedCount+" accepted="+challenge.AcceptedHits+" elapsed="+challenge.Elapsed+" lock="+(mission.GetComponent<JourneyInput>().LockedTarget?mission.GetComponent<JourneyInput>().LockedTarget.name:"none")+" obstruction="+(mission.GetComponent<JourneyInput>().AimObstruction?mission.GetComponent<JourneyInput>().AimObstruction.name:"none"));
+            Require(challenge.Cleared&&challenge.DestroyedCount==challenge.SpawnedCount&&challenge.AcceptedHits>=challenge.SpawnedCount,"Actual right trigger fragments the original pile plus newly arriving lipids before occlusion");
+            Directory.CreateDirectory(ArteryPolishReview.Reports+"/PlaqueChallenge");ArteryPolishReview.Capture(mission.mover.viewCamera,"PlaqueChallenge/05_Actual_XR_Cleared_Lumen.png");
         }
         static IEnumerator MarkIncomingVirus(int index)
         {
@@ -440,7 +546,7 @@ namespace BiologyVR.ArteryRoute.Editor
             while(virus&&mission.world.MarkedViruses==before&&Time.time-began<1.5f)
             {if(EditorApplication.timeSinceStartup>deadline)throw new InvalidOperationException("Player loop did not advance while charging at incoming virion");Aim(false,contact.bounds.center);yield return null;}
             Trigger(false,false);yield return GameSeconds(.18f);
-            Require(mission.world.MarkedViruses==before+1,"Charged BioTool marks the aimed moving virion: "+index);
+            Require(mission.world.MarkedViruses==before+1,"Rapid BioTool hit marks the aimed moving virion: "+index);
         }
         static IEnumerator AdjustToneWithHand()
         {
@@ -524,13 +630,13 @@ namespace BiologyVR.ArteryRoute.Editor
         static IEnumerator FarReentry(Transform wound,GameObject recoveredWall)
         {
             var w=mission.world;var path=mission.mover.path;var origin=mission.mover.origin.transform;
-            var cap=w.locationRoots[path.locationIds[6-3]].GetComponentsInChildren<MeshFilter>(true).First(f=>f.name=="Plaque_Cap");var mesh=cap.sharedMesh;var vertices=mesh.vertices;var position=cap.transform.position;
+            var cap=w.plaqueChallenge?w.plaqueChallenge.repairResidue.GetComponent<MeshFilter>():w.locationRoots[path.locationIds[6-3]].GetComponentsInChildren<MeshFilter>(true).First(f=>f.name=="Plaque_Cap");var mesh=cap.sharedMesh;var vertices=mesh.vertices;var position=cap.transform.position;
             var savedHead=hs;Quaternion originRotation=origin.rotation;
             TrackedHeadPosition(path.Centre(path.Length-3));yield return GameSeconds(.25f);
             Require(w.LocationRenderingCulled(path.locationIds[6-3])&&!cap.GetComponent<Renderer>().enabled,"VERY FAR tracked-device excursion hides old plaque renderers");
             Require(w.LocationRenderingCulled(path.locationIds[11-3]),"VERY FAR tracked-device excursion culls recovered wound location");
             TrackedHeadPosition(path.Centre(path.Anchor(6)+3));yield return GameSeconds(.25f);
-            Require(!w.LocationRenderingCulled(path.locationIds[6-3])&&cap.GetComponent<Renderer>().enabled&&w.plaqueState.ProcessedCount==3&&cap.sharedMesh==mesh&&mesh.vertices.SequenceEqual(vertices)&&Vector3.Distance(position,cap.transform.position)<.001f,"Plaque re-entry restores exact treated mesh, pose and processed zones");
+            Require(!w.LocationRenderingCulled(path.locationIds[6-3])&&cap.GetComponent<Renderer>().enabled&&(w.plaqueChallenge?w.plaqueChallenge.Cleared:w.plaqueState.ProcessedCount==3)&&cap.sharedMesh==mesh&&mesh.vertices.SequenceEqual(vertices)&&Vector3.Distance(position,cap.transform.position)<.001f,"Plaque re-entry restores exact treated mesh, pose and treatment state");
             TrackedHeadPosition(path.Centre(path.Anchor(11)+3));yield return GameSeconds(.25f);
             Require(!w.LocationRenderingCulled(path.locationIds[11-3])&&w.woundSite==wound&&w.repairPatch==recoveredWall&&w.RepairGrowth>.99f&&w.woundState.ActiveCellCount==0,"Recovered wound re-entry retains repaired wall instance/state and no leak");
             Require(Quaternion.Angle(originRotation,origin.rotation)<.01f,"VERY FAR excursions do not reset XR Origin heading");
@@ -552,7 +658,7 @@ namespace BiologyVR.ArteryRoute.Editor
             if(isLeft){ls=state;InputSystem.QueueStateEvent(left,ls);}else{rs=state;InputSystem.QueueStateEvent(right,rs);}
         }
         static void Aim(bool isLeft,Vector3 point)
-        {var camera=mission.mover.viewCamera.transform;var position=camera.position+camera.right*(isLeft?-.35f:.35f)-camera.up*.10f;Pose(isLeft,position,Quaternion.LookRotation(point-position,camera.up));}
+        {var camera=mission.mover.viewCamera.transform;var position=camera.position+camera.right*(isLeft?-.25f:.25f)-camera.up*.18f+camera.forward*.45f;Pose(isLeft,position,Quaternion.LookRotation(point-position,camera.up));}
         static void LookWithHead(Vector3 point)
         {
             var camera=mission.mover.viewCamera.transform;

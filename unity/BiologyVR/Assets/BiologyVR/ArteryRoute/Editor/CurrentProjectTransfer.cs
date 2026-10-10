@@ -63,6 +63,8 @@ namespace BiologyVR.ArteryRoute.Editor
             foreach(string path in roots)kept.Add(path);
             // Keep the active texture-bake provenance, not all historical capture folders.
             foreach(string path in all)if(path.StartsWith("Assets/BiologyVR/ArteryJourney/Generated/Artery_Concept_V4/")&&Path.GetExtension(path)==".json")kept.Add(path);
+            foreach(string path in all)
+                if((path.StartsWith(ActiveInstrumentBuilder.Folder+"/")||path.StartsWith(JourneyGeometry.Root+"/Generated/HolographicScreens/"))&&new[]{".json",".glb"}.Contains(Path.GetExtension(path)))kept.Add(path);
             var unresolved=new List<object>();
             foreach(string path in kept.Where(p=>new[]{".unity",".prefab",".mat",".asset"}.Contains(Path.GetExtension(p))))
             {

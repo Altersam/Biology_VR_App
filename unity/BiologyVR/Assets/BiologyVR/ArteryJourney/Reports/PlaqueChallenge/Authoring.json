@@ -1,0 +1,13 @@
+{
+  "utc": "2026-10-10T17:06:23.0532906Z",
+  "initialLipids": 30,
+  "reusableLipidSlots": 90,
+  "randomArrivalsPerSecond": "1–2",
+  "occlusionSeconds": 55.0,
+  "reusableShards": 72,
+  "rigidbodiesAdded": 0,
+  "individualRealRayContacts": true,
+  "missionTargetsRegistry": 67,
+  "phase": "Flow-fed destructible plaque; original lobules do not enlarge",
+  "hardwareVerified": false
+}

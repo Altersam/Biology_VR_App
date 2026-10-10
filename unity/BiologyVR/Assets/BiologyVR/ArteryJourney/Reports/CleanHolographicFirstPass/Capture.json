@@ -1,0 +1,16 @@
+{
+  "utc": "2026-10-10T05:25:24.210371+00:00",
+  "pcInputVerifiedUtc": "2026-10-10T05:22:51.7829244Z",
+  "method": "Actual keyboard/mouse/XRI input captures, not a mockup",
+  "frames": [
+    "01_Overview.png",
+    "02_Full_Reference.png",
+    "03_Scanner_Working.png",
+    "04_BioTool_Capture.png",
+    "05_BioTool_Tonus.png",
+    "06_BioTool_Impulse.png"
+  ],
+  "review": "FirstPass_Review.jpg",
+  "hardwareVerified": false,
+  "phase": "FIRST PASS \u2014 stop for assessment"
+}

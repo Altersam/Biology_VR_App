@@ -51,6 +51,12 @@ namespace BiologyVR.ArteryRoute.Journey
         JourneyDesktopControls desktopControls;
         float desktopToneOffset;
         public JourneyDesktopControls DesktopControls=>desktopControls;
+        public bool ScannerHeld{get;private set;}
+        public bool ToolHeld{get;private set;}
+        BioToolModeController bioModes;
+        float nextAssaultShot;
+        float nextPlaqueShot;
+        public const float AssaultFireInterval=.18f;
         void Awake()
         {
             if(!Application.isMobilePlatform){desktopControls=GetComponent<JourneyDesktopControls>();if(!desktopControls)desktopControls=gameObject.AddComponent<JourneyDesktopControls>();desktopControls.input=this;}
@@ -149,11 +155,19 @@ namespace BiologyVR.ArteryRoute.Journey
             UpdateHeldInstruments(Time.deltaTime,scan,tool);
         }
         public void CancelInstrumentProgress()
-        {ScanProgress=ChargeProgress=0;scanTarget=chargeTarget=LockedTarget=null;scanConsumed=toolConsumed=previousPhysicalTool=desktopFieldActive=false;AdjustingTone=false;ToneStability=0;if(world)world.ReleaseEmbolus();}
+        {ScannerHeld=ToolHeld=false;ScanProgress=ChargeProgress=0;scanTarget=chargeTarget=LockedTarget=null;scanConsumed=toolConsumed=previousPhysicalTool=desktopFieldActive=false;AdjustingTone=false;ToneStability=0;if(world)world.ReleaseEmbolus();}
 
         /// <summary>Shared controller/keyboard hold path. Uses real scene raycasts; no focused-target fallback.</summary>
         public void UpdateHeldInstruments(float deltaTime,bool scanning,bool firing)
         {
+            ScannerHeld=scanning;ToolHeld=firing;
+            if(!bioModes)bioModes=GetComponent<BioToolModeController>();
+            if(bioModes&&firing&&!scanning&&!bioModes.AllowsCurrentGoal())
+            {
+                ChargeProgress=0;
+                if(!previousPhysicalTool)mission.FeedbackMessage("Выбери нужный режим: A вперёд / B назад; на ПК C.");
+                previousPhysicalTool=firing;return;
+            }
             if(!instrumentFeedback)instrumentFeedback=GetComponent<JourneyToolFeedback>();
             if(!scanning){ScanProgress=0;scanTarget=null;scanConsumed=false;}
             if(!firing){ChargeProgress=0;chargeTarget=null;toolConsumed=false;}
@@ -185,7 +199,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(AdjustingTone){AdjustingTone=false;ToneStability=0;}
             if(scanning&&!scanConsumed)
             {
-                bool correct=hit&&(goal!=null&&goal.action==StudyAction.Scan&&goal.target==hit.targetId||goal==null&&mission.FreeResearchUnlocked);
+                bool correct=hit&&(goal!=null&&goal.action==StudyAction.Scan&&goal.target==hit.targetId||goal==null&&mission.FreeResearchUnlocked)&&world.CanInspectBlood(hit);
                 if(!correct){ScanProgress=0;scanTarget=null;}
                 else
                 {
@@ -200,6 +214,38 @@ namespace BiologyVR.ArteryRoute.Journey
                     }
                 }
                 if(instrumentFeedback)instrumentFeedback.PresentLock(hit,ScanProgress,correct,true,source);
+            }
+            else if(firing&&goal!=null&&mission.SceneNumber==6&&goal.action==StudyAction.Pulse&&world.plaqueChallenge)
+            {
+                if(Time.time>=nextPlaqueShot&&!world.plaqueChallenge.Failed)
+                {
+                    nextPlaqueShot=Time.time+.22f;int before=world.plaqueChallenge.DestroyedCount;
+                    if(hit&&hit.GetComponent<JourneyPlaqueLipid>())world.Primary(hit);
+                    if(world.plaqueChallenge.DestroyedCount==before)
+                    {var rig=GetComponent<JourneyInstrumentRig>();if(rig)rig.FirePulse(hit?hit.transform.position:source.position+source.forward*8);}
+                }
+                ChargeProgress=1;
+                if(instrumentFeedback)instrumentFeedback.PresentLock(hit,0,hit&&hit.GetComponent<JourneyPlaqueLipid>(),false,source);
+            }
+            else if(firing&&goal!=null&&mission.SceneNumber==9&&goal.action==StudyAction.Mark)
+            {
+                if(Time.time>=nextAssaultShot)
+                {
+                    nextAssaultShot=Time.time+AssaultFireInterval;
+                    int before=world.MarkedViruses;
+                    if(hit&&hit.targetId=="incoming-virus")world.Primary(hit);
+                    bool accepted=world.MarkedViruses>before;world.RecordAssaultShot(accepted);
+                    if(mission.Current?.action==StudyAction.Mark)mission.FeedbackMessage(accepted?$"Попадание • серия {world.AssaultCombo} • {world.MarkedViruses}/{JourneyMission.AssaultVirusCount}":"Мимо • переведи прицел на движущийся вирион");
+                    if(!accepted)
+                    {
+                        var rig=GetComponent<JourneyInstrumentRig>();
+                        Vector3 end=hit?hit.transform.position:AimObstruction?AimObstruction.bounds.center:source.position+source.forward*12;
+                        if(rig)rig.FirePulse(end);
+                        if(instrumentFeedback&&instrumentFeedback.audioSource&&instrumentFeedback.pulseSound)instrumentFeedback.audioSource.PlayOneShot(instrumentFeedback.pulseSound,.20f);
+                    }
+                }
+                ChargeProgress=1;
+                if(instrumentFeedback)instrumentFeedback.PresentLock(hit,0,hit&&hit.targetId=="incoming-virus",false,source);
             }
             else if(firing&&!toolConsumed&&goal!=null)
             {

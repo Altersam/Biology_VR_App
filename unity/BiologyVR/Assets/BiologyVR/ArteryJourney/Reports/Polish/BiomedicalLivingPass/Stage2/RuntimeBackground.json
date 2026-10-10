@@ -1,0 +1,16 @@
+{
+  "utc": "2026-10-10T17:54:59.5496353Z",
+  "pool": 360,
+  "background": 355,
+  "visibleDepthCounts": [
+    7,
+    25,
+    89
+  ],
+  "backgroundMeshTriangles": 154298,
+  "sharedMaterials": 12,
+  "allInstancedMaterials": true,
+  "editorBatches": 200,
+  "editorSetPass": 30,
+  "hardwareFPSMeasured": false
+}

@@ -65,7 +65,8 @@ namespace BiologyVR.ArteryRoute.Journey
         float displayedFraction, animationStart, animationTime, flashTime = PulseDuration;
 
         public int ProcessedCount { get; private set; }
-        public float PathologyFraction => 1f - ProcessedCount / (float)ZoneCount;
+        public float PathologyFraction => world&&world.plaqueChallenge?world.plaqueChallenge.Obstruction:1f - ProcessedCount / (float)ZoneCount;
+        public Transform LegacyGeometryRoot=>geometryRoot;
         public int CapHits { get; private set; }
         public float IntroReveal { get; private set; }
         public int SelectedZoneIndex => selected;

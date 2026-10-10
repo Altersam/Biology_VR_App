@@ -80,7 +80,7 @@ namespace BiologyVR.ArteryRoute.Journey
             foreach (var id in new[]{"rbc","hemoglobin","heme","oxygen","co2","leukocyte","platelet","plasma"})
             {
                 bool visible = id == "rbc" || id=="leukocyte" || id=="platelet" || id=="plasma" || (step >= 3 && step <= 6 && (id == "hemoglobin" || id == "heme" || id == "oxygen"))
-                    || (step == 7 && id == "co2") || (step == 8 && id == "leukocyte")
+                    || id == "co2" || (step == 8 && id == "leukocyte")
                     || ((step == 9 || step == 10) && id == "platelet") || (step >= 11 && id == "plasma");
                 var t = world.Find(id);if(t && t.gameObject.activeSelf != visible)t.gameObject.SetActive(visible);
             }
@@ -108,7 +108,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(world.mission.SceneNumber==3&&world.mission.StepIndex>=3&&!bloodDocked)
             {
                 var rbc=world.Find("rbc");
-                if(rbc&&rbc.DesktopHeld&&!world.mover.UsingTrackedInput)rbc.KeyboardGrab();
+                if(rbc&&rbc.DesktopHeld&&!world.mover.UsingTrackedInput&&!rbc.GetComponent<JourneyFlowPickup>())rbc.KeyboardGrab();
                 if(rbc&&!rbc.grabbed)
                 {
                     var flowing=rbc.GetComponent<JourneyFlowPickup>();

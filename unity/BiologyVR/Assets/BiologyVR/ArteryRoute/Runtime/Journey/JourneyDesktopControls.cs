@@ -17,6 +17,7 @@ namespace BiologyVR.ArteryRoute.Journey
         Transform aim;
         float depth=1.5f;
         bool mouseGrab;
+        JourneyHolographicScreens screens;
         readonly RaycastHit[] hits=new RaycastHit[64];
         public bool Active=>input&&input.mover&&!Application.isMobilePlatform&&!XRSettings.isDeviceActive&&!input.mover.UsingTrackedInput&&!input.useExplicitAimSources;
         public bool GrabHeld=>Active&&mouseGrab;
@@ -58,12 +59,14 @@ namespace BiologyVR.ArteryRoute.Journey
                 if(target){depth=Mathf.Clamp(Vector3.Distance(input.mover.viewCamera.transform.position,target.transform.position),.35f,10);mouseGrab=true;}
             }
             if(!mouse.leftButton.isPressed)mouseGrab=false;
-            if(Holding)depth=Mathf.Clamp(depth+WheelSteps*DepthPerWheelStep,.35f,10);
+            if(!screens)screens=GetComponent<JourneyHolographicScreens>();
+            if(Holding&&(!screens||!screens.PointerOverTheory))depth=Mathf.Clamp(depth+WheelSteps*DepthPerWheelStep,.35f,10);
             var ray=PointerRay();hand.transform.SetPositionAndRotation(input.mover.viewCamera.transform.position+ray.direction*depth,aim.rotation);
         }
         public XRGrabInteractable HoveredGrab()
         {
             if(!Active||!input.mission||!input.mission.Ready)return null;
+            if(screens&&screens.PointerOverTheory)return null;
             foreach(var target in input.world.targets)if(target&&target.DesktopHeld)return null;
             var ray=PointerRay();int count=Physics.RaycastNonAlloc(ray,hits,35,~0,QueryTriggerInteraction.Collide);
             if(count==hits.Length)return null;

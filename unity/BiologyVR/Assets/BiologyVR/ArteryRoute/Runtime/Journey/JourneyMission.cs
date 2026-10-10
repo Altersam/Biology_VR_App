@@ -12,6 +12,7 @@ namespace BiologyVR.ArteryRoute.Journey
     }
     public sealed class JourneyMission : MonoBehaviour
     {
+        public const int AssaultVirusCount=24;
         public JourneyMover mover;
         public JourneyWorld world;
         public int SceneNumber=3;
@@ -76,13 +77,13 @@ namespace BiologyVR.ArteryRoute.Journey
             switch(SceneNumber)
             {
                 case 3:
-                    Goal("Поймай эритроцит в зоне замедления",StudyAction.Grab,"rbc");
+                    Goal("Достань эритроцит из кровотока",StudyAction.Grab,"rbc");
                     Goal("Просканируй эритроцит",StudyAction.Scan,"rbc");Goal("Увеличь учебный эритроцит",StudyAction.Enlarge,"rbc");
                     Goal("Изучи гемоглобин: четыре субъединицы",StudyAction.Scan,"hemoglobin");Goal("Просканируй гем и Fe²⁺",StudyAction.Scan,"heme");
                     Goal("Сними молекулу O₂ с гема",StudyAction.Detach,"oxygen");Goal("Верни O₂ в точку связывания",StudyAction.Bind,"oxygen");
-                    Goal("Сравни транспорт CO₂",StudyAction.Scan,"co2");Goal("Найди и просканируй лейкоцит",StudyAction.Scan,"leukocyte");
-                    Goal("Просканируй тромбоцит в покое",StudyAction.Scan,"platelet");Goal("Сравни с активированной формой",StudyAction.Compare,"platelet");
-                    Goal("Изучи белки и ионы плазмы",StudyAction.Scan,"plasma");break;
+                    Goal("Поймай модель транспорта CO₂ и просканируй",StudyAction.Scan,"co2");Goal("Достань лейкоцит из потока и просканируй",StudyAction.Scan,"leukocyte");
+                    Goal("Поймай и просканируй тромбоцит в покое",StudyAction.Scan,"platelet");Goal("Сравни с активированной формой",StudyAction.Compare,"platelet");
+                    Goal("Поймай учебную модель белков/ионов плазмы и изучи",StudyAction.Scan,"plasma");break;
                 case 4:
                     Goal("Сканируй эндотелий",StudyAction.Scan,"endothelium");Goal("Включи послойный режим",StudyAction.Activate,"layers");
                     Goal("Просканируй интиму",StudyAction.Scan,"intima");Goal("Просканируй мышечно-эластическую медиа",StudyAction.Scan,"media");Goal("Просканируй адвентицию",StudyAction.Scan,"adventitia");break;
@@ -92,15 +93,16 @@ namespace BiologyVR.ArteryRoute.Journey
                     Goal("Измени модельное давление",StudyAction.Pressure,"pressure");Goal("Верни нормальные параметры",StudyAction.Activate,"normal-flow");break;
                 case 6:
                     WrongCapHits=0;Goal("Обнаружь локальное нарушение потока",StudyAction.Measure,"plaque-flow");Goal("Просканируй бляшку и её состав",StudyAction.Scan,"plaque");
-                    Goal("Открой режим BioTool «Импульс»",StudyAction.Activate,"pulse-mode");Goal("Обработай три липидные мишени, сохрани покрышку",StudyAction.Pulse,"lipid",3);break;
+                    Goal("Открой режим BioTool «Импульс»",StudyAction.Activate,"pulse-mode");Goal(world.plaqueChallenge?"Раздроби всю растущую липидную массу до окклюзии":"Обработай три липидные мишени, сохрани покрышку",StudyAction.Pulse,"lipid",world.plaqueChallenge?JourneyPlaqueChallenge.LipidCount:3);break;
                 case 7:
                     Goal("Просканируй движущийся пузырёк",StudyAction.Scan,"embolus");Goal("Открой режим «Притяжение»",StudyAction.Activate,"attract-mode");
-                    Goal("Захвати пузырёк полем BioTool",StudyAction.Capture,"embolus");Goal("Удерживай Trigger: перенеси пузырёк и стабилизируй в ловушке",StudyAction.Deposit,"embolus");break;
+                    for(int bubble=0;bubble<(world.embolusWave?JourneyEmbolusWave.Count:1);bubble++)
+                    {Goal(world.embolusWave?$"Захвати газовый эмбол: {bubble+1} / 6":"Захвати пузырёк полем BioTool",StudyAction.Capture,"embolus");Goal(world.embolusWave?$"Удерживай поле: помести эмбол {bubble+1} / 6 в ловушку":"Удерживай Trigger: перенеси пузырёк и стабилизируй в ловушке",StudyAction.Deposit,"embolus");}break;
                 case 8:
                     Goal("Просканируй неизвестный вирион",StudyAction.Scan,"virus-study");Goal("Увеличь вирус в учебном режиме",StudyAction.Enlarge,"virus-study");
                     Goal("Изучи генетический материал",StudyAction.Scan,"genome");Goal("Изучи капсид",StudyAction.Scan,"capsid");Goal("Найди антиген и эпитоп",StudyAction.Scan,"epitope");break;
                 case 9:
-                    Temperature=36.6f;ViralLoad=25;Goal("Открой иммунное управление",StudyAction.Activate,"immune-mode");Goal("Распознай и пометь восемь входящих частиц",StudyAction.Mark,"incoming-virus",8);Goal("Передай помеченные частицы фагоциту",StudyAction.Direct,"phagocyte");break;
+                    Temperature=36.6f;ViralLoad=25;Goal("Открой иммунное управление",StudyAction.Activate,"immune-mode");Goal("Отрази волну: 24 вириона — наведи BioTool и стреляй",StudyAction.Mark,"incoming-virus",AssaultVirusCount);Goal("Передай помеченные частицы фагоциту",StudyAction.Direct,"phagocyte");break;
                 case 10:
                     PressureSystolic=92;ModelRadius=lastToneReport=1;world.UpdateExperiment(ModelRadius,ModelPressure);
                     Goal("Измерь падение артериального давления",StudyAction.Measure,"pressure-low");Goal("Включи сосудистое поле",StudyAction.Activate,"tone-mode");
@@ -199,7 +201,7 @@ namespace BiologyVR.ArteryRoute.Journey
             var instrumentFeedback=GetComponent<JourneyToolFeedback>();if(instrumentFeedback)instrumentFeedback.Confirm(action,target);
             AcceptedActions++;if(action==StudyAction.Scan)ScannerActions++;else if(action!=StudyAction.Grab)ToolActions++;
             Progress++;
-            if(SceneNumber==9&&action==StudyAction.Mark){Temperature=Mathf.Min(38.1f,Temperature+.14f);ViralLoad=Mathf.Max(0,ViralLoad-3);}
+            if(SceneNumber==9&&action==StudyAction.Mark){Temperature=Mathf.Min(38.1f,Temperature+.05f);ViralLoad=Mathf.Max(0,ViralLoad-25f/AssaultVirusCount);}
             if(SceneNumber==9&&target=="phagocyte")ViralLoad=0;
             if(SceneNumber==10&&target=="pressure-stable")PressureSystolic=100;
             if(SceneNumber==10&&target=="pressure-return")PressureSystolic=92;
@@ -228,6 +230,16 @@ namespace BiologyVR.ArteryRoute.Journey
             {if(Current.target=="small-radius"&&ModelRadius<.82f)Accept(StudyAction.Radius,"small-radius");else if(Current.target=="large-radius"&&ModelRadius>1.18f)Accept(StudyAction.Radius,"large-radius");}
             else if(SceneNumber==10&&Current?.target=="tone"&&ModelRadius>.70f&&ModelRadius<.92f){PressureSystolic=100;Accept(StudyAction.Radius,"tone");}
             Changed?.Invoke();
+        }
+        public void SetPlaquePressure(float pressure)
+        {
+            if(SceneNumber!=6)return;PressureSystolic=Mathf.Clamp(pressure,80,150);Changed?.Invoke();
+        }
+        public void RetryPlaqueChallenge()
+        {
+            if(SceneNumber!=6||Current?.action!=StudyAction.Pulse)return;
+            Retries++;Progress=0;Feedback="Повтор: наведи BioTool на элементы массы и удерживай импульс. Успей освободить просвет.";
+            world.RememberEpisode();Changed?.Invoke();
         }
         public void UpdateToneFromHand(float radius)
         {
@@ -258,11 +270,11 @@ namespace BiologyVR.ArteryRoute.Journey
             PressureSystolic=ClotBalance<.28f?90:ClotBalance>.86f?96:112;
             if(Mathf.Abs(before-ClotBalance)>.005f)Changed?.Invoke();
         }
-        public void MissVirus(){MissedViruses++;WrongTargetActions++;Temperature+=.20f;ViralLoad=Mathf.Min(100,ViralLoad+5);Feedback="Частица пропущена: температура растёт.";if(Temperature>=39.5f)Checkpoint("Лихорадочная реакция выше игрового порога: контрольная точка.");Changed?.Invoke();}
+        public void MissVirus(){MissedViruses++;WrongTargetActions++;Temperature+=SceneNumber==9?.12f:.20f;ViralLoad=Mathf.Min(100,ViralLoad+5);Feedback="Частица пропущена: температура растёт.";if(Temperature>=39.5f)Checkpoint("Лихорадочная реакция выше игрового порога: контрольная точка.");Changed?.Invoke();}
         public void RetryEmbolus(bool escaped)
         {
             if(SceneNumber!=7||Goals==null||Complete)return;
-            StepIndex=Mathf.Min(StepIndex,2);Progress=0;
+            if(world.embolusWave){if(Current?.action==StudyAction.Deposit)StepIndex--;}else StepIndex=Mathf.Min(StepIndex,2);Progress=0;
             WrongTargetActions++;if(escaped)Retries++;
             Feedback=escaped?"Эмбол ушёл с потоком. Локальная контрольная точка: захвати снова.":"Поле отпущено — пузырёк снова уносит поток. Удерживай Trigger после захвата.";
             world.RememberEpisode();world.PrepareGoal(Current);Changed?.Invoke();

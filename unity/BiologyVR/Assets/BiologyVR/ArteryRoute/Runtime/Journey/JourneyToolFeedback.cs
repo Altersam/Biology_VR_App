@@ -16,6 +16,7 @@ namespace BiologyVR.ArteryRoute.Journey
         string lastMode;
         MaterialPropertyBlock lockBlock;
         MaterialPropertyBlock pulseBlock;
+        JourneyInstrumentRig instruments;
         public string CurrentMode{get;private set;}="Базовый";
         public int CompletedScans{get;private set;}
         public void Warn(bool scanner)
@@ -36,12 +37,13 @@ namespace BiologyVR.ArteryRoute.Journey
                     lockRing.transform.SetPositionAndRotation(target.transform.position+(source.position-target.transform.position).normalized*.055f,mission.mover.viewCamera.transform.rotation);
                     lockRing.transform.localScale=Vector3.one*(.70f+.20f*Mathf.Sin(Time.time*4));
                     lockRing.loop=progress<=0;lockRing.positionCount=progress<=0?48:Mathf.Max(2,Mathf.CeilToInt(progress*48));
-                    if(lockBlock==null)lockBlock=new MaterialPropertyBlock();lockBlock.SetColor("_BaseColor",correct?new Color(.20f,.91f,.98f):new Color(.95f,.56f,.20f));lockRing.SetPropertyBlock(lockBlock);
+                    if(lockBlock==null)lockBlock=new MaterialPropertyBlock();lockBlock.SetColor("_BaseColor",correct?HolographicStyle.Cyan:HolographicStyle.Amber);lockRing.SetPropertyBlock(lockBlock);
                 }
             }
             if(scanBeam)
             {
-                scanBeam.enabled=scanning&&target&&source;scanBeam.widthMultiplier=.0012f;
+                if(!instruments)instruments=GetComponent<JourneyInstrumentRig>();
+                scanBeam.enabled=!instruments&&scanning&&target&&source;scanBeam.widthMultiplier=.0012f;
                 if(scanBeam.enabled)
                 {
                     var start=source.position;var end=target.transform.position;
@@ -65,18 +67,21 @@ namespace BiologyVR.ArteryRoute.Journey
         {
             if(!mission||!ring)return;
             var target=mission.world.Find(id);var camera=mission.mover.viewCamera.transform;
-            ring.transform.position=target?target.transform.position:camera.position+camera.forward*1.8f;
+            ring.transform.position=(action==StudyAction.Mark||action==StudyAction.Pulse)&&mission.world.LastInteractionPoint.sqrMagnitude>0?mission.world.LastInteractionPoint:target?target.transform.position:camera.position+camera.forward*1.8f;
             ring.transform.rotation=camera.rotation;elapsed=0;ring.enabled=true;ConfirmedActions++;
-            if(pulseBlock==null)pulseBlock=new MaterialPropertyBlock();pulseBlock.SetColor("_BaseColor",new Color(.70f,.98f,.88f));ring.SetPropertyBlock(pulseBlock);
+            if(pulseBlock==null)pulseBlock=new MaterialPropertyBlock();pulseBlock.SetColor("_BaseColor",HolographicStyle.SoftGlow);ring.SetPropertyBlock(pulseBlock);
             if(action==StudyAction.Scan)CompletedScans++;
             var cue=action==StudyAction.Scan?scanSound:pulseSound;if(audioSource&&cue)audioSource.PlayOneShot(cue,.34f);
             if(shot)
             {
-                shot.enabled=action==StudyAction.Pulse||action==StudyAction.Mark||action==StudyAction.Scan;
+                if(!instruments)instruments=GetComponent<JourneyInstrumentRig>();
+                shot.enabled=!instruments&&(action==StudyAction.Pulse||action==StudyAction.Mark||action==StudyAction.Scan);
                 var input=mission.GetComponent<JourneyInput>();var tool=action==StudyAction.Scan?input.scanner:input.bioTool;
                 shot.SetPosition(0,XRSettings.isDeviceActive&&tool?tool.position:camera.position+camera.right*.25f-camera.up*.18f);
                 shot.SetPosition(1,mission.world.LastInteractionPoint.sqrMagnitude>0?mission.world.LastInteractionPoint:ring.transform.position);
             }
+            if(!instruments)instruments=GetComponent<JourneyInstrumentRig>();
+            if(instruments)instruments.Confirm(action,mission.world.LastInteractionPoint.sqrMagnitude>0?mission.world.LastInteractionPoint:ring.transform.position);
             if(XRSettings.isDeviceActive)
             {
                 var device=InputDevices.GetDeviceAtXRNode(action==StudyAction.Scan?XRNode.LeftHand:XRNode.RightHand);
@@ -96,6 +101,7 @@ namespace BiologyVR.ArteryRoute.Journey
         {
             if(!mission||mission.Goals==null)return;var goal=mission.Current;
             CurrentMode=goal==null?"Исследование":goal.action==StudyAction.Scan?"Сканер":goal.action==StudyAction.Pulse?"Импульс":goal.action==StudyAction.Mark?"Иммунное управление":goal.action==StudyAction.Capture||goal.action==StudyAction.Deposit?"Притяжение":goal.action==StudyAction.Radius||goal.action==StudyAction.Pressure?"Сосудистое поле":goal.action==StudyAction.Direct||goal.action==StudyAction.Balance?"Управление":"Базовый";
+            var modes=GetComponent<BioToolModeController>();if(modes&&goal?.action!=StudyAction.Scan){modes.RefreshGoal();CurrentMode=modes.Caption;}
             var input=mission.GetComponent<JourneyInput>();if(mission.SceneNumber==15&&goal?.action==StudyAction.Mark&&input&&input.LockedTarget)
             {var timing=input.LockedTarget.GetComponent<JourneyViralTiming>();if(timing&&timing.Shielded)CurrentMode="Импульс";}
             if(lastMode==CurrentMode)return;lastMode=CurrentMode;

@@ -1,29 +1,71 @@
-# Unity-проект bio_v0.2 — Coral V6 / 0.2.0
+# Biology VR — bio_v0.2
 
-Откройте эту папку (`unity/BiologyVR`) в Unity Hub с **Unity 6000.1.9f1**.
-Library восстанавливается при импорте. Packages/manifest.json и packages-lock.json
-содержат зависимости; нужен интернет/Git для восстановления Git packages.
+Самостоятельная рабочая копия последней проверенной версии Bio_v.0.1.
+Unity **6000.1.9f1**. Открывать в Unity Hub именно папку `bio_v0.2`.
+Актуальные результаты проверки этой копии: **WORKING_VERSION_RU.md**.
 
-Master scene: `Assets/BiologyVR/ArteryJourney/Scenes/ArteryNarrativeVR_VisualRework.unity`.
-Она назначается entry point и стартовой сценой Play Mode.
+Актуальный самостоятельный Unity-проект артериального маршрута Scenes03–16.
+Подготовлен из текущей сцены и её проверенных зависимостей, с сохранением GUID/.meta.
 
-Все актуальные Assets/.meta, код, shaders, XR/input settings, материалы Coral V6,
-нормальные карты и Inter с кириллицей включены. Механика и collider/path
-signatures подтверждены неизменными при visual-only переработке.
+## Открыть и запустить
 
-ПК: мышь — указатель, ЛКМ — удерживать/перенести, колесо — глубина, F/E —
-Scanner/BioTool, ПКМ — осмотр, G — альтернативный захват, Z — увеличение, → — переход.
+1. Установить **Unity 6000.1.9f1** в Unity Hub.
+2. Add project → выбрать эту папку, где находятся Assets, Packages, ProjectSettings.
+3. Дождаться импорта и восстановления пакетов (нужны интернет и Git).
+4. Открыть **Assets/BiologyVR/ArteryJourney/Scenes/ArteryNarrativeVR_VisualRework.unity**.
+5. Play → Pause выключена → кликнуть в Game.
 
-Документы: **WORKING_VERSION_RU.md**, **ARTERY_CORAL_V6_RU.md**,
-**META_QUEST_RU.md**, **PICO4_ENTERPRISE_RU.md**, **GITHUB_UPLOAD_RU.md**.
-Отчёты и скриншоты — Assets/BiologyVR/ArteryJourney/Reports.
+Editor startup также назначает эту сцену стартовой для Play Mode. В Build Settings
+оставлен единственный актуальный entry point. Library восстанавливается Unity.
 
-Сборки через меню Biology VR: Build WebGL For GitHub Pages, Build Meta Quest APK,
-Build Pico 4 Enterprise APK. Для Android используйте ASCII-путь clone,
-например `C:\Projects\Biology_VR_App\unity\BiologyVR`.
-APK должны иметь 0.2.0 / versionCode 3. Готовые бинарные файлы находятся в корне
-репозитория в play/ и локальной ReleaseFiles/; APK публикуются через Releases.
+## ПК
 
-Это самостоятельный текущий runtime/build-проект. Для восстановления всей
-исторической authoring-цепочки генераторов нужны отдельные исходные версии;
-обычный запуск и сборка используют готовую master-сцену.
+Мышь — указатель; ЛКМ удерживать — взять/перенести; отпустить — разместить;
+колесо — глубина (0,15 м/tick); F удерживать — Scanner; E — BioTool/поле;
+ПКМ + мышь — осмотр; G — альтернативный захват; Z — увеличение; → — продолжить.
+C — режим BioTool. Краткая теория и задача видны сразу;
+Tab / «Подробнее» — полная теория со скроллом. Колесо над справкой
+и PageUp/PageDown — прокрутка; «Назад» / «К практике» — краткий вид.
+Scene07: удерживать E, перенести указатель к зоне, колесом подобрать глубину.
+Scene09: короткое E — выстрел; удерживать — очередь по волне из 24 вирионов.
+В Scene03 перед сканированием извлеките объект из потока удержанием ЛКМ.
+
+## Сборки
+
+- Meta Quest: Biology VR → Build Meta Quest APK.
+- Pico: Biology VR → Build Pico 4 Enterprise APK.
+- WebGL: Biology VR → Build WebGL For GitHub Pages.
+
+Android Build Support/SDK/NDK/OpenJDK и WebGL Build Support устанавливаются через
+Unity Hub. Для Android использовать ASCII alias этой рабочей копии:
+`Z:\BiologyVR_bio_v02_build`.
+
+## Состав
+
+Assets — текущая сцена, используемые модели/материалы/текстуры, код, shaders,
+XR/input configs и Resources. Packages и ProjectSettings обязательны.
+Это подготовленный runtime/build-проект; исходная полная authoring-папка и
+история предыдущих версий сохранены отдельно. Генератор старого narrative source
+не является способом запуска этой версии: используйте готовую master-сцену.
+
+Некоторые используемые материалы имеют исторические V2-имена; они сохранены,
+потому что на них ссылается актуальная сцена. Текущая стенка — **Artery_Coral_V6**.
+Описание последнего прохода и скриншоты — **ARTERY_CORAL_V6_RU.md**.
+Активные GLB-инструменты, движущийся состав крови, стрелковая волна и
+полупрозрачные экраны со скроллом — **ACTIVE_TOOLS_AND_HOLOGRAMS_RU.md**.
+Актуальный первый визуальный проход: **CLEAN_HOLOGRAPHIC_FIRST_PASS_RU.md** —
+краткая теория/задача, пять карточек показателей, чистые cream/graphite инструменты.
+Текущая полировка читаемости и сравнение: **HOLOGRAPHIC_SECOND_PASS_RU.md**.
+Новая геометрия приборов и бесконечная случайная циркуляция фона впереди/сзади,
+по всей артерии и в трёх ветвях: **BIOMEDICAL_LIVING_PASS_RU.md**.
+Scene06 — растущая масса из 30 дробимых элементов, бой до окклюзии, эффекты
+и соответствующий монитор: **GROWING_PLAQUE_CHALLENGE_RU.md**.
+Актуальная итерация: **INFLUX_EMBOLI_AND_CONTROLS_RU.md** — липиды из потока,
+шесть эмболов, режимы на правых A/B, Continue на левой Y и усиленные эффекты.
+
+Инструкция GitHub/Pages: **GITHUB_UPLOAD_RU.md**. Содержимое Builds публикуется
+отдельно: APK через GitHub Releases, WebGL через Pages, исходники — Git + Git LFS.
+Папка `Biology_VR_App` рядом с этим проектом подготовлена отдельно для GitHub.
+Этот `bio_v0.2` предназначен для дальнейшей разработки в Unity.
+Исторические подтверждения запуска/переноса —
+**READY_TO_OPEN_RU.md** и отчёты в Assets/BiologyVR/ArteryJourney/Reports.

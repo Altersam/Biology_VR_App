@@ -1,8 +1,10 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "unity": "6000.1.9f1",
-  "art": "Coral V6",
-  "updated_utc": "2026-10-09T05:58:56.629727+00:00",
+  "art": "Coral V6 + biomedical devices + flow-fed plaque + six emboli",
+  "updated_utc": "2026-10-10T22:13:54.892233+00:00",
+  "webgl_version": "0.3.0",
+  "android_release_version": "0.2.0",
   "releases": [
     {
       "file": "BiologyVR_MetaQuest.apk",

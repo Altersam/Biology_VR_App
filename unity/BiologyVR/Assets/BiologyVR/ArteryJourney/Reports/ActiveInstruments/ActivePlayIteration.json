@@ -1,0 +1,11 @@
+{
+  "utc": "2026-10-09T19:42:54.0931981Z",
+  "orbitalCrown": true,
+  "assaultQuota": 24,
+  "assaultFireInterval": 0.18,
+  "interactiveFlowSlots": 5,
+  "backgroundPool": 360,
+  "bloodCargo": "Hb → heme → O2 travel with the extracted RBC",
+  "requiresExtractionBeforeScan": true,
+  "hardwareVerified": false
+}

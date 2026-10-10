@@ -42,6 +42,15 @@ namespace BiologyVR.ArteryRoute.Journey
         {
             if(!hud||!hud.mission||hud.mission.Goals==null||!screen)return;
             var m=hud.mission;bool tracked=m.mover.UsingTrackedInput;screen.enabled=!tracked;
+            if(hud.GetComponent<JourneyHolographicScreens>())
+            {
+                if(worldCanvas)worldCanvas.enabled=false;
+                panel.SetActive(false);briefing.gameObject.SetActive(false);
+                var pointer=m.GetComponent<JourneyInput>()?.DesktopControls;
+                if(pointer&&pointer.Active)
+                {var p=pointer.PointerPosition;var size=screen.GetComponent<RectTransform>().rect.size;crosshair.rectTransform.anchoredPosition=new Vector2((p.x/Mathf.Max(1,Screen.width)-.5f)*size.x,(p.y/Mathf.Max(1,Screen.height)-.5f)*size.y);crosshair.color=pointer.Holding?new Color(.4f,1,.55f):new Color(.7f,1,1);}
+                return;
+            }
             if(worldCanvas)worldCanvas.enabled=tracked;
             if(tracked)return;
             panel.SetActive(!hud.panelGroup||hud.panelGroup.alpha>.1f);

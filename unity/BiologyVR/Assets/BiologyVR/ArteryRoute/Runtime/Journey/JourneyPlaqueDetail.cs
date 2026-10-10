@@ -22,6 +22,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public float FormationProgress=>Mathf.Clamp01(elapsed/2.4f);
         public bool Ready=>FormationProgress>.999f;
         public int LipidLobules=>lipids==null?0:lipids.Length;
+        public GameObject LegacyDetailRoot=>detailRoot;
         public void Configure(JourneyWorld w,JourneyPlaqueState controller,GameObject root,Renderer capSurface,Transform[] droplets,int[] zoneIndices,Transform[] cells,Transform fibres,Text[] captions)
         {
             world=w;state=controller;detailRoot=root;cap=capSurface;lipids=droplets;sectors=zoneIndices;foam=cells;collagen=fibres;labels=captions;Cache();detailRoot.SetActive(false);

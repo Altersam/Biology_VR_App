@@ -1,0 +1,17 @@
+{
+  "utc": "2026-10-10T05:04:29.0768224Z",
+  "geometryPreserved": true,
+  "geometryBefore": "B094763F4D6B33014748AAA444530DEB5251073E85E5F815675C981E5DAE01FC",
+  "geometryAfter": "B094763F4D6B33014748AAA444530DEB5251073E85E5F815675C981E5DAE01FC",
+  "aimTransformsPreserved": true,
+  "inputActionsPreserved": true,
+  "backgroundPool": 360,
+  "targets": 67,
+  "style": "cream / graphite / cyan / amber",
+  "ui": "reusable overview + full scrollable reference / five large vitals tiles",
+  "physicsAdded": 0,
+  "volumetric": false,
+  "postEffectsAdded": false,
+  "hardwareVerified": false,
+  "phase": "FIRST PASS — stop for visual assessment"
+}

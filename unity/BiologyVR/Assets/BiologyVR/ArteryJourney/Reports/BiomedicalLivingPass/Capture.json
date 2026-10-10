@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-10T10:21:29.493651+00:00",
+  "pcVerifiedUtc": "2026-10-10T10:08:40.1954695Z",
+  "continuousVerifiedUtc": "2026-10-10T09:40:48.5192889Z",
+  "frames": [
+    "01_Scanner_In_Hand.png",
+    "02_BioTool_In_Hand.png",
+    "03_Devices_And_UI.png",
+    "04_Living_Bloodstream_With_UI.png",
+    "05_Flow_Into_Depth.png",
+    "06_Continuous_Backward_View.png"
+  ],
+  "method": "Actual Unity controller/input captures, not concept images",
+  "hardwareVerified": false
+}

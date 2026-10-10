@@ -11,6 +11,7 @@ namespace BiologyVR.ArteryRoute.Journey
     {
         public float radius = 16f;
         public float borderWidth;
+        public bool outlineOnly;
         const int SegmentsPerCorner = 8;
 
         protected override void OnPopulateMesh(VertexHelper mesh)
@@ -44,7 +45,7 @@ namespace BiologyVR.ArteryRoute.Journey
                     mesh.AddTriangle(a + 1, b, b + 1);
                 }
 
-                if (inner.width > 0 && inner.height > 0)
+                if (!outlineOnly && inner.width > 0 && inner.height > 0)
                 {
                     int center = mesh.currentVertCount;
                     int innerStart = 1;

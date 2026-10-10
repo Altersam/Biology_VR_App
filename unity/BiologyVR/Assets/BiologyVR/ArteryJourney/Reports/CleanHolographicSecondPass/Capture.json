@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-10T07:19:48.431483+00:00",
+  "pcInputVerifiedUtc": "2026-10-10T07:15:13.1341181Z",
+  "method": "Actual input captures from the scene; no mockups",
+  "frames": [
+    "01_Overview.png",
+    "02_Full_Reference.png",
+    "03_Scanner_Working.png",
+    "04_BioTool_Capture.png",
+    "05_BioTool_Tonus.png",
+    "06_BioTool_Impulse.png"
+  ],
+  "comparison": "Before_After.jpg",
+  "hardwareVerified": false
+}

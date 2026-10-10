@@ -16,15 +16,19 @@ namespace BiologyVR.ArteryRoute.Journey
         public float[] branchEntries;
         public string[] species;
         public JourneyFlowPickup[] interactiveCells;
+        public JourneyContinuousBloodstream continuousBackground;
         readonly System.Collections.Generic.Dictionary<int,JourneyFlowPickup> pickups=new System.Collections.Generic.Dictionary<int,JourneyFlowPickup>();
         public UnityEngine.UI.Text teachingLegend;
         int[] routes;float[] branchProgress,lastArc;Vector3[] turnStarts;float previousPlayerDistance;
         public int BranchRoutedCells{get;private set;}
+        public void RecordContinuousBranchCount(int count){BranchRoutedCells=count;}
         float[] phases,speeds;
         float[] preferredSpeed,wanderPhase,wanderRate,spinSpeed;
         Vector3[] baseScales;int[] generations;
         public int randomSeed=73519;
         public bool randomizedFlow=true;
+        [Header("Background-only first-scene composition")]
+        public bool layeredStudyBackground;
         System.Random random;
         float[] absoluteArc;
         Quaternion[] poses;Renderer[][] visuals;int visibleCellLimit;
@@ -81,11 +85,26 @@ namespace BiologyVR.ArteryRoute.Journey
         {
             absoluteArc=new float[cells.Length];float anchor=mover?mover.path.Anchor(3):0;
             for(int i=0;i<absoluteArc.Length;i++)absoluteArc[i]=Mathf.Clamp(anchor-flowBehind+Mathf.Repeat(phases[i],flowSpan),.1f,path.Length-.1f);
+            if(layeredStudyBackground)
+            {
+                // Seed the existing visual-only pool ahead of the first lesson.
+                // Never re-anchor nearby cells as the player travels afterwards.
+                for(int i=0;i<absoluteArc.Length;i++)
+                {
+                    if(pickups.ContainsKey(i))continue;
+                    float layer=(i*37%100)/100f;
+                    // A trailing supply reaches the near field over time, rather
+                    // than all near cells leaving together just after Play starts.
+                    float arc=layer<.30f?-24f+(i*17%100)/100f*30f:layer<.78f?9f+(i*29%100)/100f*13f:22f+(i*13%100)/100f*23f;
+                    absoluteArc[i]=Mathf.Min(path.Length-.1f,anchor+arc);
+                    if((i%11)==0){float a=i*2.399963f;lanesX[i]=Mathf.Cos(a)*1.55f;lanesY[i]=Mathf.Sin(a)*1.55f;}
+                }
+            }
             foreach(var pair in pickups)
             {
                 int index=pair.Key;if(index<0||index>=absoluteArc.Length)continue;
                 absoluteArc[index]=anchor+pair.Value.startDistance;lanesX[index]=pair.Value.startLane.x;lanesY[index]=pair.Value.startLane.y;
-                speeds[index]=.18f;
+                speeds[index]=.36f;
             }
         }
         public void ResumePickupAt(int index,Vector3 point)
@@ -115,11 +134,12 @@ namespace BiologyVR.ArteryRoute.Journey
             {
                 if(!cells[i]||i>=offsets.Length||i>=lanesX.Length||i>=lanesY.Length)continue;
                 if(i>=visibleCellLimit){SetVisible(i,false);continue;}
+                if(continuousBackground&&continuousBackground.isActiveAndEnabled&&!pickups.ContainsKey(i))continue;
                 pickups.TryGetValue(i,out var pickup);bool studying=pickup&&pickup.InStudyFlow;
                 if(studying&&pickup.Held){SetVisible(i,false);continue;}
                 float radial=Mathf.Sqrt(lanesX[i]*lanesX[i]+lanesY[i]*lanesY[i]);
                 float rate=(randomizedFlow?preferredSpeed[i]:1.25f+(i%7)*.08f)*(mission?mission.FlowMultiplier:1);
-                if(studying)rate=pickup.Rejoining?.45f:.18f;
+                if(studying)rate=pickup.Rejoining?.55f:.36f;
                 if(composedFlow)rate*=Mathf.Lerp(1.4f,.70f,Mathf.Clamp01(radial/3.5f));
                 speeds[i]=Mathf.MoveTowards(speeds[i],rate,Time.deltaTime*2f);float oldPhase=phases[i];phases[i]+=Time.deltaTime*speeds[i];
                 if(Mathf.FloorToInt(oldPhase/flowSpan)!=Mathf.FloorToInt(phases[i]/flowSpan)&&routes[i]<0){generations[i]++;RandomizeCell(i,true);}
