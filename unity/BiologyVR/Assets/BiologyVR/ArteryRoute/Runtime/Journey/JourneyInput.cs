@@ -38,6 +38,8 @@ namespace BiologyVR.ArteryRoute.Journey
         public float ChargeProgress{get;private set;}
         public JourneyTarget LockedTarget{get;private set;}
         public Collider AimObstruction{get;private set;}
+        public Collider LockedContact{get;private set;}
+        public JourneyPlateletCapture plateletCapture;
         public bool AdjustingTone{get;private set;}
         public float ToneStability{get;private set;}
         Vector3 toneHandStart,toneAxis;
@@ -49,10 +51,15 @@ namespace BiologyVR.ArteryRoute.Journey
         public float DesktopFieldDistance{get;private set;}=JourneyWorld.EmbolusHoldDistance;
         JourneyToolFeedback instrumentFeedback;
         JourneyDesktopControls desktopControls;
+        JourneyUiInputGuard uiGuard;
         float desktopToneOffset;
         public JourneyDesktopControls DesktopControls=>desktopControls;
         public bool ScannerHeld{get;private set;}
         public bool ToolHeld{get;private set;}
+        public bool ScannerBlockedByUi{get;private set;}
+        public bool ToolBlockedByUi{get;private set;}
+        public bool RawScannerPressed=>ReadButton(boundScanAction,XRNode.LeftHand)||(Keyboard.current!=null&&Keyboard.current.fKey.isPressed);
+        public bool RawToolPressed=>ReadButton(boundToolAction,XRNode.RightHand)||(Keyboard.current!=null&&Keyboard.current.eKey.isPressed);
         BioToolModeController bioModes;
         float nextAssaultShot;
         float nextPlaqueShot;
@@ -67,6 +74,7 @@ namespace BiologyVR.ArteryRoute.Journey
         readonly RaycastHit[] targetHits = new RaycastHit[RaycastCapacity];
         readonly RaycastHit[] assistHits = new RaycastHit[RaycastCapacity];
         readonly RaycastHit[] obstructionHits = new RaycastHit[RaycastCapacity];
+        readonly RaycastHit[] guideHits = new RaycastHit[RaycastCapacity];
 
         InputAction boundScanAction;
         InputAction boundToolAction;
@@ -149,25 +157,48 @@ namespace BiologyVR.ArteryRoute.Journey
             // OnDisable clears the queue; public HUD methods remain callable while disabled.
             pendingScan = pendingTool = false;
             if (!isActiveAndEnabled) return;
-            var keyboard=Keyboard.current;
-            bool scan=scanHeld||(keyboard!=null&&keyboard.fKey.isPressed);
-            bool tool=toolHeld||(keyboard!=null&&keyboard.eKey.isPressed);
+            // Poll live actions as well as subscribing: UI/focus cancellations or
+            // enable cycles must not leave a cached held/released state stranded.
+            if(!uiGuard){var hud=GetComponent<JourneyHud>();if(hud)uiGuard=hud.inputGuard;}
+            if(uiGuard)uiGuard.RefreshBlocking();
+            bool scan=RawScannerPressed&&!ScannerBlockedByUi;
+            bool tool=RawToolPressed&&!ToolBlockedByUi;
             UpdateHeldInstruments(Time.deltaTime,scan,tool);
         }
+        static bool ReadButton(InputAction action,XRNode node)
+        {
+            if(action!=null&&action.enabled&&action.IsPressed())return true;
+            if(!XRSettings.isDeviceActive)return false;var device=InputDevices.GetDeviceAtXRNode(node);if(!device.isValid)return false;
+            if(device.TryGetFeatureValue(UnityEngine.XR.CommonUsages.triggerButton,out bool pressed)&&pressed)return true;
+            return device.TryGetFeatureValue(UnityEngine.XR.CommonUsages.trigger,out float value)&&value>=.5f;
+        }
+        public void SetUiBlocking(bool scannerBlocked,bool toolBlocked)
+        {
+            if(scannerBlocked&&!ScannerBlockedByUi){ScanProgress=0;scanTarget=null;scanConsumed=false;ScannerHeld=false;}
+            if(toolBlocked&&!ToolBlockedByUi){ChargeProgress=0;chargeTarget=null;toolConsumed=false;ToolHeld=false;AdjustingTone=false;ToneStability=0;if(world&&world.EmbolusCaptured)world.ReleaseEmbolus();if(plateletCapture)plateletCapture.Release();}
+            ScannerBlockedByUi=scannerBlocked;ToolBlockedByUi=toolBlocked;
+        }
+        public Vector3 GuideEndpoint(Transform source,out bool targetContact)
+        {
+            targetContact=false;if(!source)return Vector3.zero;var ray=new Ray(source.position,source.forward);float distance=Mathf.Min(maxAimDistance,12f);
+            int count=Physics.RaycastNonAlloc(ray,guideHits,distance,~0,QueryTriggerInteraction.Collide);SortByDistance(guideHits,count);
+            for(int i=0;i<count;i++)
+            {
+                var collider=guideHits[i].collider;if(!collider||mover&&mover.origin&&collider.transform.IsChildOf(mover.origin.transform))continue;
+                var target=TargetFrom(collider);bool physical=collider.GetComponentInParent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+                if(collider.isTrigger&&!IsUsableTarget(target)&&!physical)continue;
+                targetContact=IsUsableTarget(target)||physical;return guideHits[i].point;
+            }
+            return ray.GetPoint(distance);
+        }
         public void CancelInstrumentProgress()
-        {ScannerHeld=ToolHeld=false;ScanProgress=ChargeProgress=0;scanTarget=chargeTarget=LockedTarget=null;scanConsumed=toolConsumed=previousPhysicalTool=desktopFieldActive=false;AdjustingTone=false;ToneStability=0;if(world)world.ReleaseEmbolus();}
+        {ScannerHeld=ToolHeld=false;ScanProgress=ChargeProgress=0;scanTarget=chargeTarget=LockedTarget=null;LockedContact=null;scanConsumed=toolConsumed=previousPhysicalTool=desktopFieldActive=false;AdjustingTone=false;ToneStability=0;if(world)world.ReleaseEmbolus();if(plateletCapture)plateletCapture.Release();}
 
         /// <summary>Shared controller/keyboard hold path. Uses real scene raycasts; no focused-target fallback.</summary>
         public void UpdateHeldInstruments(float deltaTime,bool scanning,bool firing)
         {
             ScannerHeld=scanning;ToolHeld=firing;
             if(!bioModes)bioModes=GetComponent<BioToolModeController>();
-            if(bioModes&&firing&&!scanning&&!bioModes.AllowsCurrentGoal())
-            {
-                ChargeProgress=0;
-                if(!previousPhysicalTool)mission.FeedbackMessage("Выбери нужный режим: A вперёд / B назад; на ПК C.");
-                previousPhysicalTool=firing;return;
-            }
             if(!instrumentFeedback)instrumentFeedback=GetComponent<JourneyToolFeedback>();
             if(!scanning){ScanProgress=0;scanTarget=null;scanConsumed=false;}
             if(!firing){ChargeProgress=0;chargeTarget=null;toolConsumed=false;}
@@ -175,6 +206,15 @@ namespace BiologyVR.ArteryRoute.Journey
             var goal=CurrentGoal();
             var source=AimSource(scanning?scanner:bioTool);
             var hit=Aim(source);LockedTarget=hit;
+            if(world.hemodynamics)world.hemodynamics.ObserveScanner(scanning,hit);
+            if(bioModes&&firing&&!scanning&&!bioModes.AllowsCurrentGoal())
+            {
+                ChargeProgress=0;
+                if(!previousPhysicalTool)mission.FeedbackMessage("Выбери нужный режим: A вперёд / B назад; на ПК C.");
+                previousPhysicalTool=firing;return;
+            }
+            if(plateletCapture&&plateletCapture.UpdateField(deltaTime,firing&&!scanning,AimSource(bioTool),LockedContact,desktopControls&&desktopControls.Active))
+            {ChargeProgress=plateletCapture.CaptureProgress;if(plateletCapture.JustAdhered)toolConsumed=true;previousPhysicalTool=firing;return;}
             if(world&&world.EmbolusCaptured)
             {
                 var fieldSource=AimSource(bioTool);
@@ -191,6 +231,8 @@ namespace BiologyVR.ArteryRoute.Journey
                 previousPhysicalTool=firing;return;
             }
             desktopFieldActive=false;
+            if(world.hemodynamics&&world.hemodynamics.Control(deltaTime,firing&&!scanning,AimSource(bioTool),hit,desktopControls&&desktopControls.Active))
+            {AdjustingTone=world.hemodynamics.Adjusting;ToneStability=world.hemodynamics.Stability;ChargeProgress=ToneStability;previousPhysicalTool=firing;return;}
             if(mission.SceneNumber==10&&goal!=null&&goal.action==StudyAction.Radius&&goal.target=="tone")
             {
                 UpdateManualTone(deltaTime,firing,scanning,hit);
@@ -390,7 +432,7 @@ namespace BiologyVR.ArteryRoute.Journey
 
         JourneyTarget Aim(Transform source)
         {
-            AimObstruction=null;
+            AimObstruction=null;LockedContact=null;
             if (!source || targetMask.value == 0) return null;
 
             var ray = new Ray(source.position, source.forward);
@@ -404,7 +446,7 @@ namespace BiologyVR.ArteryRoute.Journey
             {
                 var target = TargetFrom(targetHits[i].collider);
                 if (!IsUsableTarget(target)) continue;
-                if (!Obstructed(ray, targetHits[i].distance, target, 0f, source)) return target;
+                if (!Obstructed(ray, targetHits[i].distance, target, 0f, source)){LockedContact=targetHits[i].collider;return target;}
             }
 
             // BioTool actions are precision operations: never turn a nearby cap or
@@ -418,7 +460,7 @@ namespace BiologyVR.ArteryRoute.Journey
             {
                 var target = TargetFrom(assistHits[i].collider);
                 if (!IsUsableTarget(target)) continue;
-                if (!Obstructed(ray, assistHits[i].distance, target, sphereAssistRadius, source)) return target;
+                if (!Obstructed(ray, assistHits[i].distance, target, sphereAssistRadius, source)){LockedContact=assistHits[i].collider;return target;}
             }
             return null;
         }

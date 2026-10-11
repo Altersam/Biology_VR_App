@@ -1,10 +1,10 @@
 {
-  "version": "0.3.0",
+  "version": "0.4.0",
   "unity": "6000.1.9f1",
-  "art": "Coral V6 + biomedical devices + flow-fed plaque + six emboli",
-  "updated_utc": "2026-10-10T22:37:15.379044+00:00",
-  "webgl_version": "0.3.0",
-  "android_release_version": "0.2.0",
+  "art": "Coral V6 + in-vessel hemodynamics + staged hemostasis + persistent bloodstream + XR lifecycle + futuristic holographic UI",
+  "updated_utc": "2026-10-11T15:29:55.405660+00:00",
+  "webgl_version": "0.4.0",
+  "android_release_version": "0.4.0",
   "releases": [
     {
       "file": "BiologyVR_MetaQuest.apk",
@@ -15,6 +15,16 @@
       "file": "BiologyVR_Pico4Enterprise.apk",
       "bytes": 102963647,
       "sha256": "8cfbb22c2b83fe1ed7ce9e4bbffeaba159b75121d781421530c32cf49db5c6f4"
+    },
+    {
+      "file": "BiologyVR_Pico4_v0.4.0.apk",
+      "bytes": 77238537,
+      "sha256": "eebbf0396a197c01399db0e69dff5dd641703de0b512ceab5f1062513ce2f596",
+      "version": "0.4.0",
+      "device": "PICO 4 / PICO 4 Enterprise",
+      "tag": "v0.4.0"
     }
-  ]
+  ],
+  "pico_release_version": "0.4.0",
+  "android_version_code": 5
 }

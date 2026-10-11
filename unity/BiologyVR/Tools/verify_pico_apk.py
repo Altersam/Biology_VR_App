@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 ANDROID = Path(r"C:\Program Files\Unity\Hub\Editor\6000.1.9f1\Editor\Data\PlaybackEngines\AndroidPlayer")
 APK = ROOT / "Builds/Pico4Enterprise/BiologyVR_Pico4Enterprise.apk"
 REPORT = ROOT / "Assets/BiologyVR/ArteryJourney/Reports/PicoApkVerification.json"
+RELEASE = json.loads((ROOT / "Tools/release_settings.json").read_text(encoding="utf-8-sig"))
 
 
 def run(*args):
@@ -30,7 +31,7 @@ def main():
         checks = {
             "manifest_readable": code == 0 and xmlcode == 0,
             "application_id": "package: name='com.biologyvr.arteryjourney'" in badging,
-            "version_0_3_0": "versionName='0.3.0'" in badging and "versionCode='4'" in badging,
+            "version_matches": f"versionName='{RELEASE['version']}'" in badging and f"versionCode='{RELEASE['android_version_code']}'" in badging,
             "min_sdk_29": "sdkVersion:'29'" in badging,
             "target_sdk_34": "targetSdkVersion:'34'" in badging,
             "arm64_only": "native-code: 'arm64-v8a'" in badging and all("/arm64-v8a/" in name for name in native),
@@ -46,7 +47,7 @@ def main():
     with APK.open("rb") as stream:
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(chunk)
-    result = dict(utc=datetime.now(timezone.utc).isoformat(), passed=all(checks.values()), path=str(APK), size_bytes=APK.stat().st_size,
+    result = dict(utc=datetime.now(timezone.utc).isoformat(), version=RELEASE['version'], version_code=RELEASE['android_version_code'], passed=all(checks.values()), path=str(APK), size_bytes=APK.stat().st_size,
                   sha256=digest.hexdigest(), checks=checks, native_libraries=native, badging=badging, signature=signature, headset_verified=False)
     REPORT.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({key: result[key] for key in ("passed", "path", "size_bytes", "sha256", "checks")}, ensure_ascii=False, indent=2))

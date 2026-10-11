@@ -1,0 +1,19 @@
+{
+  "utc": "2026-10-11T13:49:15.2957394Z",
+  "style": "Futuristic cyan projection rails, bevelled brackets and dark blue holographic glass",
+  "textWeight": "Inter Bold",
+  "fontRasterScale": 2.5,
+  "theoryPosition": [
+    -0.56,
+    0.025,
+    1.78
+  ],
+  "vitalsPosition": [
+    0.67,
+    0.48,
+    1.8
+  ],
+  "raycastsAndCallbacksPreserved": true,
+  "heavyEffectsAdded": false,
+  "hardwareVerified": false
+}

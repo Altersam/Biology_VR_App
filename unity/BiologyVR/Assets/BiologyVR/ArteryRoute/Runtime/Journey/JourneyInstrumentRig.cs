@@ -12,6 +12,9 @@ namespace BiologyVR.ArteryRoute.Journey
         public LineRenderer scannerBeam,impulseBeam,captureTether,fieldRing,pulseRing;
         public LineRenderer captureLockRing;
         public LineRenderer[] captureRays;
+        public LineRenderer scannerGuide,bioGuide;
+        public bool ScannerGuideVisible=>scannerGuide&&scannerGuide.enabled;
+        public bool BioGuideVisible=>bioGuide&&bioGuide.enabled;
         public bool ScannerBeamVisible=>scannerBeam&&scannerBeam.enabled;
         public bool CaptureBeamVisible=>captureTether&&captureTether.enabled;
         public bool PulseVisible=>pulseRing&&pulseRing.enabled;
@@ -21,7 +24,12 @@ namespace BiologyVR.ArteryRoute.Journey
         float shotAge=1,shotDuration=.24f;
         Vector3 shotEnd;
         Vector3 bioPCMount;
-        void Awake(){if(bioPC)bioPCMount=bioPC.transform.localPosition;}
+        void Awake(){if(bioPC)bioPCMount=bioPC.transform.localPosition;scannerGuide=CreateGuide("Persistent Scanner aim guide");bioGuide=CreateGuide("Persistent BioTool aim guide");}
+        LineRenderer CreateGuide(string name)
+        {
+            var go=new GameObject(name);go.transform.SetParent(transform,false);var line=go.AddComponent<LineRenderer>();line.sharedMaterial=scannerBeam.sharedMaterial;line.useWorldSpace=true;line.positionCount=2;line.widthMultiplier=.0012f;line.shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;line.receiveShadows=false;line.enabled=false;return line;
+        }
+        public void ModeChanged(){if(bioVR)bioVR.BeginModeTransition();if(bioPC)bioPC.BeginModeTransition();}
         void LateUpdate()
         {
             if(!input||!input.mission||!input.mover||!input.mover.viewCamera)return;
@@ -32,6 +40,16 @@ namespace BiologyVR.ArteryRoute.Journey
             scannerVR.gameObject.SetActive(tracked);bioVR.gameObject.SetActive(tracked);
             scannerPC.gameObject.SetActive(!tracked&&showScanner);bioPC.gameObject.SetActive(!tracked&&!showScanner);
             ActiveScanner=tracked?scannerVR:scannerPC;ActiveBioTool=tracked?bioVR:bioPC;
+            // Aiming is independent of trigger hold and objective acceptance.
+            if(tracked)
+            {
+                var scannerAimEnd=input.GuideEndpoint(input.scanner,out bool scanContact);var bioEnd=input.GuideEndpoint(input.bioTool,out bool bioContact);
+                Draw(scannerGuide,input.scanner.position,scannerAimEnd,true,scanContact?.0017f:.0012f);
+                Draw(bioGuide,input.bioTool.position,bioEnd,true,bioContact?.0017f:.0012f);
+                ColorGuide(scannerGuide,input.ScannerBlockedByUi?HolographicStyle.Amber:HolographicStyle.Cyan);
+                ColorGuide(bioGuide,input.ToolBlockedByUi||modes&&!modes.AllowsCurrentGoal()?HolographicStyle.Amber:HolographicStyle.Cyan);
+            }
+            else{scannerGuide.enabled=false;bioGuide.enabled=false;}
             if(!tracked)
             {
                 var camera=input.mover.viewCamera.transform;var aim=input.DesktopControls?input.DesktopControls.AimTransform:camera;
@@ -39,9 +57,9 @@ namespace BiologyVR.ArteryRoute.Journey
                 if(scannerPC.gameObject.activeSelf)scannerPC.transform.rotation=Quaternion.Slerp(scannerPC.transform.rotation,Quaternion.LookRotation(direction,camera.up),1-Mathf.Exp(-Time.deltaTime*12));
                 if(bioPC.gameObject.activeSelf)bioPC.transform.rotation=Quaternion.Slerp(bioPC.transform.rotation,Quaternion.LookRotation(direction,camera.up),1-Mathf.Exp(-Time.deltaTime*12));
             }
-            var mode=modes?modes.CurrentMode:BioToolMode.Impulse;bool captured=input.world.EmbolusCaptured;
+            var mode=modes?modes.CurrentMode:BioToolMode.Impulse;bool plateletHeld=input.plateletCapture&&input.plateletCapture.Holding;bool captured=input.world.EmbolusCaptured||plateletHeld;
             string caption=modes?modes.Caption:"IMPULSE";bool popup=modes&&Time.time<modes.ModePopupUntil;
-            ActiveScanner.Present(scan,false,input.ScanProgress,mode,"SCANNER · диагностика",scan);
+            ActiveScanner.Present(scan,false,input.ScanProgress,mode,input.world.hemodynamics&&input.world.hemodynamics.Active?"SCANNER · FLOW":"SCANNER · диагностика",scan);
             ActiveBioTool.Present(fire,captured,input.ChargeProgress,mode,caption,popup);
             FaceCaption(ActiveScanner,input.mover.viewCamera.transform);
             FaceCaption(ActiveBioTool,input.mover.viewCamera.transform);
@@ -52,7 +70,7 @@ namespace BiologyVR.ArteryRoute.Journey
             Draw(scannerBeam,start,scanEnd,scan&&ActiveScanner.gameObject.activeInHierarchy,.0015f);
             bool capture=fire&&mode==BioToolMode.Capture;
             Vector3 origin=ActiveBioTool.muzzle.position;
-            Vector3 end=captured?input.world.bubble.position:target?target.transform.position:origin+ActiveBioTool.muzzle.forward*.45f;
+            Vector3 end=plateletHeld?input.plateletCapture.HeldPiece.transform.position:input.world.EmbolusCaptured?input.world.bubble.position:target?target.transform.position:origin+ActiveBioTool.muzzle.forward*.45f;
             captureTether.enabled=capture&&captured;
             if(captureTether.enabled)
             {
@@ -71,9 +89,9 @@ namespace BiologyVR.ArteryRoute.Journey
             }
             if(captureLockRing){captureLockRing.enabled=capture&&captured;captureLockRing.transform.SetPositionAndRotation(end,cameraRef.transform.rotation);captureLockRing.transform.localScale=Vector3.one*(.33f+.018f*Mathf.Sin(Time.time*7));captureLockRing.widthMultiplier=.0035f;}
             bool wide=fire&&(mode==BioToolMode.Tonus||mode==BioToolMode.Bio);
-            fieldRing.enabled=wide&&target;
+            fieldRing.enabled=wide;
             if(fieldRing.enabled)
-            {fieldRing.transform.SetPositionAndRotation(target.transform.position,cameraRef.transform.rotation);fieldRing.transform.localScale=Vector3.one*(mode==BioToolMode.Tonus?.4f:.22f);}
+            {fieldRing.transform.SetPositionAndRotation(end,cameraRef.transform.rotation);fieldRing.transform.localScale=Vector3.one*(mode==BioToolMode.Tonus?.4f:.22f);}
             shotAge+=Time.deltaTime;bool shot=shotAge<shotDuration;float phase=Mathf.Clamp01(shotAge/shotDuration);
             ActiveBioTool.AnimateHousing(shot?Mathf.Sin(phase*Mathf.PI):0,fire);ActiveScanner.AnimateHousing(0,scan);
             if(!tracked)bioPC.transform.localPosition=bioPCMount-Vector3.forward*(shot?.016f*Mathf.Sin(phase*Mathf.PI):0);
@@ -87,6 +105,8 @@ namespace BiologyVR.ArteryRoute.Journey
             if(!JourneyToolFeedback.ClipBeamStart(input.mover.viewCamera,ref start,end)){line.enabled=false;return;}
             line.widthMultiplier=width;line.positionCount=2;line.SetPosition(0,start);line.SetPosition(1,end);
         }
+        MaterialPropertyBlock guideColors;
+        void ColorGuide(LineRenderer line,Color color){guideColors??=new MaterialPropertyBlock();line.GetPropertyBlock(guideColors);guideColors.SetColor("_BaseColor",color);line.SetPropertyBlock(guideColors);}
         static void FaceCaption(JourneyInstrumentVisual view,Transform camera)
         {if(view.modeCaption&&view.modeCaption.enabled)view.modeCaption.transform.rotation=camera.rotation;}
         public void Confirm(StudyAction action,Vector3 position)
@@ -99,7 +119,7 @@ namespace BiologyVR.ArteryRoute.Journey
         {shotEnd=position;shotAge=0;ImpulseBursts++;}
         void OnDisable()
         {
-            foreach(var line in new[]{scannerBeam,impulseBeam,captureTether,fieldRing,pulseRing,captureLockRing})if(line)line.enabled=false;
+            foreach(var line in new[]{scannerBeam,impulseBeam,captureTether,fieldRing,pulseRing,captureLockRing,scannerGuide,bioGuide})if(line)line.enabled=false;
             if(captureRays!=null)foreach(var line in captureRays)if(line)line.enabled=false;
         }
     }

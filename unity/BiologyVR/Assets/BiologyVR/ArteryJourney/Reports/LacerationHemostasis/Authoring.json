@@ -1,0 +1,19 @@
+{
+  "utc": "2026-10-11T08:22:14.3047362Z",
+  "existingWoundSite": "WALL_A — persistent defect/state controller",
+  "conditionalPrimaryPlugProgress": 11,
+  "reservePlatelets": 3,
+  "jaggedScratch": true,
+  "tearDepth": true,
+  "mainFlowSplit": true,
+  "leakSelectionAtFullInjury": 0.25,
+  "independentLeakEmitterDisabled": true,
+  "capture": "held BioTool field → automatic adhesion near damaged subendothelium",
+  "stabilization": "platelet activation → GPIIb/IIIa + fibrinogen aggregation → thrombin/fibrin",
+  "EDTA": "calcium chelation blocks coagulation",
+  "gradualFibrinSeconds": 6.25,
+  "physicalTokens": 4,
+  "backgroundPool": 360,
+  "worldTargets": 67,
+  "hardwareVerified": false
+}

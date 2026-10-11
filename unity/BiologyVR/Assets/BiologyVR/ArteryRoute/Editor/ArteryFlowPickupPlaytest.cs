@@ -19,7 +19,7 @@ namespace BiologyVR.ArteryRoute.Editor
     {
         static Keyboard keyboard;static Mouse mouse;static KeyboardState keys;
         static Vector2 pendingDelta,pendingScroll,pointer;static ushort buttons;
-        static JourneyMission mission;static bool running,testingEmbolus,cursorMode,continuousOnly,plaqueOnly;
+        static JourneyMission mission;static bool running,testingEmbolus,cursorMode,continuousOnly,plaqueOnly,lacerationOnly,persistenceOnly,mobilePersistence,hemodynamicsOnly;
         static readonly List<string> checks=new List<string>();
         const string Folder=ArteryPolishReview.Reports+"/FlowPickup";
         [MenuItem("Biology VR/Test Flow Cell Catch And Release Through PC Input")]
@@ -32,11 +32,19 @@ namespace BiologyVR.ArteryRoute.Editor
         public static void RunContinuous()=>Start(false,false,true);
         [MenuItem("Biology VR/Test Growing Plaque Through Actual PC Input")]
         public static void RunPlaque()=>Start(false,true,false,true);
-        static void Start(bool embolus,bool cursor=false,bool continuous=false,bool plaque=false)
+        [MenuItem("Biology VR/Test Laceration Eleven Platelets And Activation Through PC Input")]
+        public static void RunLaceration()=>Start(false,true,false,false,true);
+        [MenuItem("Biology VR/Test Dense Bloodstream Across All Artery Scenes")]
+        public static void RunPersistence()=>Start(false,false,false,false,false,true);
+        [MenuItem("Biology VR/Test Dense Bloodstream With Mobile Pool Budget")]
+        public static void RunMobilePersistence()=>Start(false,false,false,false,false,true,true);
+        [MenuItem("Biology VR/Test Hemodynamic Experiment Through PC Input")]
+        public static void RunHemodynamics()=>Start(false,true,false,false,false,false,false,true);
+        static void Start(bool embolus,bool cursor=false,bool continuous=false,bool plaque=false,bool laceration=false,bool persistence=false,bool mobilePool=false,bool hemodynamics=false)
         {
             mission=UnityEngine.Object.FindFirstObjectByType<JourneyMission>();
             if(!EditorApplication.isPlaying||running||!mission||(!embolus&&(mission.SceneNumber!=3||mission.StepIndex!=0)))throw new InvalidOperationException("Fresh Scene03 required: playing="+EditorApplication.isPlaying+" running="+running+" scene="+(mission?mission.SceneNumber:-1)+" step="+(mission?mission.StepIndex:-1));
-            testingEmbolus=embolus;cursorMode=cursor;continuousOnly=continuous;plaqueOnly=plaque;running=true;EditorCoroutineUtility.StartCoroutineOwnerless(Guard(Test()));
+            testingEmbolus=embolus;cursorMode=cursor;continuousOnly=continuous;plaqueOnly=plaque;lacerationOnly=laceration;persistenceOnly=persistence;mobilePersistence=mobilePool;hemodynamicsOnly=hemodynamics;running=true;EditorCoroutineUtility.StartCoroutineOwnerless(Guard(Test()));
         }
         static void Check(bool success,string text)
         {checks.Add((success?"PASS: ":"BLOCKED: ")+text);if(!success)throw new InvalidOperationException(text);}
@@ -57,7 +65,7 @@ namespace BiologyVR.ArteryRoute.Editor
             finally
             {
                 while(stack.Count>0)(stack.Pop() as IDisposable)?.Dispose();running=false;
-                Directory.CreateDirectory(Folder);File.WriteAllText(Folder+(plaqueOnly?"/Plaque_Challenge_PC.json":continuousOnly?"/Continuous_Random_Flow.json":cursorMode?"/NativeCursor_PC_Input.json":testingEmbolus?"/Scene07_PC_Input.json":"/PC_Input.json"),JsonConvert.SerializeObject(new{utc=DateTime.UtcNow,passed=!checks.Exists(c=>c.StartsWith("BLOCKED")),method=plaqueOnly?"Isolated Enter(6,false) fixture; real mouse/keyboard scan, shots, failure, automatic local retry and Continue; no success APIs":continuousOnly?"240 simulated seconds at timeScale 5; real forward/back mouse look; no scene reset or mission success APIs":cursorMode?"Native MouseState position/buttons/scroll and KeyboardState; Scene03 fresh start, isolated Enter(scene,false) fixtures for Scene09/07/12/10/14; no success APIs":testingEmbolus?"Isolated Scene07 fixture: initial Enter(7,false) only; all scan/capture/release/transport/deposit through actual keyboard/mouse events, no success APIs":"Actual keyboard/mouse Input System events; no mission success/enter APIs",checks},Formatting.Indented));
+                Directory.CreateDirectory(Folder);File.WriteAllText(Folder+(hemodynamicsOnly?"/Hemodynamics_PC_Input.json":mobilePersistence?"/Mobile_All_Scenes_Persistent_Blood.json":persistenceOnly?"/All_Scenes_Persistent_Blood.json":lacerationOnly?"/Laceration_PC_Input.json":plaqueOnly?"/Plaque_Challenge_PC.json":continuousOnly?"/Continuous_Random_Flow.json":cursorMode?"/NativeCursor_PC_Input.json":testingEmbolus?"/Scene07_PC_Input.json":"/PC_Input.json"),JsonConvert.SerializeObject(new{utc=DateTime.UtcNow,passed=!checks.Exists(c=>c.StartsWith("BLOCKED")),mobilePoolBudget=mobilePersistence?180:360,method=hemodynamicsOnly?"Isolated Scene05/10 entry fixtures; actual Scanner F, held E/wheel TONUS, XRI physical card placement and normal Continue; no success APIs":persistenceOnly?"Isolated scene-entry fixtures 03–16 with normal travel; actual RMB mouse look, 90-second final-stage dwell; no mission success APIs":lacerationOnly?"Isolated Enter(11,false); real held E field capture/automatic adhesion, scanner and XRI biochemical cards; normal Continue; no mission success APIs":plaqueOnly?"Isolated Enter(6,false) fixture; real mouse/keyboard scan, shots, failure, automatic local retry and Continue; no success APIs":continuousOnly?"240 simulated seconds at timeScale 5; real forward/back mouse look; no scene reset or mission success APIs":cursorMode?"Native MouseState position/buttons/scroll and KeyboardState; Scene03 fresh start, isolated Enter(scene,false) fixtures for Scene09/07/12/10/14; no success APIs":testingEmbolus?"Isolated Scene07 fixture: initial Enter(7,false) only; all scan/capture/release/transport/deposit through actual keyboard/mouse events, no success APIs":"Actual keyboard/mouse Input System events; no mission success/enter APIs",checks},Formatting.Indented));
             }
         }
         static void Queue()
@@ -87,6 +95,9 @@ namespace BiologyVR.ArteryRoute.Editor
                 keyboard=InputSystem.AddDevice<Keyboard>();mouse=InputSystem.AddDevice<Mouse>();InputSystem.EnableDevice(keyboard);InputSystem.EnableDevice(mouse);keys=new KeyboardState();buttons=0;pendingDelta=pendingScroll=Vector2.zero;
                 pointer=new Vector2(Screen.width*.5f,Screen.height*.5f);
                 InputSystem.onBeforeUpdate+=Queue;InputSystem.onAfterUpdate+=UseTestDevices;
+                if(hemodynamicsOnly){yield return TestHemodynamics();yield break;}
+                if(persistenceOnly){yield return TestPersistentAllScenes();yield break;}
+                if(lacerationOnly){yield return TestLaceration();yield break;}
                 if(plaqueOnly){yield return TestPlaque();yield break;}
                 if(continuousOnly){yield return TestContinuous();yield break;}
                 if(testingEmbolus){yield return TestEmbolus();yield break;}
@@ -267,6 +278,8 @@ namespace BiologyVR.ArteryRoute.Editor
             try{Time.timeScale=8;double deadline=EditorApplication.timeSinceStartup+15;while(!challenge.Failed){if(EditorApplication.timeSinceStartup>deadline)throw new InvalidOperationException("No occlusion reached while withholding shots");yield return Wait(.5f);}}
             finally{Time.timeScale=scale;}
             Check(challenge.Failed&&challenge.FlowFraction<.001f&&!mission.Complete,"Ignoring growth reaches real timed occlusion, not mission success");
+            var persistent=mission.world.GetComponent<JourneyContinuousBloodstream>();float plaqueArc=mission.mover.path.Anchor(6)+5;var persistentCells=persistent.MainCellsBetween(plaqueArc-20,plaqueArc+20).ToArray();var persistentPoses=persistentCells.Select(c=>c.position).ToArray();yield return Wait(.8f);
+            Check(persistentCells.Length>=25&&persistentCells.Where((c,i)=>Vector3.Distance(c.position,persistentPoses[i])>.3f).Count()>=20,"Even a failed occlusion attempt preserves dense continuously moving background blood");
             ArteryPolishReview.Capture(mission.mover.viewCamera,"PlaqueChallenge/02_Occlusion_And_Monitor.png");
             yield return Wait(3.3f);Check(!challenge.Failed&&challenge.DestroyedCount==0&&mission.StepIndex==3&&mission.Progress==0&&mission.Retries==retries+1,"Occlusion retries only the combat attempt, preserving diagnosis and controller mode");
             keys=new KeyboardState(Key.E);float start=Time.time;bool impactCaptured=false;
@@ -291,6 +304,118 @@ namespace BiologyVR.ArteryRoute.Editor
             ArteryPolishReview.Capture(mission.mover.viewCamera,"PlaqueChallenge/04_Cleared_Lumen_And_Recovery.png");
             var originalSite=challenge.site;yield return Press(Key.RightArrow,.12f);yield return Wait(10f);
             Check(mission.SceneNumber==7&&mission.Ready&&challenge.site==originalSite&&challenge.Cleared,"Real Continue preserves cleared plaque state and proceeds to embolus episode");
+        }
+        static IEnumerator NativePlace(GameObject go,Vector3 destination)
+        {
+            cursorMode=false;yield return AimAt(go.transform.position);cursorMode=true;yield return AimAt(go.transform.position);buttons=1;yield return Wait(.25f);
+            var grab=go.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+            if(!grab||!grab.isSelected){var desktop=mission.GetComponent<JourneyInput>().DesktopControls;checks.Add("Placement diagnostic: item="+go.name+" active="+go.activeInHierarchy+" position="+go.transform.position+" grabEnabled="+(grab&&grab.enabled)+" hover="+(desktop.HoveredGrab()?desktop.HoveredGrab().name:"none")+" uiHover="+mission.GetComponent<JourneyHolographicScreens>().PointerOverTheory+" pointer="+pointer+" camera="+mission.mover.viewCamera.transform.position+" rayHits="+string.Join(",",Physics.RaycastAll(desktop.PointerRay(),35,~0,QueryTriggerInteraction.Collide).OrderBy(h=>h.distance).Select(h=>h.collider.name+":"+h.distance.ToString("F2"))));}
+            Check(grab&&grab.isSelected,"Actual LMB catches moving/physical item: "+go.name);
+            cursorMode=false;yield return AimAt(destination);cursorMode=true;yield return AimAt(destination);
+            var controls=mission.GetComponent<JourneyInput>().DesktopControls;float distance=Vector3.Distance(mission.mover.viewCamera.transform.position,destination);
+            pendingScroll=new Vector2(0,Mathf.Round((distance-controls.GrabDepth)/JourneyDesktopControls.DepthPerWheelStep)*JourneyDesktopControls.WheelUnitsPerStep);yield return Wait(.55f);buttons=0;yield return Wait(.35f);
+        }
+        static IEnumerator TestLaceration()
+        {
+            mission.Enter(11,false);yield return Wait(.4f);var world=mission.world;var puzzle=world.hemostasisPuzzle;Check(puzzle.flowLayering&&puzzle.RequiredPlatelets==11,"Layering lesson requires eleven flow platelets");
+            Directory.CreateDirectory(ArteryPolishReview.Reports+"/LacerationHemostasis");cursorMode=false;yield return AimAt(world.woundSite.position);cursorMode=true;
+            var stream=world.GetComponent<JourneyContinuousBloodstream>();float savedTimeScale=Time.timeScale;
+            try{Time.timeScale=6;float began=Time.time;while((stream.WoundCandidates<24||stream.WoundLeakedTotal==0)&&Time.time-began<150)yield return Wait(1);}
+            finally{Time.timeScale=savedTimeScale;}
+            Check(world.woundState.splitMainFlow&&stream.WoundLeakedTotal>0&&stream.WoundContinuedTotal>stream.WoundLeakedTotal,"Real primary-pool cells split: some exit through the tear while most continue downstream");
+            checks.Add("Split-flow totals: main="+stream.WoundContinuedTotal+" leak="+stream.WoundLeakedTotal+" candidates="+stream.WoundCandidates);
+            yield return ReviewWoundFlow();
+            ArteryPolishReview.Capture(mission.mover.viewCamera,"LacerationHemostasis/01_Jagged_Tear_And_Outward_Blood.png");
+            yield return AimAt(world.Find("wound").GetComponent<Collider>().bounds.center);yield return Press(Key.F,1.05f);
+            yield return AimAt(world.Find("leak").GetComponent<Collider>().bounds.center);yield return Press(Key.E,.1f);
+            yield return AimAt(world.Find("pressure-low").GetComponent<Collider>().bounds.center);yield return Press(Key.E,.1f);Check(mission.Complete,"Scanner and BioTool diagnose the actual wound before layering");
+            yield return Press(Key.RightArrow,.1f);yield return Wait(4f);Check(mission.SceneNumber==12&&mission.Ready,"Normal Continue enters same-wound platelet lesson");
+            var before=puzzle.platelets.Take(11).Select(p=>p.transform.position).ToArray();yield return Wait(.4f);Check(puzzle.platelets.Take(11).Where((p,i)=>Vector3.Distance(before[i],p.transform.position)>.06f).Count()==11,"All eleven required platelets drift in blood rather than on a stationary tray");
+            yield return NativePlace(puzzle.platelets[0].gameObject,puzzle.Slot(0));Check(puzzle.Attached==0&&mission.Progress==0,"Manual release does not mechanically impale a platelet or bypass BioTool adhesion");yield return Wait(.75f);
+            for(int i=0;i<11;i++)
+            {yield return NativeCapturePlatelet(puzzle.platelets[i],puzzle.Slot(i));Check(puzzle.Attached==i+1&&puzzle.platelets[i].Placed,"Held BioTool guides platelet "+(i+1)+" / 11; adhesion and shape change are automatic");if(i==5)ArteryPolishReview.Capture(mission.mover.viewCamera,"LacerationHemostasis/02_Platelet_Layers_From_Flow.png");}
+            keys=new KeyboardState();yield return Wait(.4f);Check(mission.StepIndex==1&&!puzzle.Activated&&!mission.Complete&&world.FibrinGrowth==0&&world.woundState.LeakStrength>.25f&&puzzle.activationPuzzle.panel.activeInHierarchy,"11/11 is only a loose primary plug: fibrin absent and residual bleeding persists");
+            var activation=puzzle.activationPuzzle;ArteryPolishReview.Capture(mission.mover.viewCamera,"LacerationHemostasis/03_Activation_Sequence_Game.png");
+            yield return AimAt(world.woundSite.position);yield return Press(Key.E,.15f);Check(!puzzle.Activated&&world.FibrinGrowth==0&&!mission.Complete,"One BioTool click cannot stabilize or heal the wound");
+            yield return NativePlace(activation.tokens[3].gameObject,activation.slots[0].position);Check(activation.Mistakes>0&&activation.Progress==0&&!puzzle.Activated,"EDTA distractor is rejected because calcium chelation inhibits coagulation");
+            for(int i=0;i<3;i++){yield return NativePlace(activation.tokens[i].gameObject,activation.slots[i].position);Check(activation.Progress==i+1,"Actual card release solves biochemical sequence step "+(i+1));}
+            yield return Wait(.5f);Check(activation.Solved&&puzzle.Activated&&!mission.Complete&&world.FibrinGrowth>0&&world.woundState.LeakStrength>.08f,"Correct activation/aggregation/thrombin-fibrin sequence starts gradual stabilization, not instantaneous closure");
+            float partial=world.woundState.LeakStrength;yield return Wait(7f);Check(puzzle.StabilizationComplete&&mission.Complete&&world.woundState.LeakStrength<.025f&&world.woundState.LeakStrength<partial,"Fibrin net forms over time and only then bleeding gradually ceases");ArteryPolishReview.Capture(mission.mover.viewCamera,"LacerationHemostasis/04_Activated_Layers_And_Healing_Start.png");
+            cursorMode=false;yield return AimAt(world.woundSite.position);cursorMode=true;CaptureClear("08_Stable_Fibrin_Endothelium_Not_Yet_Healed.png");
+            var site=world.woundSite;var poses=puzzle.platelets.Take(11).Select(p=>p.transform.position).ToArray();yield return Press(Key.RightArrow,.1f);yield return Wait(4f);Check(mission.SceneNumber==13&&world.woundSite==site&&puzzle.Attached==11&&puzzle.platelets.Take(11).Where((p,i)=>Vector3.Distance(p.transform.position,poses[i])<.01f).Count()==11,"Continue preserves the same tear and eleven hand-placed layers for balance stage");
+        }
+        static IEnumerator TestPersistentAllScenes()
+        {
+            var world=mission.world;var stream=world.GetComponent<JourneyContinuousBloodstream>();var flow=world.GetComponent<JourneyBloodFlow>();var path=mission.mover.path;float scale=Time.timeScale;
+            Directory.CreateDirectory(ArteryPolishReview.Reports+"/PersistentBlood");
+            if(mobilePersistence)flow.SetVisibleCellLimit(180);
+            try
+            {
+                Time.timeScale=4;
+                for(int scene=3;scene<=16;scene++)
+                {
+                    if(scene!=3)mission.Enter(scene,true);
+                    while(!mission.Ready)yield return Wait(.25f);
+                    yield return Wait(2f);cursorMode=false;float arc=mission.mover.Distance;
+                    yield return AimAt(path.Centre(Mathf.Min(path.Length,arc+18)));yield return Wait(.4f);int ahead=stream.VisibleMovingCells;
+                    var cells=stream.MainCellsBetween(arc-35,arc+35).ToArray();var poses=cells.Select(c=>c.position).ToArray();yield return Wait(1f);
+                    int moving=cells.Where((c,i)=>Vector3.Distance(poses[i],c.position)>.3f).Count();
+                    yield return AimAt(path.Centre(Mathf.Max(0,arc-18)));yield return Wait(.4f);int behind=stream.VisibleMovingCells;
+                    checks.Add("Scene "+scene+": nearbyMain="+stream.NearbyMainCells+" front="+ahead+" back="+behind+" moving="+moving+" palette="+stream.CurrentSpeciesCounts.Count(c=>c>0)+" refills="+stream.DensityRefills+" simulated="+stream.SimulatedSeconds+" streamEnabled="+stream.isActiveAndEnabled+" flowEnabled="+flow.isActiveAndEnabled+" flowMover="+(flow.mover?flow.mover.name:"none")+" flowCamera="+(flow.mover&&flow.mover.viewCamera?flow.mover.viewCamera.name:"none")+" camera="+mission.mover.viewCamera.transform.position+" arc="+arc+" cell6="+flow.cells[6].position+" cell6active="+flow.cells[6].gameObject.activeInHierarchy);
+                    Check(stream.NearbyMainCells>=(mobilePersistence?45:90)&&ahead>=12&&behind>=12&&moving>=(mobilePersistence?35:75),"Scene "+scene+" keeps a dense moving pool in both directions after normal travel");
+                    Check(stream.CurrentSpeciesCounts.All(c=>c>0),"Scene "+scene+" retains every existing blood visual species");
+                    if(scene==3||scene==11||scene==15||scene==16)
+                    {
+                        yield return AimAt(path.Centre(Mathf.Min(path.Length,arc+18)));
+                        var canvases=UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None);var states=canvases.Select(c=>c.enabled).ToArray();
+                        try{foreach(var canvas in canvases)canvas.enabled=false;ArteryPolishReview.Capture(mission.mover.viewCamera,"PersistentBlood/Scene"+scene.ToString("00")+(mobilePersistence?"_Mobile_Dense_Flow.png":"_Dense_Flow.png"));}
+                        finally{for(int i=0;i<canvases.Length;i++)if(canvases[i])canvases[i].enabled=states[i];}
+                    }
+                }
+                float start=Time.time;int minNear=int.MaxValue,minVisible=int.MaxValue;
+                while(Time.time-start<90)
+                {yield return Wait(.5f);minNear=Mathf.Min(minNear,stream.NearbyMainCells);minVisible=Mathf.Min(minVisible,stream.VisibleMovingCells);}
+                checks.Add("Scene16 ninety-second dwell: minimumNearby="+minNear+" minimumVisible="+minVisible);
+                Check(minNear>=(mobilePersistence?45:90)&&minVisible>=12,"Final-stage circulation remains saturated during prolonged dwell rather than exhausting");
+            }
+            finally{Time.timeScale=scale;}
+        }
+        static IEnumerator ReviewWoundFlow()
+        {
+            var world=mission.world;var path=mission.mover.path;float arc=path.Anchor(11)+5;var centre=path.Centre(arc);var forward=path.Forward(arc);var flow=world.GetComponent<JourneyBloodFlow>();
+            var stream=world.GetComponent<JourneyContinuousBloodstream>();
+            var zones=new[]{stream.MainCellsBetween(arc-12,arc-3).ToArray(),stream.MainCellsBetween(arc-3,arc+3).ToArray(),stream.MainCellsBetween(arc+3,arc+14).ToArray()};
+            var poses=zones[2].Select(c=>c.position).ToArray();yield return Wait(1f);
+            Check(zones[0].Length>0&&zones[1].Length>0&&zones[2].Length>0&&zones[2].Where((c,i)=>Vector3.Dot(c.position-poses[i],forward)>.05f).Any(),"Existing pool retains moving blood before, at and downstream of the defect");
+            checks.Add("Wound-zone primary-pool elements: before="+zones[0].Length+" at="+zones[1].Length+" downstream="+zones[2].Length);
+            cursorMode=false;yield return AimAt(path.Centre(arc+14));cursorMode=true;CaptureClear("05_Overall_Main_Stream_Before_Tear.png");
+            cursorMode=false;yield return AimAt(world.woundSite.position);cursorMode=true;CaptureClear("06_Tear_And_Shared_Pool_Diversion.png");
+            cursorMode=false;yield return AimAt(path.Centre(arc+9));cursorMode=true;CaptureClear("07_Continuing_Downstream_Blood.png");
+            cursorMode=false;yield return AimAt(world.woundSite.position);cursorMode=true;
+        }
+        static void CaptureClear(string file)
+        {
+            var canvases=UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None);var states=canvases.Select(c=>c.enabled).ToArray();
+            try{foreach(var canvas in canvases)canvas.enabled=false;ArteryPolishReview.Capture(mission.mover.viewCamera,"LacerationHemostasis/"+file);}
+            finally{for(int i=0;i<canvases.Length;i++)if(canvases[i])canvases[i].enabled=states[i];}
+        }
+        static IEnumerator NativeCapturePlatelet(JourneyHemostasisPiece item,Vector3 destination)
+        {
+            var input=mission.GetComponent<JourneyInput>();var field=input.plateletCapture;
+            if(Vector3.Distance(item.transform.position,mission.mover.viewCamera.transform.position)>9)
+            {
+                keys=new KeyboardState();cursorMode=false;var camera=mission.mover.viewCamera;yield return AimAt(camera.transform.position+mission.mover.path.Up(mission.mover.Distance)*4);cursorMode=true;
+                float waiting=Time.time;while(Vector3.Distance(item.transform.position,camera.transform.position)>9&&Time.time-waiting<15)yield return Wait(.1f);
+                Check(Vector3.Distance(item.transform.position,camera.transform.position)<9,"Distant platelet returns to the catch zone only after leaving the view");
+            }
+            cursorMode=false;yield return AimAt(item.transform.position);cursorMode=true;keys=new KeyboardState(Key.E);float began=Time.time;
+            while(!field.Holding&&Time.time-began<3)yield return AimAt(item.transform.position);
+            checks.Add("Platelet capture diagnostic: index="+item.index+" distance="+Vector3.Distance(item.transform.position,mission.mover.viewCamera.transform.position)+" progress="+field.CaptureProgress+" held="+(field.HeldPiece?field.HeldPiece.index:-1)+" placed="+item.Placed+" contact="+(input.LockedContact?input.LockedContact.name:"none")+" blocker="+(input.AimObstruction?input.AimObstruction.name:"none")+" step="+mission.StepIndex+" mode="+input.GetComponent<BioToolModeController>().CurrentMode);
+            Check(field.Holding&&field.HeldPiece==item,"Actual held E captures specific moving platelet: "+item.index);
+            cursorMode=false;yield return AimAt(destination);cursorMode=true;yield return AimAt(destination);
+            float depth=Vector3.Distance(mission.mover.viewCamera.transform.position,destination);pendingScroll=new Vector2(0,Mathf.Round((depth-field.FieldDistance)/JourneyDesktopControls.DepthPerWheelStep)*JourneyDesktopControls.WheelUnitsPerStep);
+            began=Time.time;while(!item.Placed&&Time.time-began<6)yield return Wait(.08f);
+            keys=new KeyboardState();yield return Wait(.15f);Check(item.Placed&&!field.Holding,"Near-field platelet adheres to exposed endothelium without release or a healing click");
         }
         static IEnumerator TestAssault()
         {
@@ -335,7 +460,7 @@ namespace BiologyVR.ArteryRoute.Editor
             {
                 current=camera.localEulerAngles;float yaw=Mathf.DeltaAngle(current.y,desired.y),pitch=Mathf.DeltaAngle(current.x,desired.x);
                 if(Mathf.Abs(yaw)<.5f&&Mathf.Abs(pitch)<.5f)break;
-                pendingDelta=new Vector2(yaw/.12f,-pitch/.12f);buttons=2;yield return Wait(.10f);buttons=0;yield return Wait(.05f);
+                ushort held=(ushort)(buttons&1);pendingDelta=new Vector2(yaw/.12f,-pitch/.12f);buttons=(ushort)(held|2);yield return Wait(.10f);buttons=held;yield return Wait(.05f);
             }
             yield return Wait(.05f);
         }
@@ -381,11 +506,13 @@ namespace BiologyVR.ArteryRoute.Editor
             yield return AimAt(puzzle.Slot(0));
             float distance=Vector3.Distance(mission.mover.viewCamera.transform.position,puzzle.Slot(0));
             pendingScroll=new Vector2(0,Mathf.Round((distance-desktop.GrabDepth)/JourneyDesktopControls.DepthPerWheelStep)*JourneyDesktopControls.WheelUnitsPerStep);yield return Wait(.5f);buttons=0;yield return Wait(.5f);
-            Check(puzzle.Attached==1&&piece.Placed&&mission.StepIndex==1,"Mouse pointer/wheel and LMB release physically place the first platelet into the real adhesion slot");
+            if(puzzle.flowLayering){Check(puzzle.Attached==0&&!piece.Placed&&mission.StepIndex==0,"Manual release cannot bypass BioTool adhesion");yield return Wait(.75f);yield return NativeCapturePlatelet(piece,puzzle.Slot(0));Check(puzzle.Attached==1&&mission.Progress==1,"Actual held Capture guides the first platelet into automatic adhesion");}
+            else Check(puzzle.Attached==1&&piece.Placed&&mission.StepIndex==1,"Mouse pointer/wheel and LMB release physically place the first platelet into the real adhesion slot");
             ScreenCapture.CaptureScreenshot(Folder+"/Scene12_Mouse_Placement.png");
         }
         static IEnumerator TestTone()
         {
+            if(mission.world.hemodynamics){yield return TestHemodynamics();yield break;}
             mission.Enter(10,false);yield return Wait(.4f);
             cursorMode=false;yield return AimAt(mission.world.Find("tone").transform.position);cursorMode=true;
             yield return AimAt(mission.world.Find("pressure-low").transform.position);yield return Press(Key.E,.1f);
@@ -400,6 +527,40 @@ namespace BiologyVR.ArteryRoute.Editor
             Check(mission.StepIndex==2&&mission.ModelRadius<.68f,"Whole normalized wheel ticks produce an excessive constriction, without success");
             pendingScroll=new Vector2(0,7*JourneyDesktopControls.WheelUnitsPerStep);yield return Wait(1.05f);
             Check(mission.StepIndex==3&&mission.ModelRadius>=.75f&&mission.ModelRadius<=.88f,"Mouse wheel corrects the tone and sustained safe setting completes the real regulator goal");keys=new KeyboardState();
+        }
+        static IEnumerator TestHemodynamics()
+        {
+            mission.Enter(5,false);yield return Wait(.4f);var experiment=mission.world.hemodynamics;var stream=mission.world.GetComponent<JourneyContinuousBloodstream>();Directory.CreateDirectory(HemodynamicsExperimentBuilder.Reports);
+            cursorMode=false;yield return AimAt(experiment.toneContact.transform.position);cursorMode=true;
+            Check(experiment&&mission.Goals.Count==14&&experiment.Case==0&&Mathf.Abs(experiment.P2-112)<.01f&&Mathf.Abs(experiment.DiameterMm-4.8f)<.01f,"Early episode begins as a normal in-vessel experiment with four physical measurements");
+            Check(!mission.world.flowModel.gameObject.activeInHierarchy&&experiment.display.compactTheory.activeInHierarchy&&!mission.GetComponent<JourneyHolographicScreens>().theoryRoot.gameObject.activeInHierarchy,"Large legacy flow hologram is replaced by compact in-world experiment UI");
+            foreach(var id in new[]{"hdx-p1","hdx-p2","hdx-speed","hdx-diameter"})yield return Scan(id);
+            Check(experiment.Case==1&&experiment.RadiusRatio<.8f&&experiment.ResistanceRatio>3&&experiment.VelocityRatio>1.7f&&experiment.TracerBursts>=4,"Scanner FLOW collects A/B/speed/diameter; fixed-Q narrowing increases resistance, speed and pressure drop");
+            ArteryPolishReview.Capture(mission.mover.viewCamera,"HemodynamicsExperiment/01_Narrow_In_Vessel_AR.png");
+            yield return AdjustHemodynamicsMouse();yield return Scan("hdx-check1");
+            Check(experiment.Case==2&&experiment.RadiusRatio>1.2f&&experiment.VelocityRatio<.7f&&experiment.ResistanceRatio<.5f&&experiment.FormulaDiscovered,"Wide-vessel experiment slows local velocity; resistance relation appears after discovering it");
+            ArteryPolishReview.Capture(mission.mover.viewCamera,"HemodynamicsExperiment/02_Wide_AR_And_Discovered_Relation.png");
+            yield return AdjustHemodynamicsMouse();yield return Scan("hdx-check2");
+            Check(experiment.Case==3&&Mathf.Abs(experiment.RadiusRatio-1)<.001f&&experiment.P1==100&&experiment.P2==95&&experiment.FlowRatio<.7f,"Third puzzle lowers both pressures at normal diameter rather than repeating tone correction");
+            int step=mission.StepIndex;yield return AimAt(experiment.toneContact.transform.position);yield return Press(Key.E,.4f);Check(mission.StepIndex==step&&Mathf.Abs(experiment.RadiusRatio-1)<.001f,"BioTool cannot modify the mystery vessel before diagnostic evidence");
+            foreach(var id in new[]{"hdx-diameter","hdx-speed","hdx-p1","hdx-p2"})yield return Scan(id);
+            yield return NativePlace(experiment.cards.First(c=>c.code==0).gameObject,experiment.cardSlot.position);Check(experiment.Mistakes>0&&mission.Current?.action==StudyAction.Bind,"Physical wrong narrowing hypothesis is rejected with a data-based explanation");
+            yield return NativePlace(experiment.cards.First(c=>c.code==2).gameObject,experiment.cardSlot.position);Check(experiment.AcceptedHypotheses>0&&mission.Current?.target=="hdx-final","Physical evidence-based outside-cause hypothesis succeeds without changing radius");yield return Scan("hdx-final");Check(mission.Complete&&stream.NearbyMainCells>=90,"Experiment ends after repeat verification with dense blood still circulating");
+            ArteryPolishReview.Capture(mission.mover.viewCamera,"HemodynamicsExperiment/03_Outside_Cause_Conclusion.png");
+            yield return Press(Key.RightArrow,.12f);yield return Wait(10f);Check(mission.SceneNumber==6&&mission.Ready&&!experiment.Active,"Normal Continue preserves the route to plaque and restores normal HUD");
+            mission.Enter(10,false);yield return Wait(.4f);Check(mission.Goals.Count==7&&mission.PressureSystolic==92,"Late episode is independent low-pressure diagnosis, not another tone tutorial");
+            foreach(var id in new[]{"hdx-diameter","hdx-speed","hdx-p1","hdx-p2","hdx-wall"})yield return Scan(id);
+            yield return NativePlace(experiment.cards.First(c=>c.code==1).gameObject,experiment.cardSlot.position);Check(mission.Current?.action==StudyAction.Bind,"Unsupported local dilation cannot replace late diagnosis");
+            yield return NativePlace(experiment.cards.First(c=>c.code==2).gameObject,experiment.cardSlot.position);yield return Scan("hdx-forward");Check(mission.Complete&&Mathf.Abs(experiment.RadiusRatio-1)<.001f,"Late diagnosis finishes without an unjustified radius intervention");
+            ArteryPolishReview.Capture(mission.mover.viewCamera,"HemodynamicsExperiment/04_Late_Independent_Diagnosis.png");
+            yield return Press(Key.RightArrow,.12f);yield return Wait(10f);Check(mission.SceneNumber==11&&mission.Ready&&mission.PressureSystolic==92&&mission.world.woundState.LeakStrength>.95f,"Evidence-based late decision leads normally to the existing leaking wound episode");
+        }
+        static IEnumerator AdjustHemodynamicsMouse()
+        {
+            var experiment=mission.world.hemodynamics;int step=mission.StepIndex;yield return AimAt(experiment.toneContact.transform.position);keys=new KeyboardState(Key.E);yield return Wait(.4f);
+            Check(experiment.Adjusting&&mission.StepIndex==step&&experiment.Stability==0,"Held E locks TONUS but a stationary click cannot solve the radius puzzle");
+            pendingScroll=new Vector2(0,Mathf.Round((1-experiment.RadiusRatio)/.025f)*JourneyDesktopControls.WheelUnitsPerStep);yield return Wait(.3f);Check(mission.StepIndex==step,"Correct radius still requires a stable hold rather than an instant success");yield return Wait(1f);keys=new KeyboardState();yield return Wait(.2f);
+            Check(mission.StepIndex==step+1&&experiment.RadiusRatio>=.95f&&experiment.RadiusRatio<=1.05f,"Actual held E and wheel correction produce a stable normal diameter");
         }
         static IEnumerator TestDormantRecovery()
         {
@@ -428,7 +589,10 @@ namespace BiologyVR.ArteryRoute.Editor
         }
         static IEnumerator Scan(string id)
         {
-            int before=mission.StepIndex;var target=mission.world.Find(id);yield return AimAt(target.GetComponent<Collider>().bounds.center);yield return Press(Key.F,1.05f);
+            int before=mission.StepIndex;var target=mission.world.Find(id);var point=target.GetComponent<Collider>().bounds.center;var viewport=mission.mover.viewCamera.WorldToViewportPoint(point);
+            if(cursorMode&&(viewport.z<=0||viewport.x<.08f||viewport.x>.92f||viewport.y<.08f||viewport.y>.92f)){cursorMode=false;yield return AimAt(point);cursorMode=true;}
+            yield return AimAt(point);yield return Press(Key.F,1.05f);
+            if(mission.StepIndex!=before+1){var input=mission.GetComponent<JourneyInput>();checks.Add("Scanner diagnostic: id="+id+" lock="+(input.LockedTarget?input.LockedTarget.name:"none")+" blocked="+input.ScannerBlockedByUi+" obstacle="+(input.AimObstruction?input.AimObstruction.name:"none")+" position="+point+" step="+mission.StepIndex);}
             Check(mission.StepIndex==before+1,"Actual mouse/Scanner scan: "+id);
         }
         static IEnumerator Press(Key key,float duration)

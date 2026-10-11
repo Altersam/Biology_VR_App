@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parent.parent
 REPO=ROOT.parent/'Biology_VR_App'
 PROJECT=REPO/'unity/BiologyVR'
+RELEASE=json.loads((ROOT/'Tools/release_settings.json').read_text(encoding='utf-8-sig'))
 EXCLUDED={'McpUnitySettings.json','prepared_project.json','TRANSFER_VERIFICATION.json','RECOVERY_VERIFICATION.json','CURRENT_PROJECT_TRANSFER.json'}
 
 def sha(path):
@@ -53,7 +54,7 @@ def main():
     oversized=[p.relative_to(REPO).as_posix() for p in files if p.stat().st_size>=100*1024*1024]
     attrs=git('check-attr','filter','--','play/Build/play.data.unityweb','play/Build/play.wasm.unityweb','unity/BiologyVR/Assets/BiologyVR/ArteryJourney/Generated/Artery_Coral_V6/Endothelium_Base_V6.png')
     ignored=subprocess.run(['git','check-ignore','ReleaseFiles/BiologyVR_MetaQuest.apk','ReleaseFiles/BiologyVR_Pico4Enterprise.apk','unity/BiologyVR/Library/McpUnity/bridge-token'],cwd=REPO,capture_output=True,text=True).stdout.splitlines()
-    checks={'source_matches':not mismatches,'webgl_version': 'productVersion: "0.3.0"' in html and version['version']=='0.3.0',
+    checks={'source_matches':not mismatches,'webgl_version': f'productVersion: "{RELEASE["version"]}"' in html and version['version']==RELEASE['version'],
             'loader_references':len(loader_files)>=4 and all((REPO/'play/Build'/name).is_file() for name in loader_files),
             'apks_match':all(apk_checks),'no_prohibited':not forbidden,'sizes_ok':not oversized,
             'play_not_lfs':attrs.count('filter: unset')==2,'unity_texture_lfs':'Endothelium_Base_V6.png: filter: lfs' in attrs,

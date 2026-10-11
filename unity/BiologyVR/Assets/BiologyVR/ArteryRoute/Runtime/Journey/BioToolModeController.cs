@@ -27,6 +27,7 @@ namespace BiologyVR.ArteryRoute.Journey
         {
             if(goal==null)return BioToolMode.Impulse;
             if(goal.action==StudyAction.Capture||goal.action==StudyAction.Deposit)return BioToolMode.Capture;
+            if(goal.action==StudyAction.Direct&&goal.target=="platelet")return BioToolMode.Capture;
             if(goal.action==StudyAction.Radius||goal.action==StudyAction.Pressure)return BioToolMode.Tonus;
             if(goal.action==StudyAction.Direct||goal.action==StudyAction.Balance||goal.action==StudyAction.Activate)return BioToolMode.Bio;
             return BioToolMode.Impulse;
@@ -55,7 +56,9 @@ namespace BiologyVR.ArteryRoute.Journey
         {
             if(CurrentMode==mode&&ModeChanges>0)return;
             if(CurrentMode==BioToolMode.Capture&&mode!=CurrentMode&&input&&input.world.EmbolusCaptured){input.world.ReleaseEmbolus();lastGoal=input.mission.Current;lastScene=input.mission.SceneNumber;RequiredMode=For(lastGoal);}
+            if(CurrentMode==BioToolMode.Capture&&mode!=CurrentMode&&input&&input.plateletCapture)input.plateletCapture.Release();
             CurrentMode=mode;ModeChanges++;ModePopupUntil=Time.time+1.1f;HeldSeconds=0;
+            if(input){var rig=input.GetComponent<JourneyInstrumentRig>();if(rig)rig.ModeChanged();}
             if(userSelected&&input)input.mission.FeedbackMessage(Caption);
             if(userSelected&&input){var feedback=input.GetComponent<JourneyToolFeedback>();if(feedback&&feedback.audioSource&&feedback.modeSound)feedback.audioSource.PlayOneShot(feedback.modeSound,.22f);}
             if(userSelected&&XRSettings.isDeviceActive)

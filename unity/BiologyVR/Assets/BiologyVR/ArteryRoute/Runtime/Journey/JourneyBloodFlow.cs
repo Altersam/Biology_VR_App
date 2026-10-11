@@ -21,6 +21,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public UnityEngine.UI.Text teachingLegend;
         int[] routes;float[] branchProgress,lastArc;Vector3[] turnStarts;float previousPlayerDistance;
         public int BranchRoutedCells{get;private set;}
+        public int VisibleCellLimit=>visibleCellLimit;
         public void RecordContinuousBranchCount(int count){BranchRoutedCells=count;}
         float[] phases,speeds;
         float[] preferredSpeed,wanderPhase,wanderRate,spinSpeed;
@@ -124,12 +125,11 @@ namespace BiologyVR.ArteryRoute.Journey
         void Update()
         {
             if(!path||!mover||!mover.viewCamera||cells==null||offsets==null||lanesX==null||lanesY==null)return;
-            if(teachingLegend)teachingLegend.gameObject.SetActive(mission&&mission.SceneNumber>=3&&mission.SceneNumber<=16);
+            if(teachingLegend)teachingLegend.gameObject.SetActive(mission&&mission.SceneNumber>=3&&mission.SceneNumber<=16&&!(mission.world.hemodynamics&&mission.world.hemodynamics.Active));
             if(phases==null||phases.Length!=cells.Length)InitializePhases();
             if(routes==null||routes.Length!=cells.Length)InitializeRoutes();
             if(absoluteArc==null||absoluteArc.Length!=cells.Length)InitializeWorldPositions();
             previousPlayerDistance=mover.Distance;BranchRoutedCells=0;
-            if(mission&&(mission.SceneNumber>=18||(mission.SceneNumber>=17&&mission.world&&mission.world.labRoom&&mission.world.labRoom.activeInHierarchy))){for(int i=0;i<cells.Length;i++)SetVisible(i,false);return;}
             for(int i=0;i<cells.Length;i++)
             {
                 if(!cells[i]||i>=offsets.Length||i>=lanesX.Length||i>=lanesY.Length)continue;
@@ -138,7 +138,7 @@ namespace BiologyVR.ArteryRoute.Journey
                 pickups.TryGetValue(i,out var pickup);bool studying=pickup&&pickup.InStudyFlow;
                 if(studying&&pickup.Held){SetVisible(i,false);continue;}
                 float radial=Mathf.Sqrt(lanesX[i]*lanesX[i]+lanesY[i]*lanesY[i]);
-                float rate=(randomizedFlow?preferredSpeed[i]:1.25f+(i%7)*.08f)*(mission?mission.FlowMultiplier:1);
+                float rate=randomizedFlow?preferredSpeed[i]:1.25f+(i%7)*.08f;
                 if(studying)rate=pickup.Rejoining?.55f:.36f;
                 if(composedFlow)rate*=Mathf.Lerp(1.4f,.70f,Mathf.Clamp01(radial/3.5f));
                 speeds[i]=Mathf.MoveTowards(speeds[i],rate,Time.deltaTime*2f);float oldPhase=phases[i];phases[i]+=Time.deltaTime*speeds[i];

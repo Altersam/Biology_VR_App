@@ -24,7 +24,7 @@ namespace BiologyVR.ArteryRoute.Editor
                 if(EditorApplication.isPlaying)throw new InvalidOperationException("Exit Play Mode first");
                 if(!BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.WebGL,BuildTarget.WebGL))throw new InvalidOperationException("Install WebGL Build Support in Unity Hub");
                 PlayerSettings.productName="Biology VR";
-                PlayerSettings.companyName="BiologyVR";PlayerSettings.bundleVersion="0.3.0";
+                PlayerSettings.companyName="BiologyVR";PlayerSettings.bundleVersion=BiologyReleaseVersion.Version;
                 ArteryInterfaceFont.Apply();
                 PlayerSettings.WebGL.compressionFormat=WebGLCompressionFormat.Gzip;
                 PlayerSettings.WebGL.decompressionFallback=true;
@@ -39,7 +39,7 @@ namespace BiologyVR.ArteryRoute.Editor
                 string folder=Path.GetFullPath("Builds/WebGL/play");Directory.CreateDirectory(folder);
                 var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=new[]{UniversalMobileBuild.ScenePath},locationPathName=folder,target=BuildTarget.WebGL,options=BuildOptions.None});
                 File.WriteAllText(Path.Combine(folder,".nojekyll"),string.Empty);
-                File.WriteAllText(reportPath,JsonConvert.SerializeObject(new{utc=DateTime.UtcNow,version="0.3.0",result=report.summary.result.ToString(),errors=report.summary.totalErrors,warnings=report.summary.totalWarnings,path=folder,compression="gzip with decompression fallback",threads=false,browserVerified=false},Formatting.Indented));
+                File.WriteAllText(reportPath,JsonConvert.SerializeObject(new{utc=DateTime.UtcNow,version=BiologyReleaseVersion.Version,result=report.summary.result.ToString(),errors=report.summary.totalErrors,warnings=report.summary.totalWarnings,path=folder,compression="gzip with decompression fallback",threads=false,browserVerified=false},Formatting.Indented));
             }
             catch(Exception error)
             {Directory.CreateDirectory(Path.GetDirectoryName(reportPath));File.WriteAllText(reportPath,JsonConvert.SerializeObject(new{utc=DateTime.UtcNow,result="Failed",reason=error.Message},Formatting.Indented));Debug.LogException(error);}

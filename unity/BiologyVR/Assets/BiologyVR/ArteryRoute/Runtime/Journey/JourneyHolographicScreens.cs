@@ -34,7 +34,7 @@ namespace BiologyVR.ArteryRoute.Journey
         {
             get
             {
-                if(!hud||!hud.mission||Mouse.current==null||!theoryRoot)return false;
+                if(!hud||!hud.mission||Mouse.current==null||!theoryRoot||!theoryRoot.gameObject.activeInHierarchy)return false;
                 return RectTransformUtility.RectangleContainsScreenPoint(theoryRoot,Mouse.current.position.ReadValue(),hud.mission.mover.viewCamera);
             }
         }
@@ -71,6 +71,8 @@ namespace BiologyVR.ArteryRoute.Journey
             if(m.SceneNumber==6&&m.world.plaqueChallenge&&m.Current?.action==StudyAction.Pulse)
             {var plaque=m.world.plaqueChallenge;taskProgress.text=$"Осталось {plaque.RemainingCount} • {plaque.RemainingSeconds:0}с";taskHint.text=plaque.Failed?"ОККЛЮЗИЯ • повтор через 3 секунды":$"Trigger / E — очередь • прибыло +{plaque.ReinforcementCount}";}
             if(m.SceneNumber==7&&m.world.embolusWave)taskProgress.text=$"Ловушка {m.world.embolusWave.StabilizedCount}/6";
+            if(m.SceneNumber==12&&m.world.hemostasisPuzzle&&m.world.hemostasisPuzzle.flowLayering)
+            {var puzzle=m.world.hemostasisPuzzle;taskProgress.text=puzzle.Activated?$"Фибрин {m.world.FibrinGrowth:P0}":puzzle.Attached<11?$"Первичная {puzzle.Attached}/11":$"Цепочка {puzzle.activationPuzzle.Progress}/3";if(m.Current?.action==StudyAction.Activate)taskHint.text="Grip / ЛКМ — три этапа стабилизации по порядку";else if(m.Current?.target=="platelet")taskHint.text="Удерживай Capture • подведи: адгезия автоматическая";}
             if(overview)overview.SetActive(!ShowPractice);
             if(referenceView)referenceView.SetActive(ShowPractice);
             theoryScroll.enabled=ShowPractice;
@@ -87,12 +89,15 @@ namespace BiologyVR.ArteryRoute.Journey
             if(vitalValues==null||vitalValues.Length!=5)return;
             var values=new[]{$"{m.PressureSystolic:0}/{m.PressureDiastolic:0}","72","98 %",$"{m.Temperature:0.0}°",$"{m.ViralLoad:0} %"};
             var plaque=m.SceneNumber==6?m.world.plaqueChallenge:null;
+            var wound=m.SceneNumber>=11&&m.SceneNumber<=14?m.world.woundState:null;
             if(plaque){values[1]=$"{plaque.PulseBpm:0}";values[2]=$"{plaque.OxygenPercent:0} %";values[4]=$"{plaque.FlowFraction*100:0} %";}
-            if(vitalLabels!=null&&vitalLabels.Length==5)vitalLabels[4].text=plaque?"КРОВОТОК":"ВИРУС";
+            if(wound)values[4]=$"{wound.LeakStrength*100:0} %";
+            if(vitalLabels!=null&&vitalLabels.Length==5)vitalLabels[4].text=plaque?"КРОВОТОК":wound?"УТЕЧКА":"ВИРУС";
             if(monitorStatus)monitorStatus.text=plaque?"● ЛОКАЛЬНАЯ МОДЕЛЬ":"● МОДЕЛЬ / LIVE";
             bool infection=m.ViralLoad>=.5f;
             var states=new[]{m.PressureSystolic<110?"Ниже нормы":m.PressureSystolic>130?"Выше нормы":"Норма","Норма","Норма",m.Temperature>37.2f?"Повышена":"Норма",infection?"Инфекция":"Не обнаружен"};
             if(plaque){states[1]=plaque.PulseBpm>90?"Компенсация":"Норма";states[2]=plaque.OxygenPercent<95?"Снижена":"Норма";states[4]=plaque.Failed?"ОККЛЮЗИЯ":plaque.Cleared?"Просвет свободен":$"Сужение {plaque.Obstruction*100:0}%";}
+            if(wound)states[4]=wound.LeakStrength>.03f?"Кровь наружу":"Остановлена";
             for(int i=0;i<5;i++){vitalValues[i].text=values[i];vitalStatuses[i].text=states[i];vitalStatuses[i].color=(i==0&&(m.PressureSystolic<110||m.PressureSystolic>130)||i==3&&m.Temperature>37.2f||i==4&&(infection||plaque&&!plaque.Cleared)||plaque&&((i==1&&plaque.PulseBpm>90)||(i==2&&plaque.OxygenPercent<95)))?HolographicStyle.Amber:HolographicStyle.Secondary;}
         }
         public void TogglePractice(){ShowPractice=!ShowPractice;Refresh();}
@@ -122,10 +127,12 @@ namespace BiologyVR.ArteryRoute.Journey
         {
             if(m.Complete)return "Продолжить → / левая Y";
             var goal=m.Current;if(goal==null)return "";
+            if(goal.target=="hemostasis-stable")return "Наблюдай фибрин и постепенное уменьшение утечки";
             if(goal.action==StudyAction.Scan)return m.SceneNumber==3?"Grip / ЛКМ — взять · Trigger / F — сканировать":"Scanner: левый Trigger / F · навести на цель";
             if(goal.action==StudyAction.Grab)return "Grip / ЛКМ — достать из потока";
             if(goal.action==StudyAction.Enlarge)return "Две руки / Z — учебное увеличение";
             if(goal.target=="oxygen")return "Взять O₂ · перенести · отпустить у гема";
+            if(m.SceneNumber==12&&goal.action==StudyAction.Direct&&goal.target=="platelet")return "BioTool Capture: удерживать Trigger / E • подвести к ране";
             if(goal.action==StudyAction.Bind||((m.SceneNumber==12||m.SceneNumber==13)&&(goal.action==StudyAction.Direct||goal.action==StudyAction.Balance)))return "Grip / ЛКМ — взять · перенести · отпустить";
             if(goal.action==StudyAction.Capture||goal.action==StudyAction.Deposit)return "Удерживать Trigger / E — поле захвата";
             if(m.SceneNumber==9&&goal.action==StudyAction.Mark)return "Trigger / E — импульс · удержание — очередь";
@@ -142,8 +149,8 @@ namespace BiologyVR.ArteryRoute.Journey
             8=>"Геном окружён капсидом.\nПоверхностный антиген помогает\nиммунной системе распознать вирус.",
             9=>"Метка помогает иммунной клетке\nраспознать и поглотить вирион.\nПропуски повышают вирусную нагрузку.",
             10=>"Тонус временно поддерживает АД.\nУмеренное сужение сохраняет поток.\nПричину падения давления нужно найти.",
-            11=>"Дефект стенки вызывает утечку.\nКровопотеря снижает давление.\nНайди повреждение и оцени поток.",
-            12=>"Тромбоциты формируют пробку.\nТромбин запускает образование фибрина.\nСеть укрепляет место повреждения.",
+            11=>"Целостность стенки нарушена.\nУтечка ↑ • обнажён субэндотелий.\nЧасть потока идёт наружу, основная — дальше.",
+            12=>"Адгезия образует первичную пробку.\nАктивация и агрегация её усиливают.\nФибрин стабилизирует; утечка снижается.",
             13=>"Недостаток пробки оставляет утечку.\nИзбыток перекрывает просвет.\nРабочий результат — равновесие.",
             14=>"Фагоцит очищает клеточный детрит.\nПлазмин удаляет фибрин.\nЭндотелий восстанавливает стенку.",
             15=>"Антитело узнаёт подходящий эпитоп.\nФагоцит удаляет связанный комплекс.\nT-клетка устраняет источник инфекции.",

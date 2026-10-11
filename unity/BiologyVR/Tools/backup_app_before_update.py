@@ -6,7 +6,8 @@ from pathlib import Path
 
 root=Path(__file__).resolve().parent.parent
 source=root.parent/'Biology_VR_App'
-dest=root.parent/('Biology_VR_App_before_v03_'+datetime.now().strftime('%Y%m%d_%H%M%S'))
+version=json.loads((root/'Tools/release_settings.json').read_text(encoding='utf-8-sig'))['version'].replace('.','')
+dest=root.parent/('Biology_VR_App_before_v'+version+'_'+datetime.now().strftime('%Y%m%d_%H%M%S'))
 if not source.is_dir() or not dest.parent.is_dir():raise SystemExit('Repository or backup parent missing')
 dest.mkdir();count=0
 for entry in source.iterdir():

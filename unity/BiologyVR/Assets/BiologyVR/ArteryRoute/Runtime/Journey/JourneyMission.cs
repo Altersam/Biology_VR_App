@@ -88,6 +88,14 @@ namespace BiologyVR.ArteryRoute.Journey
                     Goal("Сканируй эндотелий",StudyAction.Scan,"endothelium");Goal("Включи послойный режим",StudyAction.Activate,"layers");
                     Goal("Просканируй интиму",StudyAction.Scan,"intima");Goal("Просканируй мышечно-эластическую медиа",StudyAction.Scan,"media");Goal("Просканируй адвентицию",StudyAction.Scan,"adventitia");break;
                 case 5:
+                    if(world.hemodynamics)
+                    {
+                        Goal("Scanner: измерь давление A до участка",StudyAction.Scan,"hdx-p1");Goal("Измерь давление B после участка",StudyAction.Scan,"hdx-p2");Goal("Измерь локальную скорость",StudyAction.Scan,"hdx-speed");Goal("Измерь диаметр участка",StudyAction.Scan,"hdx-diameter");
+                        Goal("Опыт 1: настрой нормальный диаметр и удержи стабильный режим",StudyAction.Radius,"hdx-normal1");Goal("Проверь давление B после коррекции",StudyAction.Scan,"hdx-check1");
+                        Goal("Опыт 2: настрой нормальный диаметр и удержи стабильный режим",StudyAction.Radius,"hdx-normal2");Goal("Проверь локальную скорость после коррекции",StudyAction.Scan,"hdx-check2");
+                        Goal("АД снизилось: сначала измерь диаметр",StudyAction.Scan,"hdx-diameter");Goal("Измерь скорость",StudyAction.Scan,"hdx-speed");Goal("Измерь давление A",StudyAction.Scan,"hdx-p1");Goal("Измерь давление B",StudyAction.Scan,"hdx-p2");
+                        Goal("Сопоставь данные: перенеси карточку обоснованной гипотезы",StudyAction.Bind,"hdx-hypothesis");Goal("Повторно просканируй участок и сделай вывод",StudyAction.Scan,"hdx-final");break;
+                    }
                     Goal("Сними давление, скорость и площадь",StudyAction.Measure,"flow");Goal("Активируй голографическую модель",StudyAction.Activate,"flow-model");
                     Goal("Уменьши радиус модели",StudyAction.Radius,"small-radius");Goal("Увеличь радиус модели",StudyAction.Radius,"large-radius");
                     Goal("Измени модельное давление",StudyAction.Pressure,"pressure");Goal("Верни нормальные параметры",StudyAction.Activate,"normal-flow");break;
@@ -104,12 +112,20 @@ namespace BiologyVR.ArteryRoute.Journey
                 case 9:
                     Temperature=36.6f;ViralLoad=25;Goal("Открой иммунное управление",StudyAction.Activate,"immune-mode");Goal("Отрази волну: 24 вириона — наведи BioTool и стреляй",StudyAction.Mark,"incoming-virus",AssaultVirusCount);Goal("Передай помеченные частицы фагоциту",StudyAction.Direct,"phagocyte");break;
                 case 10:
+                    if(world.hemodynamics)
+                    {
+                        PressureSystolic=92;
+                        Goal("Низкое АД: измерь локальный диаметр",StudyAction.Scan,"hdx-diameter");Goal("Измерь скорость крови",StudyAction.Scan,"hdx-speed");Goal("Измерь давление до участка",StudyAction.Scan,"hdx-p1");Goal("Измерь давление после участка",StudyAction.Scan,"hdx-p2");Goal("Проверь целостность местной стенки",StudyAction.Scan,"hdx-wall");
+                        Goal("На основании измерений выбери действие физической карточкой",StudyAction.Bind,"hdx-hypothesis");Goal("Повторно осмотри выход из участка",StudyAction.Scan,"hdx-forward");break;
+                    }
                     PressureSystolic=92;ModelRadius=lastToneReport=1;world.UpdateExperiment(ModelRadius,ModelPressure);
                     Goal("Измерь падение артериального давления",StudyAction.Measure,"pressure-low");Goal("Включи сосудистое поле",StudyAction.Activate,"tone-mode");
                     Goal("Удерживай Trigger: опусти BioTool и удержи умеренный тонус",StudyAction.Radius,"tone");Goal("Замерь временную стабилизацию",StudyAction.Measure,"pressure-stable");Goal("Подтверди повторное падение и найди причину",StudyAction.Measure,"pressure-return");break;
                 case 11:
                     Goal("Сканером определи повреждение эндотелия",StudyAction.Scan,"wound");Goal("BioTool измерь утечку крови",StudyAction.Measure,"leak");Goal("HUD подтверди снижение давления",StudyAction.Measure,"pressure-low");break;
                 case 12:
+                    if(world.hemostasisPuzzle&&world.hemostasisPuzzle.flowLayering)
+                    {Goal("BioTool Capture: подведи тромбоциты к субэндотелию — условная первичная пробка",StudyAction.Direct,"platelet",11);Goal("Стабилизируй пробку: активация → агрегация → тромбин/фибрин",StudyAction.Activate,"platelet");Goal("Наблюдай образование фибрина и постепенную остановку утечки",StudyAction.Measure,"hemostasis-stable");break;}
                     Goal("Возьми тромбоцит и прикрепи к exposed wound",StudyAction.Direct,"platelet");Goal("Активируй первый прикреплённый тромбоцит",StudyAction.Activate,"platelet");
                     Goal("Добавь пять тромбоцитов руками: агрегация",StudyAction.Direct,"platelet",5);Goal("Сканируй доступные факторы: найди тромбин",StudyAction.Scan,"thrombin");
                     Goal("Активируй тромбин: фибриноген → фибрин",StudyAction.Activate,"thrombin");Goal("Протяни три нити между парными anchors вокруг пробки",StudyAction.Direct,"fibrin",3);break;
@@ -139,12 +155,12 @@ namespace BiologyVR.ArteryRoute.Journey
             {
                 case 3:LearningTerm="Форменные элементы крови";LearningNote="Эритроциты переносят O₂ и часть CO₂; лейкоциты участвуют в защите; тромбоциты помогают остановить кровотечение.";Formula="Hb + O₂ ⇄ HbO₂";ProfessorLine="Сравни объект, его функцию и место в общей системе.";break;
                 case 4:LearningTerm="Эндотелий и стенка артерии";LearningNote="Эндотелий контактирует с кровью; медиа меняет тонус; наружные слои поддерживают сосуд.";ProfessorLine="Сосуд — это живая ткань, а не пустая трубка.";break;
-                case 5:LearningTerm="Гемодинамика";LearningNote="Радиус особенно сильно влияет на поток: небольшое сужение заметно меняет пропускную способность.";Formula="Q = vS   •   Q ∝ ΔP·r⁴/(ηL)";ProfessorLine="Проверь закономерность сначала на модели, затем сравни с наблюдаемым потоком.";break;
+                case 5:LearningTerm="Гемодинамический эксперимент";LearningNote="Поток возникает из-за разности давлений. Измерь A и B, сравни скорость и диаметр, затем проверь свою гипотезу экспериментом. В первых двух опытах расход фиксирован; в третьем изменён приток.";Formula="";ProfessorLine="Прежде чем лечить сосуд, выясним, от чего зависит поток.";break;
                 case 6:LearningTerm="Атеросклеротическая бляшка";LearningNote="LDL и воспаление формируют липидное ядро; фиброзная покрышка удерживает его внутри стенки.";Formula="Повреждение покрышки → тромбоциты → фибрин → окклюзия";ProfessorLine="Точность важнее силы: работай только по липидным мишеням.";break;
                 case 7:LearningTerm="Газовый эмбол";LearningNote="Пузырёк может перемещаться с кровотоком и застрять там, где просвет становится уже.";ProfessorLine="Опасность определяется не размером объекта, а тем, где он окажется.";break;
                 case 8:LearningTerm="Строение вирусной частицы";LearningNote="Сначала различи генетический материал, капсид и поверхностный антиген — атака без распознавания неточна.";Formula="Антиген ⊃ эпитоп";ProfessorLine="Не атакуй неизвестное. Получи данные.";break;
                 case 9:LearningTerm="Иммунный ответ";LearningNote="Распознавание и маркировка позволяют иммунной клетке забрать частицу; пропуски повышают температуру.";Formula="39,5 °C — критический игровой предел";ProfessorLine="Сохрани контроль над волной: правильное действие снижает нагрузку.";break;
-                case 10:LearningTerm="Сосудистый тонус";LearningNote="Умеренное сужение временно поддерживает давление, но не устраняет причину его падения.";Formula="92/60 → 100/66 → поиск утечки";ProfessorLine="Симптом можно временно стабилизировать, но причину нужно найти.";break;
+                case 10:LearningTerm="Диагностика низкого давления";LearningNote="Измерь локальный диаметр, скорость, давление по обе стороны участка и целостность стенки. Выбери действие на основании полученных данных.";Formula="";ProfessorLine="Обоснуй действие измерениями.";break;
                 case 11:LearningTerm="Повреждение эндотелия";LearningNote="Разрыв стенки объясняет одновременно кровопотерю и падение давления.";Formula="Дефект стенки + утечка → снижение объёма кровотока";ProfessorLine="Три независимых наблюдения должны привести к одному выводу.";break;
                 case 12:LearningTerm="Гемостаз";LearningNote="Адгезия и активация тромбоцитов создают первичную пробку; тромбин запускает сеть фибрина.";Formula="Фибриноген —(тромбин)→ фибрин";ProfessorLine="Пробка должна расти поэтапно, а не возникать мгновенно.";break;
                 case 13:LearningTerm="Баланс гемостаза";LearningNote="Недостаточная пробка пропускает кровь, избыточная перекрывает просвет; нужен рабочий оптимум.";Formula="Кровотечение остановлено + поток сохранён";ProfessorLine="Хороший результат — это баланс, а не максимальное значение шкалы.";break;
@@ -247,6 +263,11 @@ namespace BiologyVR.ArteryRoute.Journey
             ModelRadius=Mathf.Clamp(radius,.55f,1.15f);world.UpdateExperiment(ModelRadius,ModelPressure);
             PressureSystolic=ModelRadius>=.72f?Mathf.Lerp(92,100,Mathf.InverseLerp(1,.88f,ModelRadius)):100-(.72f-ModelRadius)*90;
             if(Mathf.Abs(lastToneReport-ModelRadius)>=.01f){lastToneReport=ModelRadius;Changed?.Invoke();}
+        }
+        public void UpdateHemodynamicState(float radius,float pressure)
+        {
+            if(SceneNumber!=5&&SceneNumber!=10)return;
+            ModelRadius=radius;PressureSystolic=pressure;
         }
         public void WarnExcessiveTone()
         {WrongTargetActions++;Feedback="Чрезмерное сужение ограничивает поток. Подними BioTool и верни умеренный тонус.";Changed?.Invoke();}

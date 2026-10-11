@@ -56,6 +56,8 @@ Shader "BiologyVR/Artery Visual V2"
             CBUFFER_END
             float4 _InspectionOriginWS,_InspectionUpWS,_InspectionForwardWS,_InspectionRightWS,_InspectionHalfSize;
             float _InspectionReveal;
+            float4 _HemoCentreWS,_HemoAxisWS;
+            float _HemoRadius;
             struct A {float4 p:POSITION;float3 n:NORMAL;float4 t:TANGENT;float2 uv:TEXCOORD0;float3 centre:TEXCOORD1;UNITY_VERTEX_INPUT_INSTANCE_ID};
             struct V {float4 p:SV_POSITION;float3 ws:TEXCOORD0;half3 n:TEXCOORD1;half3 t:TEXCOORD2;half3 b:TEXCOORD3;float2 uv:TEXCOORD4;half fog:TEXCOORD5;float2 localUV:TEXCOORD6;UNITY_VERTEX_OUTPUT_STEREO};
             V Vert(A i)
@@ -68,6 +70,13 @@ Shader "BiologyVR/Artery Visual V2"
                 float pulse=_PulseAmplitude*(.5+.5*sin(_Time.y*_PulseBpm*.10471976));
                 float weight=1-smoothstep(4,12,distance(TransformObjectToWorld(i.centre),_ToneCentre.xyz));
                 i.p.xyz+=(i.p.xyz-i.centre)*(pulse+(_Tone-1)*weight);
+                if(_HemoRadius>.01)
+                {
+                    float3 centreDelta=TransformObjectToWorld(i.centre)-_HemoCentreWS.xyz;
+                    float along=abs(dot(centreDelta,_HemoAxisWS.xyz));
+                    float localWeight=(1-smoothstep(.5,1.1,along))*(1-smoothstep(1.3,2.2,length(centreDelta)));
+                    i.p.xyz+=(i.p.xyz-i.centre)*(_HemoRadius-1)*localWeight;
+                }
                 VertexPositionInputs p=GetVertexPositionInputs(i.p.xyz);VertexNormalInputs n=GetVertexNormalInputs(i.n,i.t);
                 o.p=p.positionCS;o.ws=p.positionWS;o.n=n.normalWS;o.t=n.tangentWS;o.b=n.bitangentWS;
                 o.uv=TRANSFORM_TEX(panelUV,_BaseMap);o.localUV=i.uv;o.fog=ComputeFogFactor(p.positionCS.z);return o;

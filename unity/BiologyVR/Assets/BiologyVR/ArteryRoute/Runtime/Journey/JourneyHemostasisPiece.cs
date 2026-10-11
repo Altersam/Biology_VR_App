@@ -11,11 +11,14 @@ namespace BiologyVR.ArteryRoute.Journey
         public int index;
         public bool strand;
         public bool Placed{get;private set;}
+        public int PlacementSlot{get;private set;}=-1;
         XRGrabInteractable grab;
         // Inactive reserve pieces/strands have not run Awake when a later
         // episode configures their interaction state directly.
         public XRGrabInteractable Grab{get{if(!grab)grab=GetComponent<XRGrabInteractable>();return grab;}}
-        public bool Held=>Grab&&Grab.isSelected;
+        public bool FieldHeld{get;private set;}
+        public bool Held=>FieldHeld||(Grab&&Grab.isSelected);
+        public void SetFieldHeld(bool held){FieldHeld=held;if(Grab)Grab.enabled=!held&&!Placed;}
         void Awake(){grab=GetComponent<XRGrabInteractable>();}
         void OnEnable()
         {
@@ -31,6 +34,7 @@ namespace BiologyVR.ArteryRoute.Journey
             puzzle.PlaceReleased(this,args.interactorObject.transform);
         }
         public void SetPlaced(bool value){Placed=value;if(Grab)Grab.enabled=!value;}
+        public void SetPlacementSlot(int slot){PlacementSlot=slot;}
         public void EnableBalanceGrab(){if(Grab)Grab.enabled=true;}
     }
 }

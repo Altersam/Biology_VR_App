@@ -1,0 +1,27 @@
+{
+  "utc": "2026-10-11T15:25:19.037795+00:00",
+  "version": "0.4.0",
+  "version_code": 5,
+  "device": "PICO 4 / PICO 4 Enterprise",
+  "file": "BiologyVR_Pico4_v0.4.0.apk",
+  "local_path": "Z:\\YandexDisk\\ПетПроекты\\Biology_VR\\3д\\Unity\\bio_v0.2\\Builds\\Pico4\\BiologyVR_Pico4_v0.4.0.apk",
+  "bytes": 77238537,
+  "sha256": "eebbf0396a197c01399db0e69dff5dd641703de0b512ceab5f1062513ce2f596",
+  "verification": {
+    "manifest_readable": true,
+    "application_id": true,
+    "version_matches": true,
+    "min_sdk_29": true,
+    "target_sdk_34": true,
+    "arm64_only": true,
+    "unity_runtime": true,
+    "il2cpp_runtime": true,
+    "openxr_runtime": true,
+    "pico_vr_manifest": true,
+    "pico_sdk_manifest": true,
+    "controller_manifest": true,
+    "signature_valid": true
+  },
+  "hardware_verified": false,
+  "github_release_uploaded": false
+}

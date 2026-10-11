@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-11T14:33:31.4093484Z",
+  "early": "in-vessel experiment / fixed Q for narrow and wide cases / reduced supply mystery",
+  "late": "independent local diagnosis / no automatic vasoconstriction",
+  "model": "Rrel=r^-4; fixed-Q cases ΔP=8Rrel and vrel=r^-2; normal-diameter mystery ΔP=5, Qrel=5/8",
+  "physicalCards": 3,
+  "scannerFlowTracers": 7,
+  "streamlines": 8,
+  "legacyFlowHologramHidden": true,
+  "compactTheory": true,
+  "globalMetrics": 3,
+  "pool": 360,
+  "registeredTargets": 77,
+  "hardwareVerified": false
+}

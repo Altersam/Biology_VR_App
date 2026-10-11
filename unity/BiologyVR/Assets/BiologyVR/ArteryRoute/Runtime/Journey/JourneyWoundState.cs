@@ -37,6 +37,11 @@ namespace BiologyVR.ArteryRoute.Journey
         public float LeakStrength{get;private set;}
         public int ActiveCellCount{get;private set;}
         public Vector3 Outward=>outward;
+        public bool scratchLeak;
+        public bool splitMainFlow;
+        public Renderer LegacyMatrix=>backing;
+        public GameObject LegacyCollagen=>collagen;
+        public void ReplaceTearSurfaces(Renderer matrix,GameObject scaffold){backing=matrix;collagen=scaffold;scratchLeak=true;}
 
         public void Configure(JourneyWorld configuredWorld,Transform[] pool,Renderer matrix,GameObject scaffold,JourneyTarget[] diagnosticTargets)
         {
@@ -108,7 +113,7 @@ namespace BiologyVR.ArteryRoute.Journey
             bool atWound=scene>=11&&scene<=14;
             bool visited=world.IsEpisodeCompleted(11)||world.IsEpisodeCompleted(12)||world.IsEpisodeCompleted(13)||world.IsEpisodeCompleted(14);
             if(backing)backing.enabled=(atWound||visited)&&world.RepairGrowth<.999f;
-            if(collagen)collagen.SetActive((atWound||visited)&&world.RepairGrowth<.999f&&world.AttachedPlatelets<3);
+            if(collagen)collagen.SetActive((atWound||visited)&&world.RepairGrowth<.999f&&world.AttachedPlatelets<(world.hemostasisPuzzle&&world.hemostasisPuzzle.flowLayering?11:3));
             // The old diagnostic targets share one position. Only the current
             // diagnostic contact may intercept a ray; physical pool cells have none.
             if(contacts!=null)foreach(var contact in contacts)
@@ -126,7 +131,9 @@ namespace BiologyVR.ArteryRoute.Journey
             switch(mission.SceneNumber)
             {
                 case 11:return 1f;
-                case 12:return (1f-.84f*Mathf.Clamp01(world.AttachedPlatelets/6f))*(1f-world.FibrinGrowth)*(world.hemostasisPuzzle?1f-.75f*world.hemostasisPuzzle.Connections/3f:1f);
+                case 12:
+                    if(world.hemostasisPuzzle&&world.hemostasisPuzzle.flowLayering)return Mathf.Lerp(1,.35f,Mathf.Clamp01(world.AttachedPlatelets/11f))*(1-Mathf.SmoothStep(0,1,world.FibrinGrowth));
+                    return (1f-.84f*Mathf.Clamp01(world.AttachedPlatelets/(float)(world.hemostasisPuzzle?world.hemostasisPuzzle.RequiredPlatelets:6)))*(1f-world.FibrinGrowth)*(world.hemostasisPuzzle?1f-.75f*world.hemostasisPuzzle.Connections/3f:1f);
                 case 13:return mission.ClotBalance<.28f?.75f:mission.ClotBalance<.5f?.35f:0f;
                 default:return 0f;
             }
@@ -141,8 +148,14 @@ namespace BiologyVR.ArteryRoute.Journey
             bool atWound=mission.SceneNumber>=11&&mission.SceneNumber<=14;
             if(!atWound){ResetPool();return;}
             if(backing)backing.enabled=world.RepairGrowth<.999f;
-            if(collagen)collagen.SetActive(world.RepairGrowth<.999f&&!(mission.SceneNumber>=12&&world.AttachedPlatelets>=3));
+            if(collagen)collagen.SetActive(world.RepairGrowth<.999f&&!(mission.SceneNumber>=12&&world.AttachedPlatelets>=(world.hemostasisPuzzle&&world.hemostasisPuzzle.flowLayering?11:3)));
             if(mission.SceneNumber==14)UpdateHealingPresentation();
+            if(splitMainFlow)
+            {
+                foreach(var renderer in cellRenderers)if(renderer)renderer.enabled=false;
+                ActiveCellCount=world.GetComponent<JourneyContinuousBloodstream>()?world.GetComponent<JourneyContinuousBloodstream>().ActiveWoundLeakCount:0;
+                return;
+            }
             clock+=Time.deltaTime*LeakStrength;
             while(clock>=.18f)
             {
@@ -170,6 +183,7 @@ namespace BiologyVR.ArteryRoute.Journey
         {
             float lane=(index%3-1)*.13f;
             var site=world.woundSite.position;
+            if(scratchLeak){site+=forward*((index%7-3)*.28f)+up*Mathf.Sin(index*1.73f)*.035f;lane*=.28f;}
             var p0=site-outward*1.00f-forward*.70f+up*lane;
             var p1=site-outward*.38f-forward*.25f+up*lane*.55f;
             var p2=site+outward*.38f+forward*.08f+up*lane*.55f;
@@ -196,7 +210,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(world.clot){world.clot.gameObject.SetActive(visible);world.clot.localScale=clotScale*Mathf.Max(.01f,remaining);}
             if(world.fibrin){world.fibrin.SetActive(visible&&world.FibrinRemoval<.999f);world.fibrin.transform.localScale=fibrinScale*Mathf.Max(.01f,remaining*(1-world.FibrinRemoval));}
             for(int i=0;i<world.platelets.Length;i++)if(world.platelets[i])
-            {world.platelets[i].SetActive(visible&&i<world.AttachedPlatelets);world.platelets[i].transform.localScale=plateletScales[i]*Mathf.Max(.01f,remaining);}
+            {var physical=world.platelets[i].GetComponent<JourneyHemostasisPiece>();bool placed=world.hemostasisPuzzle&&world.hemostasisPuzzle.flowLayering?physical&&physical.Placed:i<world.AttachedPlatelets;world.platelets[i].SetActive(visible&&placed);world.platelets[i].transform.localScale=plateletScales[i]*Mathf.Max(.01f,remaining);}
         }
 
         void ResetPool()

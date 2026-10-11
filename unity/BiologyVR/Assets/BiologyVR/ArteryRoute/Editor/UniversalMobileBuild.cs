@@ -39,7 +39,7 @@ namespace BiologyVR.ArteryRoute.Editor
             PlayerSettings.Android.applicationEntry=AndroidApplicationEntry.Activity;
             PlayerSettings.Android.splitApplicationBinary=false;
             PlayerSettings.Android.optimizedFramePacing=true;
-            PlayerSettings.bundleVersion="0.3.0";PlayerSettings.Android.bundleVersionCode=4;
+            PlayerSettings.bundleVersion=BiologyReleaseVersion.Version;PlayerSettings.Android.bundleVersionCode=BiologyReleaseVersion.AndroidCode;
             PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.Android,false);
             PlayerSettings.SetGraphicsAPIs(BuildTarget.Android,new[]{GraphicsDeviceType.OpenGLES3});
             EditorUserBuildSettings.buildAppBundle=false;
@@ -180,8 +180,8 @@ namespace BiologyVR.ArteryRoute.Editor
         {
             var android=UnityEditor.Build.NamedBuildTarget.Android;
             PlayerSettings.SetApplicationIdentifier(android,"com.biologyvr.arteryjourney");
-            PlayerSettings.bundleVersion="0.2.0";
-            PlayerSettings.Android.bundleVersionCode=3;
+            PlayerSettings.bundleVersion=BiologyReleaseVersion.Version;
+            PlayerSettings.Android.bundleVersionCode=BiologyReleaseVersion.AndroidCode;
             PlayerSettings.Android.minSdkVersion=AndroidSdkVersions.AndroidApiLevel32;
             PlayerSettings.Android.targetArchitectures=AndroidArchitecture.ARM64;
             PlayerSettings.Android.androidIsGame=true;

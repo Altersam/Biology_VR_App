@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-11T15:10:52.552108+00:00",
+  "pcVerifiedUtc": "2026-10-11T14:53:06.284476Z",
+  "xrSequential": "FULL SIMULATOR PASS",
+  "method": "Actual Unity mouse, keyboard, XR InputActions/XRI and camera renders",
+  "frames": [
+    "01_Narrow_In_Vessel_AR.png",
+    "02_Wide_AR_And_Discovered_Relation.png",
+    "03_Outside_Cause_Conclusion.png",
+    "04_Late_Independent_Diagnosis.png",
+    "05_XR_Narrow_Experiment.png",
+    "06_XR_Late_Diagnosis.png"
+  ],
+  "hardwareVerified": false
+}

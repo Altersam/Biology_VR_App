@@ -15,6 +15,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public Transform woundSite,clot,phagocyte,infected,tCell,flowModel,bubble,trap;
         public GameObject fibrin,repairPatch,occlusion,labRoom;
         public GameObject[] debris,platelets;
+        public JourneyHemodynamicsExperiment hemodynamics;
         public GameObject[] remainingComplexes;
         public GameObject virusPrefab;
         public Renderer[] toneWall;
@@ -334,6 +335,7 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         public bool CanApply(StudyAction action,string target)
         {
+            if(hemodynamics&&target.StartsWith("hdx-"))return hemodynamics.CanApply(action,target);
             if(mission.SceneNumber==3&&action==StudyAction.Scan&&!CanInspectBlood(Find(target)))return false;
             if(mission.SceneNumber==16&&target.StartsWith("check-"))
             {
@@ -420,6 +422,7 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         public void Apply(StudyAction action,string target,int progress)
         {
+            if(hemodynamics&&target.StartsWith("hdx-")){hemodynamics.Accepted(action,target);return;}
             if(mission.SceneNumber==16&&target.StartsWith("check-"))HomeostasisChecks++;
             switch(target)
             {
@@ -495,7 +498,7 @@ namespace BiologyVR.ArteryRoute.Journey
                 if(embolusArc>mover.path.Anchor(7)+13||Vector3.Distance(bubble.position,mover.viewCamera.transform.position)>12)
                 {ResetEmbolusCheckpoint();mission.RetryEmbolus(true);}
             }
-             if(fibrinGrowth>0&&fibrin){fibrinGrowth=Mathf.Min(1,fibrinGrowth+Time.deltaTime*.45f);fibrin.transform.localScale=fibrinBaseScale*fibrinGrowth;}
+             if(fibrinGrowth>0&&fibrin){float rate=mission.SceneNumber==12&&hemostasisPuzzle&&hemostasisPuzzle.flowLayering?.16f:.45f;fibrinGrowth=Mathf.Min(1,fibrinGrowth+Time.deltaTime*rate);fibrin.transform.localScale=fibrinBaseScale*fibrinGrowth;}
             if(mission.SceneNumber==14&&fibrinolysis){FibrinRemoval=Mathf.Min(1,FibrinRemoval+Time.deltaTime*.32f);fibrinGrowth=1-FibrinRemoval;if(FibrinRemoval>=1&&fibrin)fibrin.SetActive(false);}
             if(repairGrowth>0&&repairPatch){repairGrowth=Mathf.Min(1,repairGrowth+Time.deltaTime*.30f);var r=repairPatch.GetComponent<Renderer>();if(r){var block=new MaterialPropertyBlock();r.GetPropertyBlock(block);block.SetFloat("_Reveal",repairGrowth);r.SetPropertyBlock(block);}}
             bool wave=(mission.SceneNumber==9||mission.SceneNumber==15)&&mission.Current?.action==StudyAction.Mark&&!sourceRemoved;

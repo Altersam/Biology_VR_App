@@ -1,6 +1,7 @@
 {
-  "utc": "2026-10-10T17:58:48.3910541Z",
+  "utc": "2026-10-11T13:53:15.2044818Z",
   "passed": true,
+  "mobilePoolBudget": 360,
   "method": "Isolated Enter(6,false) fixture; real mouse/keyboard scan, shots, failure, automatic local retry and Continue; no success APIs",
   "checks": [
     "PASS: Plaque starts with thirty targets and uses a ninety-slot reinforcement pool",
@@ -9,8 +10,9 @@
     "PASS: Actual input opens timed plaque pulse challenge",
     "PASS: Random one/two-lipid batches enter from blood each second and visibly fly toward the mass",
     "PASS: Ignoring growth reaches real timed occlusion, not mission success",
+    "PASS: Even a failed occlusion attempt preserves dense continuously moving background blood",
     "PASS: Occlusion retries only the combat attempt, preserving diagnosis and controller mode",
-    "Plaque firing diagnostic: destroyed=43 hits=44 lock=none obstruction=none elapsed=9,862068",
+    "Plaque firing diagnostic: destroyed=48 hits=49 lock=none obstruction=none elapsed=11,756",
     "PASS: Actual shots destroy original and newly arriving lipids; clearance requires no remaining inbound or attached elements",
     "PASS: Complete fragmentation removes hit contacts and obstructing bulk, restoring open flow",
     "PASS: Monitor pressure, pulse, oxygen and local flow recover with mass clearance",

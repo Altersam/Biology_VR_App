@@ -64,7 +64,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public void PrepareGoal(StudyGoal goal)
         {
             if (!world || !world.mission) return;
-            if(world.mission.SceneNumber==5&&world.flowModel)world.flowModel.gameObject.SetActive(world.mission.StepIndex>=1);
+            if(world.mission.SceneNumber==5&&world.flowModel)world.flowModel.gameObject.SetActive(!world.hemodynamics&&world.mission.StepIndex>=1);
             if(world.mission.SceneNumber==8)
             {
                 if(world.virusInspection)return;

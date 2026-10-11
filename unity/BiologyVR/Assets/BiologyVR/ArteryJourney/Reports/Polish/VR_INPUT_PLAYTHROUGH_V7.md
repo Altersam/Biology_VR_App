@@ -1,6 +1,6 @@
 # V8 Sequential XR Input Playthrough
 
-Generated UTC: 2026-10-10T20:47:43.5412549Z
+Generated UTC: 2026-10-11T15:07:32.1062382Z
 
 Status: FULL SIMULATOR PASS
 
@@ -36,7 +36,7 @@ PASS: Biomedical tool views add no physical contacts
 
 Installed device mesh triangles: Scanner=2168; BioTool=3136
 
-Diagnostic: step=1 ready=True RBC selected=True grabbed=True runtime right grip=1 button=True deviceEnabled=True focused=False controller=(0.59, -0.12, 5.11) RBC=(0.58, -0.12, 5.24) bounds=Center: (0.58, -0.12, 5.24), Extents: (0.13, 0.13, 0.13) collider=True grab=True
+Diagnostic: step=1 ready=True RBC selected=True grabbed=True runtime right grip=1 button=True deviceEnabled=True focused=False controller=(0.58, -0.13, 5.07) RBC=(0.58, -0.12, 5.20) bounds=Center: (0.58, -0.12, 5.20), Extents: (0.13, 0.13, 0.13) collider=True grab=True
 
 RBC target enabled=True mission matches=True selecting=Near-Far Interactor
 
@@ -50,25 +50,29 @@ RBC lastAcceptedGrabId=rbc
 
 Interactor Gaze Interactor XRGazeInteractor enabled=False hover=False selected=False targets= selectActive=False pos=(0.00, 0.15, 0.00)
 
-Interactor Poke Interactor XRPokeInteractor enabled=True hover=False selected=False targets= selectActive=True pos=(0.17, -0.12, 5.11)
+Interactor Poke Interactor XRPokeInteractor enabled=True hover=False selected=False targets= selectActive=True pos=(0.16, -0.13, 5.07)
 
-Interactor Near-Far Interactor NearFarInteractor enabled=True hover=False selected=False targets= selectActive=False pos=(0.17, -0.12, 5.11)
+Interactor Near-Far Interactor NearFarInteractor enabled=True hover=False selected=False targets= selectActive=False pos=(0.16, -0.13, 5.07)
 
-Interactor Teleport Interactor XRRayInteractor enabled=False hover=False selected=False targets= selectActive=False pos=(0.17, -0.14, 5.08)
+Interactor Teleport Interactor XRRayInteractor enabled=False hover=False selected=False targets= selectActive=False pos=(0.16, -0.15, 5.03)
 
-Interactor Poke Interactor XRPokeInteractor enabled=True hover=False selected=False targets= selectActive=True pos=(0.59, -0.12, 5.11)
+Interactor Poke Interactor XRPokeInteractor enabled=True hover=False selected=False targets= selectActive=True pos=(0.58, -0.13, 5.07)
 
-Interactor Near-Far Interactor NearFarInteractor enabled=True hover=False selected=True targets=Research target — rbc selectActive=True pos=(0.59, -0.12, 5.11)
+Interactor Near-Far Interactor NearFarInteractor enabled=True hover=False selected=True targets=Research target — rbc selectActive=True pos=(0.58, -0.13, 5.07)
 
-Interactor Teleport Interactor XRRayInteractor enabled=False hover=False selected=False targets= selectActive=False pos=(0.59, -0.14, 5.08)
+Interactor Teleport Interactor XRRayInteractor enabled=False hover=False selected=False targets= selectActive=False pos=(0.58, -0.15, 5.03)
 
 Interactor Climb Teleport ClimbTeleportInteractor enabled=True hover=False selected=False targets= selectActive=False pos=(0.00, -1.21, 0.00)
 
-Interactor Desktop mouse XRI hand JourneyDesktopInteractor enabled=True hover=False selected=False targets= selectActive=False pos=(-0.95, -0.44, 1.00)
+Interactor Desktop mouse XRI hand JourneyDesktopInteractor enabled=True hover=False selected=False targets= selectActive=False pos=(-0.94, -0.44, 1.00)
 
 PASS: Right grip actually selects RBC and advances Grab
 
 PASS: Early Scanner release does not complete scan
+
+During RBC scan: raw=True action=True enabled=True blocked=False progress=0,5419174 locked=Research target — rbc contact=Research target — rbc obstruction=none guideContact=True guideEnd=(0.55, -0.12, 5.07) source=(-0.18, -0.03, 0.48) target=(0.58, -0.12, 5.20) targetBounds=Center: (0.58, -0.12, 5.20), Extents: (0.13, 0.13, 0.13)
+
+Held RBC scan diagnostic: blocked=False held=False progress=0 contact=none obstruction=none
 
 PASS: Held real Scanner trigger completes raycast scan
 
@@ -88,7 +92,7 @@ PASS: Scanner objective expected for hemoglobin
 
 Contact hemoglobin: Research target — hemoglobin / SphereCollider layerInspector=True
 
-Scan hemoglobin: step=4 enabled=True lock=hemoglobin progress=1 blocker=none aim=(-0.17, 0.00, 0.65) target=(0.28, 0.04, 6.54) contact=(0.28, 0.04, 6.54)
+Scan hemoglobin: step=4 enabled=True lock=hemoglobin progress=1 blocker=none aim=(0.91, -0.03, 0.32) target=(0.27, 0.04, 6.49) contact=(0.27, 0.04, 6.49)
 
 PASS: Scanner completed hemoglobin
 
@@ -96,7 +100,7 @@ PASS: Scanner objective expected for heme
 
 Contact heme: Research target — heme / SphereCollider layerInspector=True
 
-Scan heme: step=5 enabled=True lock=heme progress=1 blocker=none aim=(-0.16, 0.00, 0.65) target=(0.60, 0.18, 6.49) contact=(0.60, 0.18, 6.49)
+Scan heme: step=5 enabled=True lock=heme progress=1 blocker=none aim=(0.91, -0.03, 0.32) target=(0.60, 0.18, 6.44) contact=(0.60, 0.18, 6.44)
 
 PASS: Scanner completed heme
 
@@ -112,7 +116,7 @@ PASS: Actual XR grip extracts co2 from blood before scanning
 
 Contact co2: Research target — co2 / SphereCollider layerInspector=True
 
-Scan co2: step=8 enabled=True lock=co2 progress=1 blocker=none aim=(-0.16, 0.00, 0.65) target=(0.89, 0.51, 10.92) contact=(0.89, 0.51, 10.92)
+Scan co2: step=8 enabled=True lock=co2 progress=1 blocker=none aim=(0.91, -0.03, 0.32) target=(0.88, 0.52, 10.89) contact=(0.88, 0.52, 10.89)
 
 PASS: Scanner completed co2
 
@@ -126,7 +130,7 @@ PASS: Scanner objective expected for leukocyte
 
 Contact leukocyte: Research target — leukocyte / SphereCollider layerInspector=True
 
-Scan leukocyte: step=9 enabled=True lock=leukocyte progress=1 blocker=none aim=(-0.17, -0.01, 0.65) target=(0.83, -0.44, 11.56) contact=(0.83, -0.44, 11.56)
+Scan leukocyte: step=9 enabled=True lock=leukocyte progress=1 blocker=none aim=(0.91, -0.03, 0.32) target=(0.82, -0.44, 11.53) contact=(0.82, -0.44, 11.53)
 
 PASS: Scanner completed leukocyte
 
@@ -142,7 +146,7 @@ PASS: Actual XR grip extracts platelet from blood before scanning
 
 Contact platelet: Research target — platelet / SphereCollider layerInspector=True
 
-Scan platelet: step=10 enabled=True lock=platelet progress=1 blocker=none aim=(-0.14, 0.00, 0.65) target=(2.47, 0.24, 12.02) contact=(2.47, 0.24, 12.02)
+Scan platelet: step=10 enabled=True lock=platelet progress=1 blocker=none aim=(-0.18, -0.03, 0.48) target=(2.46, 0.24, 11.99) contact=(2.46, 0.24, 11.99)
 
 PASS: Scanner completed platelet
 
@@ -158,7 +162,7 @@ PASS: Actual XR grip extracts plasma from blood before scanning
 
 Contact plasma: Research target — plasma / SphereCollider layerInspector=True
 
-Scan plasma: step=12 enabled=True lock=plasma progress=1 blocker=none aim=(-0.14, -0.01, 0.65) target=(3.25, -0.46, 13.30) contact=(3.25, -0.46, 13.30)
+Scan plasma: step=12 enabled=True lock=plasma progress=1 blocker=none aim=(-0.18, -0.03, 0.48) target=(3.27, -0.47, 13.35) contact=(3.27, -0.47, 13.35)
 
 PASS: Scanner completed plasma
 
@@ -170,13 +174,15 @@ PASS: Actual left Y InputAction starts completed 03→04 travel
 
 PASS: Completed Scene03 location stays active during transition
 
+Travel blood samples=190661 maximum consecutive visible displacement=0,01916215
+
+PASS: Moving visible blood remains continuous across the actual scene transition
+
 PASS: 03→04 smooth travel arrives without debug enter/force-next
 
 PASS: Origin and tracked head rotation preserved across travel
 
 PASS: Same live Scanner/BioTool aim instances persist across travel
-
-PASS: Observed nearby blood cell continues in world without travelling-anchor jump
 
 PASS: Scanner objective expected for endothelium
 
@@ -184,7 +190,7 @@ Contact endothelium: Scene04_Band_endothelium / MeshCollider layerInspector=True
 
 PASS: Scanner uses actual wall shell contact for endothelium
 
-Scan endothelium: step=1 enabled=True lock=layers progress=1 blocker=none aim=(0.98, -0.01, 10.54) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
+Scan endothelium: step=1 enabled=True lock=layers progress=1 blocker=none aim=(0.82, -0.03, 10.49) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
 
 PASS: Scanner completed endothelium
 
@@ -196,7 +202,7 @@ Contact intima: Scene04_Band_intima / MeshCollider layerInspector=True
 
 PASS: Scanner uses actual wall shell contact for intima
 
-Scan intima: step=3 enabled=True lock=media progress=1 blocker=none aim=(0.99, -0.01, 10.53) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
+Scan intima: step=3 enabled=True lock=media progress=1 blocker=none aim=(0.82, -0.03, 10.49) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
 
 PASS: Scanner completed intima
 
@@ -206,7 +212,7 @@ Contact media: Scene04_Band_media / MeshCollider layerInspector=True
 
 PASS: Scanner uses actual wall shell contact for media
 
-Scan media: step=4 enabled=True lock=adventitia progress=1 blocker=none aim=(0.99, -0.01, 10.53) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
+Scan media: step=4 enabled=True lock=adventitia progress=1 blocker=none aim=(0.82, -0.03, 10.49) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
 
 PASS: Scanner completed media
 
@@ -216,7 +222,7 @@ Contact adventitia: Scene04_Band_adventitia / MeshCollider layerInspector=True
 
 PASS: Scanner uses actual wall shell contact for adventitia
 
-Scan adventitia: step=5 enabled=True lock=none progress=1 blocker=none aim=(0.99, -0.01, 10.53) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
+Scan adventitia: step=5 enabled=True lock=none progress=1 blocker=none aim=(0.82, -0.03, 10.49) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
 
 PASS: Scanner completed adventitia
 
@@ -228,69 +234,123 @@ PASS: Real left Y continues completed Scene04
 
 PASS: Transition 04→05 arrives through normal travel
 
-PASS: BioTool objective expected for flow
+PASS: Early experiment uses a compact task and AR on the vessel instead of a separate flow hologram
 
-PASS: BioTool target exists: flow
+PASS: Scanner objective expected for hdx-p1
 
-PASS: BioTool target contact enabled: flow
+Contact hdx-p1: AR measurement contact / hdx-p1 / SphereCollider layerInspector=True
 
-Tool flow: locked=flow charge=0 radius=1 pressure=120 aim=(12.50, -11.94, 39.99) contact=(11.75, -10.70, 41.58)
+Scan hdx-p1: step=1 enabled=True lock=none progress=1 blocker=none aim=(12.20, -11.98, 40.47) target=(14.54, -12.41, 41.44) contact=(14.54, -12.41, 41.44)
 
-PASS: BioTool completed flow
+PASS: Scanner completed hdx-p1
 
-PASS: BioTool objective expected for flow-model
+PASS: Scanner objective expected for hdx-p2
 
-PASS: BioTool target exists: flow-model
+Contact hdx-p2: AR measurement contact / hdx-p2 / SphereCollider layerInspector=True
 
-PASS: BioTool target contact enabled: flow-model
+Scan hdx-p2: step=2 enabled=True lock=none progress=1 blocker=none aim=(12.20, -11.98, 40.47) target=(15.20, -11.53, 44.01) contact=(15.20, -11.53, 44.01)
 
-Tool flow-model: locked=flow-model charge=0 radius=1 pressure=120 aim=(12.54, -11.95, 40.00) contact=(12.48, -10.97, 41.51)
+PASS: Scanner completed hdx-p2
 
-PASS: BioTool completed flow-model
+PASS: Scanner objective expected for hdx-speed
 
-PASS: Scene05 flow measurement and holographic model activation use BioTool trigger
+Contact hdx-speed: AR measurement contact / hdx-speed / SphereCollider layerInspector=True
 
-PASS: BioTool objective expected for small-radius
+Scan hdx-speed: step=3 enabled=True lock=none progress=1 blocker=none aim=(12.20, -11.98, 40.47) target=(14.68, -12.54, 42.97) contact=(14.68, -12.54, 42.97)
 
-PASS: BioTool target exists: small-radius
+PASS: Scanner completed hdx-speed
 
-PASS: BioTool target contact enabled: small-radius
+PASS: Scanner objective expected for hdx-diameter
 
-Tool small-radius: locked=small-radius charge=0 radius=0,65 pressure=120 aim=(12.60, -11.97, 40.01) contact=(13.20, -11.24, 41.43)
+Contact hdx-diameter: AR measurement contact / hdx-diameter / SphereCollider layerInspector=True
 
-PASS: BioTool completed small-radius
+Scan hdx-diameter: step=4 enabled=True lock=none progress=1 blocker=none aim=(12.79, -12.42, 39.65) target=(14.39, -11.32, 42.62) contact=(14.39, -11.32, 42.62)
 
-PASS: BioTool objective expected for large-radius
+PASS: Scanner completed hdx-diameter
 
-PASS: BioTool target exists: large-radius
+PASS: Four real Scanner measurements reveal fixed-Q narrowing and its pressure/velocity consequences
 
-PASS: BioTool target contact enabled: large-radius
+PASS: A stationary held XR TONUS trigger cannot solve the experiment
 
-Tool large-radius: locked=large-radius charge=0 radius=1,35 pressure=120 aim=(12.47, -12.00, 40.02) contact=(11.49, -11.48, 41.87)
+PASS: Correcting radius by hand still requires a stable hold
 
-PASS: BioTool completed large-radius
+PASS: Real XR hand displacement and settling restore normal experimental diameter
 
-PASS: BioTool objective expected for pressure
+PASS: Scanner objective expected for hdx-check1
 
-PASS: BioTool target exists: pressure
+Contact hdx-check1: AR measurement contact / hdx-check1 / SphereCollider layerInspector=True
 
-PASS: BioTool target contact enabled: pressure
+Scan hdx-check1: step=6 enabled=True lock=none progress=1 blocker=none aim=(12.20, -11.98, 40.47) target=(15.20, -11.53, 44.01) contact=(15.20, -11.53, 44.01)
 
-Tool pressure: locked=pressure charge=0 radius=1,35 pressure=155 aim=(12.52, -12.01, 40.04) contact=(12.22, -11.75, 41.79)
+PASS: Scanner completed hdx-check1
 
-PASS: BioTool completed pressure
+PASS: Second experiment starts wide; discovered resistance relation is shown locally
 
-PASS: BioTool objective expected for normal-flow
+PASS: A stationary held XR TONUS trigger cannot solve the experiment
 
-PASS: BioTool target exists: normal-flow
+PASS: Correcting radius by hand still requires a stable hold
 
-PASS: BioTool target contact enabled: normal-flow
+PASS: Real XR hand displacement and settling restore normal experimental diameter
 
-Tool normal-flow: locked=normal-flow charge=0 radius=1 pressure=120 aim=(12.58, -12.03, 40.04) contact=(12.95, -12.02, 41.72)
+PASS: Scanner objective expected for hdx-check2
 
-PASS: BioTool completed normal-flow
+Contact hdx-check2: AR measurement contact / hdx-check2 / SphereCollider layerInspector=True
 
-PASS: Scene05 radius/pressure experiment completes and returns to normal flow
+Scan hdx-check2: step=8 enabled=True lock=none progress=1 blocker=none aim=(12.20, -11.98, 40.47) target=(14.68, -12.54, 42.97) contact=(14.68, -12.54, 42.97)
+
+PASS: Scanner completed hdx-check2
+
+PASS: Normal diameter with both pressures lower requires an outside-cause hypothesis
+
+PASS: Scanner objective expected for hdx-diameter
+
+Contact hdx-diameter: AR measurement contact / hdx-diameter / SphereCollider layerInspector=True
+
+Scan hdx-diameter: step=9 enabled=True lock=none progress=1 blocker=none aim=(12.79, -12.42, 39.65) target=(15.06, -11.40, 42.48) contact=(15.06, -11.40, 42.48)
+
+PASS: Scanner completed hdx-diameter
+
+PASS: Scanner objective expected for hdx-speed
+
+Contact hdx-speed: AR measurement contact / hdx-speed / SphereCollider layerInspector=True
+
+Scan hdx-speed: step=10 enabled=True lock=none progress=1 blocker=none aim=(12.20, -11.98, 40.47) target=(14.68, -12.54, 42.97) contact=(14.68, -12.54, 42.97)
+
+PASS: Scanner completed hdx-speed
+
+PASS: Scanner objective expected for hdx-p1
+
+Contact hdx-p1: AR measurement contact / hdx-p1 / SphereCollider layerInspector=True
+
+Scan hdx-p1: step=11 enabled=True lock=none progress=1 blocker=none aim=(12.20, -11.98, 40.47) target=(14.54, -12.41, 41.44) contact=(14.54, -12.41, 41.44)
+
+PASS: Scanner completed hdx-p1
+
+PASS: Scanner objective expected for hdx-p2
+
+Contact hdx-p2: AR measurement contact / hdx-p2 / SphereCollider layerInspector=True
+
+Scan hdx-p2: step=12 enabled=True lock=none progress=1 blocker=none aim=(12.20, -11.98, 40.47) target=(15.20, -11.53, 44.01) contact=(15.20, -11.53, 44.01)
+
+PASS: Scanner completed hdx-p2
+
+PASS: Actual XR grip selects a hemodynamic hypothesis card: 0
+
+PASS: Actual wrong physical hypothesis/action is rejected by the collected measurements
+
+PASS: Actual XR grip selects a hemodynamic hypothesis card: 2
+
+PASS: Evidence-based physical card resolves diagnosis without changing the normal vessel radius
+
+PASS: Scanner objective expected for hdx-final
+
+Contact hdx-final: AR measurement contact / hdx-final / SphereCollider layerInspector=True
+
+Scan hdx-final: step=14 enabled=True lock=none progress=1 blocker=none aim=(12.79, -12.42, 39.65) target=(15.06, -11.40, 42.48) contact=(15.06, -11.40, 42.48)
+
+PASS: Scanner completed hdx-final
+
+PASS: All three early experiments complete through real Scanner, held TONUS and physical card inputs
 
 PASS: Real left Y continues completed Scene05
 
@@ -302,7 +362,7 @@ PASS: BioTool target exists: plaque-flow
 
 PASS: BioTool target contact enabled: plaque-flow
 
-Tool plaque-flow: locked=plaque charge=0 radius=1 pressure=120 aim=(37.61, 8.95, 62.98) contact=(37.96, 9.17, 64.19)
+Tool plaque-flow: locked=plaque charge=0 radius=1 pressure=120 aim=(37.49, 8.78, 63.04) contact=(37.96, 9.17, 64.19)
 
 PASS: BioTool completed plaque-flow
 
@@ -310,7 +370,7 @@ PASS: Scanner objective expected for plaque
 
 Contact plaque: Actual growing plaque diagnosis contact / BoxCollider layerInspector=True
 
-Scan plaque: step=2 enabled=True lock=none progress=1 blocker=none aim=(37.52, 8.96, 63.39) target=(41.78, 7.73, 64.43) contact=(41.07, 9.96, 66.17)
+Scan plaque: step=2 enabled=True lock=none progress=1 blocker=none aim=(37.80, 8.54, 62.59) target=(41.78, 7.73, 64.43) contact=(41.07, 9.96, 66.17)
 
 PASS: Scanner completed plaque
 
@@ -322,13 +382,13 @@ PASS: BioTool target exists: pulse-mode
 
 PASS: BioTool target contact enabled: pulse-mode
 
-Tool pulse-mode: locked=none charge=0 radius=1 pressure=120 aim=(37.64, 8.92, 62.97) contact=(38.19, 8.88, 64.05)
+Tool pulse-mode: locked=none charge=0 radius=1 pressure=120 aim=(37.49, 8.78, 63.04) contact=(38.19, 8.88, 64.05)
 
 PASS: BioTool completed pulse-mode
 
 PASS: Scene06 plaque inspection and pulse mode use real instruments
 
-Plaque XR diagnostic: before=2 destroyed=45 accepted=45 elapsed=9,941557 lock=none obstruction=none
+Plaque XR diagnostic: before=2 destroyed=40 accepted=40 elapsed=8,840737 lock=none obstruction=none
 
 PASS: Actual right trigger fragments the original pile plus newly arriving lipids before occlusion
 
@@ -356,7 +416,7 @@ PASS: BioTool target exists: attract-mode
 
 PASS: BioTool target contact enabled: attract-mode
 
-Tool attract-mode: locked=none charge=0 radius=1 pressure=120 aim=(23.36, 2.85, 93.43) contact=(22.06, 2.71, 94.17)
+Tool attract-mode: locked=none charge=0 radius=1 pressure=120 aim=(23.51, 2.84, 93.36) contact=(22.06, 2.71, 94.17)
 
 PASS: BioTool completed attract-mode
 
@@ -364,7 +424,7 @@ PASS: Releasing BioTool before charge finishes does not capture embolus
 
 PASS: Moving BioTool capture objective expected for embolus
 
-Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(23.43, 2.85, 93.51) target=(21.51, 2.37, 96.71)
+Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(23.51, 2.84, 93.36) target=(21.51, 2.37, 96.71)
 
 PASS: BioTool captured moving target embolus
 
@@ -380,7 +440,7 @@ PASS: Released embolus drifts again with the flow
 
 PASS: Moving BioTool capture objective expected for embolus
 
-Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.89, 2.69, 93.58) target=(21.85, 2.45, 96.16)
+Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.93, 2.69, 93.41) target=(21.85, 2.44, 96.17)
 
 PASS: BioTool captured moving target embolus
 
@@ -392,17 +452,17 @@ PASS: Only sustained in-trap placement completes geometric deposit
 
 PASS: Moving BioTool capture objective expected for embolus
 
-Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.88, 2.71, 93.58) target=(20.72, 2.90, 98.05)
+Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.93, 2.69, 93.41) target=(20.72, 2.90, 98.05)
 
 PASS: BioTool captured moving target embolus
 
-Transport result: bubble=(19.72, 1.97, 98.79) trap=(22.33, 1.92, 94.66) stability=1
+Transport result: bubble=(19.73, 1.97, 98.79) trap=(22.33, 1.92, 94.66) stability=1
 
 PASS: Only sustained in-trap placement completes geometric deposit
 
 PASS: Moving BioTool capture objective expected for embolus
 
-Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.86, 2.68, 93.57) target=(19.65, 1.94, 98.93)
+Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.93, 2.69, 93.41) target=(19.65, 1.94, 98.93)
 
 PASS: BioTool captured moving target embolus
 
@@ -412,7 +472,7 @@ PASS: Only sustained in-trap placement completes geometric deposit
 
 PASS: Moving BioTool capture objective expected for embolus
 
-Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.89, 2.69, 93.58) target=(20.09, 1.99, 101.02)
+Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.93, 2.69, 93.41) target=(20.09, 1.99, 101.02)
 
 PASS: BioTool captured moving target embolus
 
@@ -422,7 +482,7 @@ PASS: Only sustained in-trap placement completes geometric deposit
 
 PASS: Moving BioTool capture objective expected for embolus
 
-Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.87, 2.70, 93.57) target=(18.18, 2.62, 102.40)
+Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.93, 2.69, 93.41) target=(18.18, 2.62, 102.40)
 
 PASS: BioTool captured moving target embolus
 
@@ -432,7 +492,7 @@ PASS: Only sustained in-trap placement completes geometric deposit
 
 PASS: Moving BioTool capture objective expected for embolus
 
-Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.89, 2.68, 93.58) target=(18.29, 1.15, 104.82)
+Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.93, 2.69, 93.41) target=(18.29, 1.15, 104.82)
 
 PASS: BioTool captured moving target embolus
 
@@ -450,7 +510,7 @@ PASS: Scanner objective expected for virus-study
 
 Contact virus-study: Research target — virus-study / SphereCollider layerInspector=True
 
-Scan virus-study: step=1 enabled=True lock=virus-study progress=1 blocker=none aim=(41.78, 13.92, 124.25) target=(43.45, 14.36, 124.96) contact=(43.45, 14.36, 124.96)
+Scan virus-study: step=1 enabled=True lock=virus-study progress=1 blocker=none aim=(41.64, 13.87, 124.17) target=(43.45, 14.36, 124.96) contact=(43.45, 14.36, 124.96)
 
 PASS: Scanner completed virus-study
 
@@ -472,7 +532,7 @@ PASS: Scanner objective expected for genome
 
 Contact genome: Research target — genome / SphereCollider layerInspector=True
 
-Scan genome: step=3 enabled=True lock=capsid progress=1 blocker=none aim=(42.48, 14.30, 124.34) target=(43.51, 14.38, 125.00) contact=(43.51, 14.38, 125.00)
+Scan genome: step=3 enabled=True lock=capsid progress=1 blocker=none aim=(42.32, 14.29, 124.28) target=(43.40, 14.33, 124.93) contact=(43.40, 14.33, 124.93)
 
 PASS: Scanner completed genome
 
@@ -480,7 +540,7 @@ PASS: Scanner objective expected for capsid
 
 Contact capsid: Research target — capsid / SphereCollider layerInspector=True
 
-Scan capsid: step=4 enabled=True lock=none progress=1 blocker=none aim=(42.48, 14.29, 124.34) target=(43.45, 14.36, 124.96) contact=(43.45, 14.36, 124.96)
+Scan capsid: step=4 enabled=True lock=none progress=1 blocker=none aim=(42.32, 14.29, 124.28) target=(43.45, 14.36, 124.96) contact=(43.45, 14.36, 124.96)
 
 PASS: Scanner completed capsid
 
@@ -488,7 +548,7 @@ PASS: Scanner objective expected for epitope
 
 Contact epitope: Research target — epitope / SphereCollider layerInspector=True
 
-Scan epitope: step=5 enabled=True lock=none progress=1 blocker=none aim=(42.47, 14.33, 124.33) target=(43.64, 14.19, 125.05) contact=(43.64, 14.19, 125.05)
+Scan epitope: step=5 enabled=True lock=none progress=1 blocker=none aim=(42.32, 14.29, 124.28) target=(43.64, 14.19, 125.05) contact=(43.64, 14.19, 125.05)
 
 PASS: Scanner completed epitope
 
@@ -504,7 +564,7 @@ PASS: BioTool target exists: immune-mode
 
 PASS: BioTool target contact enabled: immune-mode
 
-Tool immune-mode: locked=immune-mode charge=0 radius=1 pressure=120 aim=(42.42, 13.93, 124.39) contact=(42.86, 14.86, 124.98)
+Tool immune-mode: locked=immune-mode charge=0 radius=1 pressure=120 aim=(42.33, 13.79, 124.32) contact=(42.86, 14.86, 124.98)
 
 PASS: BioTool completed immune-mode
 
@@ -616,7 +676,7 @@ PASS: BioTool target exists: phagocyte
 
 PASS: BioTool target contact enabled: phagocyte
 
-Tool phagocyte: locked=phagocyte charge=0 radius=1 pressure=120 aim=(42.44, 13.89, 124.41) contact=(42.96, 14.49, 125.08)
+Tool phagocyte: locked=phagocyte charge=0 radius=1 pressure=120 aim=(42.33, 13.79, 124.32) contact=(42.96, 14.49, 125.08)
 
 PASS: BioTool completed phagocyte
 
@@ -628,79 +688,81 @@ PASS: Real left Y continues completed Scene09
 
 PASS: Transition 09→10 arrives through normal travel
 
-PASS: BioTool objective expected for pressure-low
+PASS: Later low-pressure episode requires independent diagnosis instead of repeated tone training
 
-PASS: BioTool target exists: pressure-low
+PASS: Scanner objective expected for hdx-diameter
 
-PASS: BioTool target contact enabled: pressure-low
+Contact hdx-diameter: AR measurement contact / hdx-diameter / SphereCollider layerInspector=True
 
-Tool pressure-low: locked=pressure-low charge=0 radius=1 pressure=120 aim=(68.28, 3.58, 138.54) contact=(68.81, 3.02, 139.57)
+Scan hdx-diameter: step=1 enabled=True lock=none progress=1 blocker=none aim=(67.17, 4.46, 137.87) target=(65.77, 3.65, 141.41) contact=(65.77, 3.65, 141.41)
 
-PASS: BioTool completed pressure-low
+PASS: Scanner completed hdx-diameter
 
-PASS: BioTool objective expected for tone-mode
+PASS: Scanner objective expected for hdx-speed
 
-PASS: BioTool target exists: tone-mode
+Contact hdx-speed: AR measurement contact / hdx-speed / SphereCollider layerInspector=True
 
-PASS: BioTool target contact enabled: tone-mode
+Scan hdx-speed: step=2 enabled=True lock=none progress=1 blocker=none aim=(67.95, 4.00, 138.50) target=(66.29, 4.82, 141.61) contact=(66.29, 4.82, 141.61)
 
-Tool tone-mode: locked=tone-mode charge=0 radius=1 pressure=120 aim=(68.19, 3.61, 138.58) contact=(68.03, 3.34, 139.70)
+PASS: Scanner completed hdx-speed
 
-PASS: BioTool completed tone-mode
+PASS: Scanner objective expected for hdx-p1
 
-PASS: Scene10 pressure loss measured before opening vascular control
+Contact hdx-p1: AR measurement contact / hdx-p1 / SphereCollider layerInspector=True
 
-PASS: Holding/clicking tone without hand movement cannot auto-set radius
+Scan hdx-p1: step=3 enabled=True lock=none progress=1 blocker=none aim=(67.95, 4.00, 138.50) target=(65.91, 4.52, 140.15) contact=(65.91, 4.52, 140.15)
 
-PASS: Tone control locks to a correctly aimed held trigger
+PASS: Scanner completed hdx-p1
 
-PASS: Excessive manual constriction warns but cannot complete moderate-tone goal
+PASS: Scanner objective expected for hdx-p2
 
-PASS: Passing into safe tone range still requires a sustained steady hold
+Contact hdx-p2: AR measurement contact / hdx-p2 / SphereCollider layerInspector=True
 
-PASS: Correcting hand position and settling finishes tone through InputActions
+Scan hdx-p2: step=4 enabled=True lock=none progress=1 blocker=none aim=(67.95, 4.00, 138.50) target=(66.16, 3.95, 142.88) contact=(66.16, 3.95, 142.88)
 
-PASS: Manual BioTool motion and settling produce moderate constriction and temporary stabilization
+PASS: Scanner completed hdx-p2
 
-PASS: BioTool objective expected for pressure-stable
+PASS: Scanner objective expected for hdx-wall
 
-PASS: BioTool target exists: pressure-stable
+Contact hdx-wall: AR measurement contact / hdx-wall / SphereCollider layerInspector=True
 
-PASS: BioTool target contact enabled: pressure-stable
+Scan hdx-wall: step=5 enabled=True lock=none progress=1 blocker=none aim=(67.95, 4.00, 138.50) target=(65.55, 3.15, 141.33) contact=(65.55, 3.15, 141.33)
 
-Tool pressure-stable: locked=pressure-stable charge=0 radius=0,8003413 pressure=120 aim=(67.74, 4.04, 138.50) contact=(68.76, 3.89, 139.76)
+PASS: Scanner completed hdx-wall
 
-PASS: BioTool completed pressure-stable
+PASS: Actual XR grip selects a hemodynamic hypothesis card: 0
 
-PASS: Early repeat measurement cannot complete the pressure-drop goal
+PASS: Actual wrong physical hypothesis/action is rejected by the collected measurements
 
-PASS: BioTool objective expected for pressure-return
+PASS: Actual XR grip selects a hemodynamic hypothesis card: 2
 
-PASS: BioTool target exists: pressure-return
+PASS: Evidence-based physical card resolves diagnosis without changing the normal vessel radius
 
-PASS: BioTool target contact enabled: pressure-return
+PASS: Scanner objective expected for hdx-forward
 
-Tool pressure-return: locked=pressure-return charge=0 radius=0,8003413 pressure=120 aim=(67.66, 4.08, 138.54) contact=(67.94, 4.23, 139.90)
+Contact hdx-forward: AR measurement contact / hdx-forward / SphereCollider layerInspector=True
 
-PASS: BioTool completed pressure-return
+Scan hdx-forward: step=7 enabled=True lock=none progress=1 blocker=none aim=(67.95, 4.00, 138.50) target=(66.21, 3.83, 143.46) contact=(66.21, 3.83, 143.46)
 
-PASS: Repeated real measurement detects delayed pressure fall despite vascular tone
+PASS: Scanner completed hdx-forward
+
+PASS: Late pressure diagnosis completes through Scanner/XRI and leads to further investigation
 
 PASS: Real left Y continues completed Scene10
 
 PASS: Transition 10→11 arrives through normal travel
 
-PASS: Treated tone root and shader radius persist on entering wound diagnosis
+PASS: Late diagnosis preserves the intact local wall without an unnecessary radius intervention
 
 PASS: 10→11 preserves head/origin rotation and original instrument instances
 
-PASS: Scene11 starts with actual pooled outward blood leakage
+PASS: Scene11 diverts existing primary-pool cells while most continue downstream
 
 PASS: Scanner objective expected for wound
 
 Contact wound: Research target — wound / SphereCollider layerInspector=True
 
-Scan wound: step=1 enabled=True lock=leak progress=1 blocker=none aim=(91.29, 1.86, 177.62) target=(91.35, 2.99, 183.40) contact=(91.35, 2.99, 183.40)
+Scan wound: step=1 enabled=True lock=leak progress=1 blocker=none aim=(91.30, 1.85, 177.45) target=(91.35, 2.99, 183.40) contact=(91.35, 2.99, 183.40)
 
 PASS: Scanner completed wound
 
@@ -710,7 +772,7 @@ PASS: BioTool target exists: leak
 
 PASS: BioTool target contact enabled: leak
 
-Tool leak: locked=none charge=0 radius=0,8003413 pressure=120 aim=(90.85, 2.04, 177.70) contact=(91.35, 2.99, 183.40)
+Tool leak: locked=none charge=0 radius=1 pressure=120 aim=(90.85, 2.04, 177.53) contact=(91.35, 2.99, 183.40)
 
 PASS: BioTool completed leak
 
@@ -720,201 +782,249 @@ PASS: BioTool target exists: pressure-low
 
 PASS: BioTool target contact enabled: pressure-low
 
-Tool pressure-low: locked=pressure-low charge=0 radius=0,8003413 pressure=120 aim=(90.96, 2.06, 177.65) contact=(91.66, 2.36, 178.39)
+Tool pressure-low: locked=pressure-low charge=0 radius=1 pressure=120 aim=(90.85, 2.04, 177.53) contact=(91.66, 2.36, 178.39)
 
 PASS: BioTool completed pressure-low
 
 PASS: Scene11 Scanner/measurement sequence identifies wound, leak and pressure loss
 
-PASS: Diagnosed wound remains in the same physical location and keeps leaking until treated
+PASS: Diagnosed wound remains in the same physical location and keeps its open leak until treated
 
 PASS: Scene12 continues same wound and leak instances from Scene11
 
-PASS: Six physical platelet XRI pieces authored at existing wound
+PASS: Eleven flow platelets and three balance reserves authored at existing wound
 
-PASS: Real right grip selects Controllable platelet 0
+PASS: Real right grip selects Flow-caught platelet 0
 
-Released Controllable platelet 0 position=(92.47, 2.56, 182.85) intended=(92.47, 2.56, 182.85) accepted=False
+Released Flow-caught platelet 0 position=(91.50, 2.51, 178.96) intended=(91.68, 2.77, 181.87) accepted=False
 
 PASS: Wrong physical platelet placement stays unaccepted and can be re-grabbed
 
-PASS: Real right grip selects Controllable platelet 0
+PASS: Held real right Trigger catches flow platelet 0
 
-Released Controllable platelet 0 position=(91.70, 2.91, 183.55) intended=(91.70, 2.91, 183.55) accepted=True
+Platelet transport diagnostic: index=0 position=(90.98, 3.05, 182.50) destination=(90.90, 3.11, 182.57) distance=0,1223808 holding=False blocked=False mode=Capture
 
-PASS: First actual platelet release adheres to wound
+PASS: BioTool approach causes automatic adhesion and shape change without release placement: 0
 
-PASS: BioTool objective expected for platelet
+PASS: Held real right Trigger catches flow platelet 1
 
-PASS: BioTool target exists: platelet
+Platelet transport diagnostic: index=1 position=(91.33, 2.81, 183.00) destination=(91.25, 2.87, 183.07) distance=0,122376 holding=False blocked=False mode=Capture
 
-PASS: BioTool target contact enabled: platelet
+PASS: BioTool approach causes automatic adhesion and shape change without release placement: 1
 
-Tool platelet: locked=platelet charge=0 radius=0,8003413 pressure=120 aim=(90.81, 2.17, 177.60) contact=(91.70, 2.91, 183.55)
+PASS: Held real right Trigger catches flow platelet 2
 
-PASS: BioTool completed platelet
+Platelet transport diagnostic: index=2 position=(91.79, 2.94, 183.43) destination=(91.71, 3.00, 183.51) distance=0,1223808 holding=False blocked=False mode=Capture
 
-PASS: First attached platelet changes into activated pseudopod-like mesh
+PASS: BioTool approach causes automatic adhesion and shape change without release placement: 2
 
-PASS: Real right grip selects Controllable platelet 1
+PASS: Held real right Trigger catches flow platelet 3
 
-Released Controllable platelet 1 position=(91.53, 2.63, 183.44) intended=(91.53, 2.63, 183.44) accepted=True
+Platelet transport diagnostic: index=3 position=(92.10, 2.73, 183.97) destination=(92.06, 2.76, 184.00) distance=0,06118344 holding=False blocked=False mode=Capture
 
-PASS: Real right grip selects Controllable platelet 2
+PASS: BioTool approach causes automatic adhesion and shape change without release placement: 3
 
-Released Controllable platelet 2 position=(91.28, 2.68, 183.21) intended=(91.28, 2.68, 183.21) accepted=True
+PASS: Held real right Trigger catches flow platelet 4
 
-PASS: Real right grip selects Controllable platelet 3
+Platelet transport diagnostic: index=4 position=(90.94, 3.08, 182.54) destination=(90.94, 3.08, 182.54) distance=0 holding=False blocked=False mode=Capture
 
-Released Controllable platelet 3 position=(91.28, 2.95, 183.01) intended=(91.28, 2.95, 183.01) accepted=True
+PASS: BioTool approach causes automatic adhesion and shape change without release placement: 4
 
-PASS: Real right grip selects Controllable platelet 4
+PASS: Held real right Trigger catches flow platelet 5
 
-Released Controllable platelet 4 position=(91.45, 3.23, 183.12) intended=(91.45, 3.23, 183.12) accepted=True
+Platelet transport diagnostic: index=5 position=(91.29, 2.84, 183.03) destination=(91.29, 2.84, 183.03) distance=0 holding=False blocked=False mode=Capture
 
-PASS: Real right grip selects Controllable platelet 5
+PASS: BioTool approach causes automatic adhesion and shape change without release placement: 5
 
-Released Controllable platelet 5 position=(91.70, 3.19, 183.35) intended=(91.70, 3.19, 183.35) accepted=True
+PASS: Held real right Trigger catches flow platelet 6
 
-PASS: Five more hand-placed platelets form spatial plug and reduce real leak
+Platelet transport diagnostic: index=6 position=(91.75, 2.97, 183.47) destination=(91.75, 2.97, 183.47) distance=0 holding=False blocked=False mode=Capture
 
-PASS: Wrong available factor scan cannot substitute thrombin identification
+PASS: BioTool approach causes automatic adhesion and shape change without release placement: 6
 
-PASS: Scanner objective expected for thrombin
+PASS: Held real right Trigger catches flow platelet 7
 
-Contact thrombin: Research target — thrombin / SphereCollider layerInspector=True
+Platelet transport diagnostic: index=7 position=(92.06, 2.76, 184.00) destination=(92.10, 2.73, 183.97) distance=0,06118344 holding=False blocked=False mode=Capture
 
-Scan thrombin: step=4 enabled=True lock=thrombin progress=1 blocker=none aim=(91.28, 2.01, 177.60) target=(91.69, 1.87, 182.99) contact=(91.69, 1.87, 182.99)
+PASS: BioTool approach causes automatic adhesion and shape change without release placement: 7
 
-PASS: Scanner completed thrombin
+PASS: Held real right Trigger catches flow platelet 8
 
-PASS: BioTool objective expected for thrombin
+Platelet transport diagnostic: index=8 position=(90.90, 3.11, 182.57) destination=(90.98, 3.05, 182.50) distance=0,1223808 holding=False blocked=False mode=Capture
 
-PASS: BioTool target exists: thrombin
+PASS: BioTool approach causes automatic adhesion and shape change without release placement: 8
 
-PASS: BioTool target contact enabled: thrombin
+PASS: Held real right Trigger catches flow platelet 9
 
-Tool thrombin: locked=thrombin charge=0 radius=0,8003413 pressure=120 aim=(90.82, 2.14, 177.60) contact=(91.69, 1.87, 182.99)
+Platelet transport diagnostic: index=9 position=(91.25, 2.87, 183.07) destination=(91.33, 2.81, 183.00) distance=0,122376 holding=False blocked=False mode=Capture
 
-PASS: BioTool completed thrombin
+PASS: BioTool approach causes automatic adhesion and shape change without release placement: 9
 
-PASS: Thrombin reaction generates physical fibrin strand endpoints
+PASS: Held real right Trigger catches flow platelet 10
 
-PASS: Real right grip selects Physical fibrin end handle 0
+Platelet transport diagnostic: index=10 position=(91.71, 3.00, 183.51) destination=(91.79, 2.94, 183.43) distance=0,1223808 holding=False blocked=False mode=Bio
 
-Released Physical fibrin end handle 0 position=(91.31, 3.40, 182.66) intended=(91.31, 3.40, 182.66) accepted=False
+PASS: BioTool approach causes automatic adhesion and shape change without release placement: 10
 
-PASS: Releasing fibrin at its starting anchor does not complete a connection
+PASS: Eleven automatically adherent platelets form only a loose primary plug with residual leakage
 
-PASS: Real right grip selects Physical fibrin end handle 0
+PASS: A single BioTool trigger cannot stabilize or heal the primary plug
 
-Released Physical fibrin end handle 0 position=(91.84, 2.38, 183.74) intended=(91.84, 2.38, 183.74) accepted=True
+PASS: Actual XR grip selects biochemical card 3
 
-PASS: Real right grip selects Physical fibrin end handle 1
+PASS: Actual EDTA card is rejected: calcium chelation inhibits coagulation
 
-Released Physical fibrin end handle 1 position=(91.98, 2.84, 183.67) intended=(91.98, 2.84, 183.67) accepted=True
+PASS: Actual XR grip selects biochemical card 0
 
-PASS: Real right grip selects Physical fibrin end handle 2
+PASS: Real XR grip/release solves stabilization stage 1
 
-Released Physical fibrin end handle 2 position=(92.12, 3.29, 183.60) intended=(92.12, 3.29, 183.60) accepted=True
+PASS: Actual XR grip selects biochemical card 1
 
-PASS: Scene12 requires three spatial fibrin connections and closes same leaking wound
+PASS: Real XR grip/release solves stabilization stage 2
 
-PASS: Scene13 inherits same six-platelet plug and three fibrin links without reset
+PASS: Actual XR grip selects biochemical card 2
 
-PASS: Hand-placed platelet transforms persist across 12→13
+PASS: Real XR grip/release solves stabilization stage 3
+
+PASS: Activation, aggregation and thrombin/fibrin solution starts gradual fibrin stabilization
+
+PASS: Fibrin gradually stops bleeding; endothelial healing remains a later episode
+
+PASS: Scene13 inherits same eleven-platelet plug and fibrin links without reset
+
+PASS: Adherent platelet transforms persist across 12→13
 
 PASS: Scanner objective expected for clot
 
 Contact clot: Research target — clot / SphereCollider layerInspector=True
 
-Scan clot: step=1 enabled=True lock=platelet progress=1 blocker=none aim=(91.27, 2.04, 177.60) target=(91.35, 2.99, 183.40) contact=(91.35, 2.99, 183.40)
+Scan clot: step=1 enabled=True lock=platelet progress=1 blocker=none aim=(91.28, 2.03, 177.43) target=(91.35, 2.99, 183.40) contact=(91.35, 2.99, 183.40)
 
 PASS: Scanner completed clot
 
-PASS: Real right grip selects Controllable platelet 0
+PASS: Real right grip selects Flow-caught platelet 0
 
-Released Controllable platelet 0 position=(92.54, 2.53, 182.78) intended=(92.54, 2.53, 182.78) accepted=False
+Released Flow-caught platelet 0 position=(91.75, 2.74, 181.81) intended=(91.75, 2.74, 181.81) accepted=False
 
-PASS: Real right grip selects Controllable platelet 1
+PASS: Real right grip selects Flow-caught platelet 1
 
-Released Controllable platelet 1 position=(92.37, 2.26, 182.67) intended=(92.37, 2.26, 182.67) accepted=False
+Released Flow-caught platelet 1 position=(92.09, 2.49, 182.30) intended=(92.09, 2.49, 182.30) accepted=False
 
-PASS: Real right grip selects Controllable platelet 2
+PASS: Real right grip selects Flow-caught platelet 2
 
-Released Controllable platelet 2 position=(92.12, 2.30, 182.44) intended=(92.12, 2.30, 182.44) accepted=False
+Released Flow-caught platelet 2 position=(92.55, 2.63, 182.74) intended=(92.55, 2.63, 182.74) accepted=False
 
-PASS: Real right grip selects Controllable platelet 3
+PASS: Real right grip selects Flow-caught platelet 3
 
-Released Controllable platelet 3 position=(92.13, 2.58, 182.24) intended=(92.13, 2.58, 182.24) accepted=False
+Released Flow-caught platelet 3 position=(92.90, 2.38, 183.24) intended=(92.90, 2.38, 183.24) accepted=False
+
+PASS: Real right grip selects Flow-caught platelet 4
+
+Released Flow-caught platelet 4 position=(91.78, 2.71, 181.77) intended=(91.78, 2.71, 181.77) accepted=False
+
+PASS: Real right grip selects Flow-caught platelet 5
+
+Released Flow-caught platelet 5 position=(92.13, 2.46, 182.27) intended=(92.13, 2.46, 182.27) accepted=False
+
+PASS: Real right grip selects Flow-caught platelet 6
+
+Released Flow-caught platelet 6 position=(92.59, 2.60, 182.70) intended=(92.59, 2.60, 182.70) accepted=False
+
+PASS: Real right grip selects Flow-caught platelet 7
+
+Released Flow-caught platelet 7 position=(92.94, 2.35, 183.20) intended=(92.94, 2.35, 183.20) accepted=False
+
+PASS: Real right grip selects Flow-caught platelet 8
+
+Released Flow-caught platelet 8 position=(91.82, 2.68, 181.73) intended=(91.82, 2.68, 181.73) accepted=False
 
 PASS: Real right grip selects Physical fibrin end handle 0
 
-Released Physical fibrin end handle 0 position=(91.31, 3.40, 182.66) intended=(91.31, 3.40, 182.66) accepted=False
+Released Physical fibrin end handle 0 position=(90.95, 3.11, 182.41) intended=(90.95, 3.11, 182.41) accepted=False
 
 PASS: Real right grip selects Physical fibrin end handle 1
 
-Released Physical fibrin end handle 1 position=(91.17, 2.95, 182.73) intended=(91.17, 2.95, 182.73) accepted=False
+Released Physical fibrin end handle 1 position=(90.91, 2.98, 182.43) intended=(90.91, 2.98, 182.43) accepted=False
 
 PASS: Real right grip selects Physical fibrin end handle 2
 
-Released Physical fibrin end handle 2 position=(91.04, 2.49, 182.80) intended=(91.04, 2.49, 182.80) accepted=False
+Released Physical fibrin end handle 2 position=(90.87, 2.85, 182.45) intended=(90.87, 2.85, 182.45) accepted=False
 
 PASS: Removing real platelets/fibrin produces UNDER with renewed blood leak
 
-PASS: Real right grip selects Controllable platelet 0
+PASS: Real right grip selects Flow-caught platelet 0
 
-Released Controllable platelet 0 position=(91.70, 2.91, 183.55) intended=(91.70, 2.91, 183.55) accepted=True
+Released Flow-caught platelet 0 position=(90.90, 3.11, 182.57) intended=(90.90, 3.11, 182.57) accepted=True
 
-PASS: Real right grip selects Controllable platelet 1
+PASS: Real right grip selects Flow-caught platelet 1
 
-Released Controllable platelet 1 position=(91.53, 2.63, 183.44) intended=(91.53, 2.63, 183.44) accepted=True
+Released Flow-caught platelet 1 position=(91.29, 2.84, 183.03) intended=(91.25, 2.87, 183.07) accepted=True
 
-PASS: Real right grip selects Controllable platelet 2
+PASS: Real right grip selects Flow-caught platelet 2
 
-Released Controllable platelet 2 position=(91.28, 2.68, 183.21) intended=(91.28, 2.68, 183.21) accepted=True
+Released Flow-caught platelet 2 position=(91.75, 2.97, 183.47) intended=(91.71, 3.00, 183.51) accepted=True
 
-PASS: Real right grip selects Controllable platelet 3
+PASS: Real right grip selects Flow-caught platelet 3
 
-Released Controllable platelet 3 position=(91.28, 2.95, 183.01) intended=(91.28, 2.95, 183.01) accepted=True
+Released Flow-caught platelet 3 position=(92.06, 2.76, 184.00) intended=(92.06, 2.76, 184.00) accepted=True
+
+PASS: Real right grip selects Flow-caught platelet 4
+
+Released Flow-caught platelet 4 position=(90.94, 3.08, 182.54) intended=(90.94, 3.08, 182.54) accepted=True
+
+PASS: Real right grip selects Flow-caught platelet 5
+
+Released Flow-caught platelet 5 position=(91.33, 2.81, 183.00) intended=(91.29, 2.84, 183.03) accepted=True
+
+PASS: Real right grip selects Flow-caught platelet 6
+
+Released Flow-caught platelet 6 position=(91.79, 2.94, 183.43) intended=(91.75, 2.97, 183.47) accepted=True
+
+PASS: Real right grip selects Flow-caught platelet 7
+
+Released Flow-caught platelet 7 position=(92.10, 2.73, 183.97) intended=(92.10, 2.73, 183.97) accepted=True
+
+PASS: Real right grip selects Flow-caught platelet 8
+
+Released Flow-caught platelet 8 position=(90.98, 3.05, 182.50) intended=(90.98, 3.05, 182.50) accepted=True
 
 PASS: Real right grip selects Physical fibrin end handle 0
 
-Released Physical fibrin end handle 0 position=(91.84, 2.38, 183.74) intended=(91.84, 2.38, 183.74) accepted=True
+Released Physical fibrin end handle 0 position=(92.20, 2.67, 183.99) intended=(92.20, 2.67, 183.99) accepted=True
 
 PASS: Real right grip selects Physical fibrin end handle 1
 
-Released Physical fibrin end handle 1 position=(91.98, 2.84, 183.67) intended=(91.98, 2.84, 183.67) accepted=True
+Released Physical fibrin end handle 1 position=(92.24, 2.80, 183.97) intended=(92.24, 2.80, 183.97) accepted=True
 
 PASS: Real right grip selects Physical fibrin end handle 2
 
-Released Physical fibrin end handle 2 position=(92.12, 3.29, 183.60) intended=(92.12, 3.29, 183.60) accepted=True
+Released Physical fibrin end handle 2 position=(92.28, 2.93, 183.95) intended=(92.28, 2.93, 183.95) accepted=True
 
-PASS: Real right grip selects Reserve hand platelet 6
+PASS: Real right grip selects Reserve balance platelet 11
 
-Released Reserve hand platelet 6 position=(91.85, 2.89, 183.72) intended=(91.85, 2.89, 183.72) accepted=True
+Released Reserve balance platelet 11 position=(92.14, 2.70, 183.93) intended=(92.14, 2.70, 183.93) accepted=True
 
-PASS: Real right grip selects Reserve hand platelet 7
+PASS: Real right grip selects Reserve balance platelet 12
 
-Released Reserve hand platelet 7 position=(91.55, 2.43, 183.55) intended=(91.55, 2.43, 183.55) accepted=True
+Released Reserve balance platelet 12 position=(91.02, 3.02, 182.46) intended=(91.02, 3.02, 182.46) accepted=True
 
-PASS: Real right grip selects Reserve hand platelet 8
+PASS: Real right grip selects Reserve balance platelet 13
 
-Released Reserve hand platelet 8 position=(91.14, 2.50, 183.15) intended=(91.14, 2.50, 183.15) accepted=True
+Released Reserve balance platelet 13 position=(91.37, 2.78, 182.96) intended=(91.37, 2.78, 182.96) accepted=True
 
 PASS: Adding reserve platelets by hand produces OVER obstruction and slowed flow
 
-PASS: Real right grip selects Reserve hand platelet 6
+PASS: Real right grip selects Reserve balance platelet 11
 
-Released Reserve hand platelet 6 position=(92.76, 2.48, 182.89) intended=(92.76, 2.48, 182.89) accepted=False
+Released Reserve balance platelet 11 position=(93.05, 2.29, 183.10) intended=(93.05, 2.29, 183.10) accepted=False
 
-PASS: Real right grip selects Reserve hand platelet 7
+PASS: Real right grip selects Reserve balance platelet 12
 
-Released Reserve hand platelet 7 position=(92.46, 2.03, 182.72) intended=(92.46, 2.03, 182.72) accepted=False
+Released Reserve balance platelet 12 position=(91.93, 2.62, 181.63) intended=(91.93, 2.62, 181.63) accepted=False
 
-PASS: Real right grip selects Reserve hand platelet 8
+PASS: Real right grip selects Reserve balance platelet 13
 
-Released Reserve hand platelet 8 position=(92.06, 2.09, 182.32) intended=(92.06, 2.09, 182.32) accepted=False
+Released Reserve balance platelet 13 position=(92.28, 2.37, 182.13) intended=(92.28, 2.37, 182.13) accepted=False
 
 PASS: Physical correction returns to OPTIMAL with open lumen
 
@@ -924,7 +1034,7 @@ PASS: BioTool target exists: open-flow
 
 PASS: BioTool target contact enabled: open-flow
 
-Tool open-flow: locked=open-flow charge=0 radius=0,8003413 pressure=120 aim=(90.93, 2.19, 177.53) contact=(92.28, 2.53, 178.41)
+Tool open-flow: locked=open-flow charge=0 radius=1 pressure=120 aim=(90.80, 2.18, 177.43) contact=(92.28, 2.53, 178.41)
 
 PASS: BioTool completed open-flow
 
@@ -948,7 +1058,7 @@ PASS: BioTool target exists: cleanup-mode
 
 PASS: BioTool target contact enabled: cleanup-mode
 
-Tool cleanup-mode: locked=cleanup-mode charge=0 radius=0,8003413 pressure=120 aim=(90.81, 2.15, 177.60) contact=(91.43, 2.01, 182.64)
+Tool cleanup-mode: locked=cleanup-mode charge=0 radius=1 pressure=120 aim=(90.80, 2.18, 177.43) contact=(91.43, 2.01, 182.64)
 
 PASS: BioTool completed cleanup-mode
 
@@ -964,7 +1074,7 @@ PASS: Scanner objective expected for plasmin
 
 Contact plasmin: Recovery factor — plasmin / SphereCollider layerInspector=True
 
-Scan plasmin: step=4 enabled=True lock=plasmin progress=1 blocker=none aim=(91.29, 2.01, 177.60) target=(92.01, 1.93, 183.32) contact=(92.01, 1.93, 183.32)
+Scan plasmin: step=4 enabled=True lock=plasmin progress=1 blocker=none aim=(90.22, 2.35, 177.44) target=(92.01, 1.93, 183.32) contact=(92.01, 1.93, 183.32)
 
 PASS: Scanner completed plasmin
 
@@ -974,7 +1084,7 @@ PASS: BioTool target exists: plasmin
 
 PASS: BioTool target contact enabled: plasmin
 
-Tool plasmin: locked=plasmin charge=0 radius=0,8003413 pressure=120 aim=(90.82, 2.15, 177.60) contact=(92.01, 1.93, 183.32)
+Tool plasmin: locked=plasmin charge=0 radius=1 pressure=120 aim=(90.80, 2.18, 177.43) contact=(92.01, 1.93, 183.32)
 
 PASS: BioTool completed plasmin
 
@@ -986,7 +1096,7 @@ PASS: BioTool target exists: repair
 
 PASS: BioTool target contact enabled: repair
 
-Tool repair: locked=healed-wall charge=0 radius=0,8003413 pressure=120 aim=(90.80, 2.18, 177.61) contact=(91.35, 2.99, 183.40)
+Tool repair: locked=healed-wall charge=0 radius=1 pressure=120 aim=(90.80, 2.18, 177.43) contact=(91.35, 2.99, 183.40)
 
 PASS: BioTool completed repair
 
@@ -996,7 +1106,7 @@ PASS: Scanner objective expected for healed-wall
 
 Contact healed-wall: Research target — healed-wall / SphereCollider layerInspector=True
 
-Scan healed-wall: step=7 enabled=True lock=none progress=1 blocker=none aim=(91.27, 2.04, 177.60) target=(91.35, 2.99, 183.40) contact=(91.35, 2.99, 183.40)
+Scan healed-wall: step=7 enabled=True lock=none progress=1 blocker=none aim=(91.28, 2.03, 177.43) target=(91.35, 2.99, 183.40) contact=(91.35, 2.99, 183.40)
 
 PASS: Scanner completed healed-wall
 
@@ -1010,7 +1120,7 @@ PASS: Scanner objective expected for infected-cell
 
 Contact infected-cell: Research target — infected-cell / SphereCollider layerInspector=True
 
-Scan infected-cell: step=1 enabled=True lock=infected-cell progress=1 blocker=none aim=(119.39, 16.05, 233.54) target=(121.29, 17.71, 235.89) contact=(121.29, 17.71, 235.89)
+Scan infected-cell: step=1 enabled=True lock=infected-cell progress=1 blocker=none aim=(119.32, 15.96, 233.41) target=(121.29, 17.71, 235.89) contact=(121.29, 17.71, 235.89)
 
 PASS: Scanner completed infected-cell
 
@@ -1032,7 +1142,7 @@ PASS: Scanner objective expected for epitope
 
 Contact epitope: Research target — epitope / SphereCollider layerInspector=True
 
-Scan epitope: step=3 enabled=True lock=epitope progress=1 blocker=none aim=(119.39, 16.05, 233.54) target=(121.05, 17.54, 235.62) contact=(121.05, 17.54, 235.62)
+Scan epitope: step=3 enabled=True lock=epitope progress=1 blocker=none aim=(119.32, 15.96, 233.41) target=(121.05, 17.54, 235.62) contact=(121.05, 17.54, 235.62)
 
 PASS: Scanner completed epitope
 
@@ -1050,7 +1160,7 @@ PASS: BioTool target exists: neutralized
 
 PASS: BioTool target contact enabled: neutralized
 
-Tool neutralized: locked=infected-cell charge=0 radius=0,8003413 pressure=120 aim=(119.34, 16.47, 233.33) contact=(121.05, 17.54, 235.62)
+Tool neutralized: locked=infected-cell charge=0 radius=1 pressure=120 aim=(119.27, 16.40, 233.19) contact=(121.05, 17.54, 235.62)
 
 PASS: BioTool completed neutralized
 
@@ -1060,7 +1170,7 @@ PASS: BioTool target exists: t-cell
 
 PASS: BioTool target contact enabled: t-cell
 
-Tool t-cell: locked=none charge=0 radius=0,8003413 pressure=120 aim=(119.38, 16.35, 233.30) contact=(121.21, 16.99, 235.39)
+Tool t-cell: locked=none charge=0 radius=1 pressure=120 aim=(119.27, 16.40, 233.19) contact=(121.20, 16.98, 235.38)
 
 PASS: BioTool completed t-cell
 
@@ -1080,7 +1190,7 @@ PASS: BioTool target exists: check-pressure
 
 PASS: BioTool target contact enabled: check-pressure
 
-Tool check-pressure: locked=check-pressure charge=0 radius=0,8003413 pressure=120 aim=(119.27, 16.34, 233.34) contact=(119.59, 15.61, 234.81)
+Tool check-pressure: locked=check-pressure charge=0 radius=1 pressure=120 aim=(119.27, 16.40, 233.19) contact=(119.59, 15.61, 234.81)
 
 PASS: BioTool completed check-pressure
 
@@ -1090,7 +1200,7 @@ PASS: BioTool target exists: check-temperature
 
 PASS: BioTool target contact enabled: check-temperature
 
-Tool check-temperature: locked=check-temperature charge=0 radius=0,8003413 pressure=120 aim=(119.29, 16.39, 233.36) contact=(119.66, 16.25, 234.70)
+Tool check-temperature: locked=check-temperature charge=0 radius=1 pressure=120 aim=(119.27, 16.40, 233.19) contact=(119.66, 16.25, 234.70)
 
 PASS: BioTool completed check-temperature
 
@@ -1100,7 +1210,7 @@ PASS: BioTool target exists: check-flow
 
 PASS: BioTool target contact enabled: check-flow
 
-Tool check-flow: locked=check-flow charge=0 radius=0,8003413 pressure=120 aim=(119.29, 16.46, 233.35) contact=(119.73, 16.88, 234.58)
+Tool check-flow: locked=check-flow charge=0 radius=1 pressure=120 aim=(119.27, 16.40, 233.19) contact=(119.73, 16.88, 234.58)
 
 PASS: BioTool completed check-flow
 
@@ -1108,7 +1218,7 @@ PASS: Scanner objective expected for check-wall
 
 Contact check-wall: Homeostasis sensor — check-wall / SphereCollider layerInspector=True
 
-Scan check-wall: step=4 enabled=True lock=check-wall progress=1 blocker=none aim=(119.40, 15.91, 233.55) target=(120.17, 15.48, 234.45) contact=(120.17, 15.48, 234.45)
+Scan check-wall: step=4 enabled=True lock=check-wall progress=1 blocker=none aim=(119.32, 15.96, 233.41) target=(120.17, 15.48, 234.45) contact=(120.17, 15.48, 234.45)
 
 PASS: Scanner completed check-wall
 
@@ -1116,7 +1226,7 @@ PASS: Scanner objective expected for check-virus
 
 Contact check-virus: Homeostasis sensor — check-virus / SphereCollider layerInspector=True
 
-Scan check-virus: step=5 enabled=True lock=check-virus progress=1 blocker=none aim=(119.42, 15.98, 233.54) target=(120.24, 16.12, 234.33) contact=(120.24, 16.12, 234.33)
+Scan check-virus: step=5 enabled=True lock=check-virus progress=1 blocker=none aim=(119.32, 15.96, 233.41) target=(120.24, 16.12, 234.33) contact=(120.24, 16.12, 234.33)
 
 PASS: Scanner completed check-virus
 
@@ -1126,7 +1236,7 @@ PASS: BioTool target exists: check-hemostasis
 
 PASS: BioTool target contact enabled: check-hemostasis
 
-Tool check-hemostasis: locked=check-hemostasis charge=0 radius=0,8003413 pressure=120 aim=(119.37, 16.45, 233.32) contact=(120.32, 16.75, 234.22)
+Tool check-hemostasis: locked=check-hemostasis charge=0 radius=1 pressure=120 aim=(119.27, 16.40, 233.19) contact=(120.32, 16.75, 234.22)
 
 PASS: BioTool completed check-hemostasis
 
@@ -1146,4 +1256,4 @@ VERY FAR method: tracked HMD state excursions along existing path after final me
 
 ## Scope
 
-Only completed PASS sequences above establish verification for this run. No debug enter/force-next/mission Accept is called by this driver. Scene05 retains ray-target parameter controls. Scanner/BioTool are controller-mounted visuals, not physically grabbable instruments. Physical Quest/Pico, thermal/FPS, pooling/difficulty overhaul and joystick comfort remain unverified. VERY FAR uses tracked HMD state excursions, not a mission reset. Scenes12–16 are verified only when their actual hand/tool/measurement sequences above pass.
+Only completed PASS sequences above establish verification for this run. No debug enter/force-next/mission Accept is called by this driver. Scenes05/10 use in-vessel measurements, manual TONUS and physical hypothesis cards when the experiment is installed. Scanner/BioTool are controller-mounted visuals, not physically grabbable instruments. Physical Quest/Pico, thermal/FPS and joystick comfort remain unverified. VERY FAR uses tracked HMD state excursions, not a mission reset. Scenes12–16 are verified only when their actual hand/tool/measurement sequences above pass.

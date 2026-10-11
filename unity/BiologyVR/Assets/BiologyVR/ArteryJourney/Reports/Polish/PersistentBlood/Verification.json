@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-11T08:50:11.225813+00:00",
+  "desktopUtc": "2026-10-11T08:43:45.4067628Z",
+  "mobilePoolUtc": "2026-10-11T08:48:18.2635009Z",
+  "desktopPassed": true,
+  "mobilePoolPassed": true,
+  "method": "Actual Unity camera renders and mouse-input scene fixtures; mobile pool budget simulated in Editor",
+  "frames": [
+    "Scene03_Dense_Flow.png",
+    "Scene11_Dense_Flow.png",
+    "Scene15_Dense_Flow.png",
+    "Scene16_Dense_Flow.png"
+  ],
+  "hardwareVerified": false
+}

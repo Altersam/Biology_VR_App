@@ -1,0 +1,14 @@
+{
+  "utc": "2026-10-11T13:52:00.176147+00:00",
+  "authoringUtc": "2026-10-11T13:49:15.2957394Z",
+  "method": "Actual Unity XR InputActions and camera renders",
+  "xrSequential": "FULL SIMULATOR PASS",
+  "controllerLifecycle": "PASS",
+  "hardwareVerified": false,
+  "frames": [
+    "XRControllers/Persistent_Aiming_Guides.png",
+    "ActiveInstruments/08_Holographic_Theory_Actual_XR_Scroll.png",
+    "V7Input/Scene12_Spatial_Fibrin_Complete.png",
+    "V7Input/Scene16_Actual_Homeostasis_Checks.png"
+  ]
+}
