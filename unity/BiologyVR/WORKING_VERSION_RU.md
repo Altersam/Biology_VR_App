@@ -168,3 +168,19 @@ UTC **2026-10-11T15:07:32.1062382Z**. Мобильный пул 180 в Scenes03�
 Кадры — `Reports/Polish/HemodynamicsExperiment/Gameplay_Review.jpg`.
 По запросу пользователя исходники/WebGL и PICO APK публикуются как **0.4.0**;
 фактические результаты — **RELEASE_0_4_0_RU.md** и отчёты сборки.
+
+## Публикация 0.4.0
+
+WebGL 0.4.0 — Succeeded, 0 errors / 7 warnings; загрузка в Chromium PASS.
+PICO 4 APK 0.4.0 / code 5 — Succeeded, 0 errors / 14 warnings;
+manifest/ARM64/IL2CPP/OpenXR/PICO metadata/signature PASS.
+Файл — `Builds/Pico4/BiologyVR_Pico4_v0.4.0.apk`, 77 238 537 байт.
+SHA-256 — `eebbf0396a197c01399db0e69dff5dd641703de0b512ceab5f1062513ce2f596`.
+
+Исходники и WebGL опубликованы commit `f2ff9eb5c2b15addfff26d87e3f301119f778f4c`
+в `Altersam/Biology_VR_App`. GitHub Pages deployment **success**,
+run **38151833857**; опубликованная страница игры подтверждает `productVersion: 0.4.0`.
+PICO APK и SHA256SUMS прикреплены к
+https://github.com/Altersam/Biology_VR_App/releases/tag/v0.4.0 .
+GitHub asset digest совпадает с локальным APK. Unity возвращена к оригинальному
+проекту `bio_v0.2` на Z: и Desktop target; master сохранён, Console 0 errors.
