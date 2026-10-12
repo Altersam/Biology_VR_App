@@ -184,3 +184,36 @@ PICO APK и SHA256SUMS прикреплены к
 https://github.com/Altersam/Biology_VR_App/releases/tag/v0.4.0 .
 GitHub asset digest совпадает с локальным APK. Unity возвращена к оригинальному
 проекту `bio_v0.2` на Z: и Desktop target; master сохранён, Console 0 errors.
+
+## Свободное первое исследование — следующая рабочая итерация
+
+**FREE_BLOOD_RESEARCH_RU.md**: первый артериальный эпизод (внутренний Scene03)
+больше не задаёт порядок RBC → WBC → platelet → plasma. Все восемь существующих
+объектов доступны с начала; четыре основных компонента обязательны, Hb,
+гем/Fe²⁺, O₂ и CO₂ независимы. ScriptableObject страницы, индивидуальные статусы,
+контекстный профессор, повторное открытие без зачёта и обычный Continue после 4/4.
+В рамках прохождения состояния и страницы сохраняются; кровь не останавливается.
+Свежие PC/XR результаты — `Free_Blood_Research_PC_Input.json` и
+`VR_INPUT_PLAYTHROUGH_V7.md`. APK/WebGL 0.4.0 — предыдущая опубликованная итерация.
+
+Подтверждения свободного первого исследования:
+- ПК: все 24 порядка **PASS**, UTC 2026-10-11T19:44:44.5670239Z.
+- XR: полный маршрут + VERY FAR **FULL SIMULATOR PASS**,
+  UTC 2026-10-11T19:59:45.4835926Z, включая O₂↔гем и двуручное увеличение.
+- Saved scene **PASS**, UTC 2026-10-11T20:06:53.24966Z:
+  647 зависимостей, journal/theory ссылки валидны, нет missing scripts/assets.
+- Compile 0 errors / 0 warnings, Console 0 errors.
+Обзор — `Reports/Polish/FreeBloodResearch/Gameplay_Review.jpg`.
+
+## Сборки свободного исследования — 0.5.0
+
+По запросу пользователя обновлены WebGL и два отдельных Android-профиля:
+PICO 4 / PICO 4 Enterprise и Meta Quest 2 / Pro / 3 / 3S (Oculus).
+Версия **0.5.0**, Android versionCode **6**.
+Обе сборки — release (`BuildOptions.None`), ARM64 / IL2CPP / OpenXR / OpenGLES3.
+PICO: 77 256 609 байт, 0 errors / 14 warnings, manifest/signature/runtime PASS.
+Quest: 76 372 394 байта, 0 errors / 12 warnings, Meta devices/category/headtracking,
+подпись и отсутствие PICO runtime PASS. WebGL: 0 errors / 7 warnings, Chromium PASS.
+Ссылки, параметры и SHA-256 — **RELEASE_0_5_0_RU.md**.
+Локальные APK: `Builds/Pico4/BiologyVR_Pico4_v0.5.0.apk` и
+`Builds/MetaQuest/BiologyVR_MetaQuest_v0.5.0.apk`.

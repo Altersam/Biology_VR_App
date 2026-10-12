@@ -15,10 +15,9 @@ namespace BiologyVR.ArteryRoute.Journey
         public Material[] restingPlateletMaterials,activatedPlateletMaterials;
         public UnityEngine.UI.Text[] bloodLabels;
         public int LastScene {get;private set;}
-        bool bloodDocked;
         public void Stage(int scene)
         {
-            LastScene=scene;bloodDocked=false;var path=world.mover.path;float s=path.Anchor(scene);
+            LastScene=scene;var path=world.mover.path;float s=path.Anchor(scene);
             if(layerCutaway)layerCutaway.SetActive(scene==4||world.IsEpisodeCompleted(4));
             if(plateletComparison)plateletComparison.SetActive(world.IsEpisodeCompleted(3));
             if(scene==11)foreach(var p in world.platelets)if(p)p.SetActive(false);
@@ -74,17 +73,11 @@ namespace BiologyVR.ArteryRoute.Journey
                 return;
             }
             if(world.mission.SceneNumber!=3)return;
-            int step = world.mission.StepIndex;
-            // Exact canonical scene03 sequence: Grab, Scan, Enlarge, Hb, Heme, O2 off/on,
-            // CO2, WBC, resting platelet, compare activated platelet, plasma.
+            if(world.research){world.research.RefreshAvailability();return;}
             foreach (var id in new[]{"rbc","hemoglobin","heme","oxygen","co2","leukocyte","platelet","plasma"})
             {
-                bool visible = id == "rbc" || id=="leukocyte" || id=="platelet" || id=="plasma" || (step >= 3 && step <= 6 && (id == "hemoglobin" || id == "heme" || id == "oxygen"))
-                    || id == "co2" || (step == 8 && id == "leukocyte")
-                    || ((step == 9 || step == 10) && id == "platelet") || (step >= 11 && id == "plasma");
-                var t = world.Find(id);if(t && t.gameObject.activeSelf != visible)t.gameObject.SetActive(visible);
+                var t = world.Find(id);if(t)t.gameObject.SetActive(true);
             }
-            if(plateletComparison)plateletComparison.SetActive(step == 10);
         }
         public bool TryViewFocus(out Vector3 point)
         {
@@ -105,21 +98,6 @@ namespace BiologyVR.ArteryRoute.Journey
         void Update()
         {
             if(!world||!world.mover||wallChunks==null)return;
-            if(world.mission.SceneNumber==3&&world.mission.StepIndex>=3&&!bloodDocked)
-            {
-                var rbc=world.Find("rbc");
-                if(rbc&&rbc.DesktopHeld&&!world.mover.UsingTrackedInput&&!rbc.GetComponent<JourneyFlowPickup>())rbc.KeyboardGrab();
-                if(rbc&&!rbc.grabbed)
-                {
-                    var flowing=rbc.GetComponent<JourneyFlowPickup>();
-                    if(flowing&&flowing.InStudyFlow){bloodDocked=true;}
-                    else
-                    {
-                    var path=world.mover.path;float s=path.Anchor(3);
-                    rbc.SetPresentationPose(path.Offset(s+1.8f,1.0f,-.22f),path.Frame(s)*Quaternion.Euler(70,15,0));bloodDocked=true;
-                    }
-                }
-            }
             bool inLab=world.mission.SceneNumber>=17&&world.labRoom&&world.labRoom.activeInHierarchy;
             float visibility=world.mover.viewCamera.farClipPlane+18f;
             for(int i=0;i<wallChunks.Length;i++)if(wallChunks[i])wallChunks[i].enabled=!inLab&&world.mission.SceneNumber<18&&Mathf.Abs(chunkDistances[i]-world.mover.Distance)<visibility;
@@ -131,7 +109,7 @@ namespace BiologyVR.ArteryRoute.Journey
             var ids=new[]{"rbc","leukocyte","platelet","plasma"};var camera=world.mover.viewCamera.transform;
             for(int i=0;i<bloodLabels.Length&&i<ids.Length;i++)if(bloodLabels[i])
             {
-                bool active=world.mission.SceneNumber==3;bloodLabels[i].gameObject.SetActive(active);if(!active)continue;
+                bool active=world.mission.SceneNumber==3&&!world.research;bloodLabels[i].gameObject.SetActive(active);if(!active)continue;
                 var target=world.Find(ids[i]);if(!target)continue;
                 float above=i==0?.20f:i==1?.23f:.15f;
                 bloodLabels[i].transform.SetPositionAndRotation(target.transform.position+camera.up*above,camera.rotation);

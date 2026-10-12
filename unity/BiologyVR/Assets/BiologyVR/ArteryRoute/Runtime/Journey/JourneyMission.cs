@@ -29,10 +29,11 @@ namespace BiologyVR.ArteryRoute.Journey
         public int WrongCapHits{get;private set;}
         public string Feedback{get;private set;}="Сначала наблюдаем, потом делаем вывод.";
         public bool Ready=>mover!=null&&!mover.Moving;
-        public bool Complete=>Goals!=null&&StepIndex>=Goals.Count;
+        public bool FreeBloodResearch=>SceneNumber==3&&world&&world.research;
+        public bool Complete=>FreeBloodResearch?world.research.Complete:Goals!=null&&StepIndex>=Goals.Count;
         public void RecordHomeostasisMeasurements(){PressureSystolic=120;Temperature=36.8f;}
         public StudyGoal Current=>Complete?null:Goals[StepIndex];
-        public string CurrentGoalLabel=>FreeResearchUnlocked&&SceneNumber==18?"Свободное исследование — сканируй модели":SceneNumber==17&&world&&world.Returning?"Переход масштаба — подожди":Victory?"ПОБЕДА — вирусный очаг нейтрализован":Goals==null?"Подготовка исследовательского режима":Complete&&SceneNumber==15?"Дождись завершения фагоцитоза":Complete?"Этап завершён — можно продолжить":Current.label;
+        public string CurrentGoalLabel=>FreeBloodResearch?world.research.GoalLabel:FreeResearchUnlocked&&SceneNumber==18?"Свободное исследование — сканируй модели":SceneNumber==17&&world&&world.Returning?"Переход масштаба — подожди":Victory?"ПОБЕДА — вирусный очаг нейтрализован":Goals==null?"Подготовка исследовательского режима":Complete&&SceneNumber==15?"Дождись завершения фагоцитоза":Complete?"Этап завершён — можно продолжить":Current.label;
         public string LearningTerm{get;private set;}="Гомеостаз";
         public string LearningNote{get;private set;}="Сначала наблюдаем. Потом делаем вывод.";
         public string Formula{get;private set;}="";
@@ -77,13 +78,7 @@ namespace BiologyVR.ArteryRoute.Journey
             switch(SceneNumber)
             {
                 case 3:
-                    Goal("Достань эритроцит из кровотока",StudyAction.Grab,"rbc");
-                    Goal("Просканируй эритроцит",StudyAction.Scan,"rbc");Goal("Увеличь учебный эритроцит",StudyAction.Enlarge,"rbc");
-                    Goal("Изучи гемоглобин: четыре субъединицы",StudyAction.Scan,"hemoglobin");Goal("Просканируй гем и Fe²⁺",StudyAction.Scan,"heme");
-                    Goal("Сними молекулу O₂ с гема",StudyAction.Detach,"oxygen");Goal("Верни O₂ в точку связывания",StudyAction.Bind,"oxygen");
-                    Goal("Поймай модель транспорта CO₂ и просканируй",StudyAction.Scan,"co2");Goal("Достань лейкоцит из потока и просканируй",StudyAction.Scan,"leukocyte");
-                    Goal("Поймай и просканируй тромбоцит в покое",StudyAction.Scan,"platelet");Goal("Сравни с активированной формой",StudyAction.Compare,"platelet");
-                    Goal("Поймай учебную модель белков/ионов плазмы и изучи",StudyAction.Scan,"plasma");break;
+                    Goal("Исследуй состав крови в любом порядке",StudyAction.Scan,"blood-composition",world.research?world.research.RequiredCount:4);break;
                 case 4:
                     Goal("Сканируй эндотелий",StudyAction.Scan,"endothelium");Goal("Включи послойный режим",StudyAction.Activate,"layers");
                     Goal("Просканируй интиму",StudyAction.Scan,"intima");Goal("Просканируй мышечно-эластическую медиа",StudyAction.Scan,"media");Goal("Просканируй адвентицию",StudyAction.Scan,"adventitia");break;
@@ -146,6 +141,7 @@ namespace BiologyVR.ArteryRoute.Journey
             }
             if(travel)mover.TravelTo(SceneNumber);else mover.TravelTo(SceneNumber,true);
             world.ShowScene(SceneNumber);
+            if(FreeBloodResearch)world.research.EnterStage();
             Changed?.Invoke();
         }
         void SetBriefing(int scene)
@@ -153,7 +149,7 @@ namespace BiologyVR.ArteryRoute.Journey
             LearningTerm="Гомеостаз";LearningNote="Сначала наблюдаем. Потом делаем вывод.";Formula="";ProfessorLine="Сначала наблюдаем. Потом делаем вывод.";
             switch(scene)
             {
-                case 3:LearningTerm="Форменные элементы крови";LearningNote="Эритроциты переносят O₂ и часть CO₂; лейкоциты участвуют в защите; тромбоциты помогают остановить кровотечение.";Formula="Hb + O₂ ⇄ HbO₂";ProfessorLine="Сравни объект, его функцию и место в общей системе.";break;
+                case 3:LearningTerm="Состав крови / свободное исследование";LearningNote="Осмотрись. Выбери любой объект и исследуй его Scanner или возьми, чтобы рассмотреть ближе.";Formula="";ProfessorLine="";break;
                 case 4:LearningTerm="Эндотелий и стенка артерии";LearningNote="Эндотелий контактирует с кровью; медиа меняет тонус; наружные слои поддерживают сосуд.";ProfessorLine="Сосуд — это живая ткань, а не пустая трубка.";break;
                 case 5:LearningTerm="Гемодинамический эксперимент";LearningNote="Поток возникает из-за разности давлений. Измерь A и B, сравни скорость и диаметр, затем проверь свою гипотезу экспериментом. В первых двух опытах расход фиксирован; в третьем изменён приток.";Formula="";ProfessorLine="Прежде чем лечить сосуд, выясним, от чего зависит поток.";break;
                 case 6:LearningTerm="Атеросклеротическая бляшка";LearningNote="LDL и воспаление формируют липидное ядро; фиброзная покрышка удерживает его внутри стенки.";Formula="Повреждение покрышки → тромбоциты → фибрин → окклюзия";ProfessorLine="Точность важнее силы: работай только по липидным мишеням.";break;
@@ -203,7 +199,9 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         public bool Accept(StudyAction action,string target)
         {
-            if(!started||!Ready||Complete||Victory)return false;
+            if(!started||!Ready||Victory)return false;
+            if(FreeBloodResearch)return world.research.Interact(action,target);
+            if(Complete)return false;
             if(SceneNumber==6&&action==StudyAction.Pulse&&target=="cap")
             {
                 WrongCapHits++;WrongTargetActions++;Feedback=$"Покрышка повреждена ({WrongCapHits}/3). Возможен тромбоз.";world.ShowCapDamage(WrongCapHits);
@@ -246,6 +244,20 @@ namespace BiologyVR.ArteryRoute.Journey
             {if(Current.target=="small-radius"&&ModelRadius<.82f)Accept(StudyAction.Radius,"small-radius");else if(Current.target=="large-radius"&&ModelRadius>1.18f)Accept(StudyAction.Radius,"large-radius");}
             else if(SceneNumber==10&&Current?.target=="tone"&&ModelRadius>.70f&&ModelRadius<.92f){PressureSystolic=100;Accept(StudyAction.Radius,"tone");}
             Changed?.Invoke();
+        }
+        public void RecordResearchScan(string id)
+        {
+            AcceptedActions++;ScannerActions++;
+            var feedback=GetComponent<JourneyToolFeedback>();if(feedback)feedback.Confirm(StudyAction.Scan,id);
+        }
+        public void RefreshResearchJournal(bool completedNow,string feedback,string professor)
+        {
+            if(!FreeBloodResearch)return;var research=world.research;var focused=research.Focused;
+            Progress=research.RequiredInvestigated;StepIndex=research.Complete?1:0;
+            LearningTerm=focused?focused.theory.displayName:"Состав крови / свободное исследование";
+            LearningNote=focused?focused.theory.pages[focused.Page].text:"Осмотрись. Выбери любой объект; остальные доступны одновременно.";
+            Formula=focused?focused.theory.pages[focused.Page].visualConnection:"";ProfessorLine=professor;Feedback=feedback;
+            world.RememberEpisode();world.PrepareGoal(Current);Changed?.Invoke();
         }
         public void SetPlaquePressure(float pressure)
         {

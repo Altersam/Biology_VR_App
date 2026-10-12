@@ -2959,6 +2959,7 @@ GameObject:
   - component: {fileID: 31545700}
   - component: {fileID: 31545699}
   - component: {fileID: 31545698}
+  - component: {fileID: 31545701}
   m_Layer: 8
   m_Name: "Research target \u2014 plasma"
   m_TagString: Untagged
@@ -3194,6 +3195,24 @@ MonoBehaviour:
   poolIndex: 2
   startDistance: 2.4
   startLane: {x: 1.05, y: -0.4}
+--- !u!114 &31545701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 31545694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fadead7c74f64d4ea7fd9faac6f9c72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  theory: {fileID: 11400000, guid: 49223ceba481ae440b0352b9d8e43854, type: 2}
+  manager: {fileID: 1373304207}
+  target: {fileID: 31545697}
+  state: 0
+  introduced: 0
+  page: 0
 --- !u!1 &32625452
 GameObject:
   m_ObjectHideFlags: 0
@@ -5521,6 +5540,7 @@ GameObject:
   - component: {fileID: 58070381}
   - component: {fileID: 58070385}
   - component: {fileID: 58070386}
+  - component: {fileID: 58070387}
   m_Layer: 8
   m_Name: "Research target \u2014 platelet"
   m_TagString: Untagged
@@ -5787,6 +5807,24 @@ MonoBehaviour:
   poolIndex: 9
   startDistance: 1.45
   startLane: {x: 0.8, y: 0.25}
+--- !u!114 &58070387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 58070379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fadead7c74f64d4ea7fd9faac6f9c72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  theory: {fileID: 11400000, guid: 1bbb95547a16023469ac63cfa748af10, type: 2}
+  manager: {fileID: 1373304207}
+  target: {fileID: 58070384}
+  state: 0
+  introduced: 0
+  page: 0
 --- !u!1 &58607052
 GameObject:
   m_ObjectHideFlags: 0
@@ -16818,6 +16856,7 @@ GameObject:
   - component: {fileID: 195483050}
   - component: {fileID: 195483054}
   - component: {fileID: 195483055}
+  - component: {fileID: 195483056}
   m_Layer: 8
   m_Name: "Research target \u2014 leukocyte"
   m_TagString: Untagged
@@ -17084,6 +17123,24 @@ MonoBehaviour:
   poolIndex: 10
   startDistance: 1.6
   startLane: {x: -0.65, y: -0.45}
+--- !u!114 &195483056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 195483048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fadead7c74f64d4ea7fd9faac6f9c72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  theory: {fileID: 11400000, guid: c558bb7e47521b444b15ff0be7f2eb28, type: 2}
+  manager: {fileID: 1373304207}
+  target: {fileID: 195483053}
+  state: 0
+  introduced: 0
+  page: 0
 --- !u!1 &199881216
 GameObject:
   m_ObjectHideFlags: 0
@@ -55121,6 +55178,7 @@ GameObject:
   - component: {fileID: 635182052}
   - component: {fileID: 635182051}
   - component: {fileID: 635182050}
+  - component: {fileID: 635182053}
   m_Layer: 8
   m_Name: "Research target \u2014 heme"
   m_TagString: Untagged
@@ -55181,7 +55239,7 @@ MonoBehaviour:
   label: heme
   mission: {fileID: 931878391}
   grabbed: 0
-  hoverEmission: 0
+  hoverEmission: 1
   hoverEmissionColor: {r: 0.02, g: 0.24, b: 0.42, a: 1}
 --- !u!114 &635182050
 MonoBehaviour:
@@ -55197,7 +55255,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 635182049}
   carrier: {fileID: 751694191}
-  displayOffset: {x: 0.33, y: 0.14, z: 0}
+  displayOffset: {x: -0.46, y: 0.38, z: 0}
   detached: 0
 --- !u!114 &635182051
 MonoBehaviour:
@@ -55355,6 +55413,24 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &635182053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 635182046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fadead7c74f64d4ea7fd9faac6f9c72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  theory: {fileID: 11400000, guid: 0dee3c30386471646a78498bcaa4d95d, type: 2}
+  manager: {fileID: 1373304207}
+  target: {fileID: 635182049}
+  state: 0
+  introduced: 0
+  page: 0
 --- !u!1 &635637193
 GameObject:
   m_ObjectHideFlags: 0
@@ -57056,7 +57132,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1035892476}
         m_TargetAssemblyTypeName: BiologyVR.ArteryRoute.Journey.JourneyHolographicScreens,
           Assembly-CSharp
-        m_MethodName: ShowOverview
+        m_MethodName: ShowResearchOverview
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -66477,6 +66553,7 @@ GameObject:
   - component: {fileID: 751694189}
   - component: {fileID: 751694188}
   - component: {fileID: 751694192}
+  - component: {fileID: 751694193}
   m_Layer: 8
   m_Name: "Research target \u2014 hemoglobin"
   m_TagString: Untagged
@@ -66694,7 +66771,7 @@ MonoBehaviour:
   label: hemoglobin
   mission: {fileID: 931878391}
   grabbed: 0
-  hoverEmission: 0
+  hoverEmission: 1
   hoverEmissionColor: {r: 0.02, g: 0.24, b: 0.42, a: 1}
 --- !u!114 &751694192
 MonoBehaviour:
@@ -66710,8 +66787,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 751694191}
   carrier: {fileID: 1668641264}
-  displayOffset: {x: -0.33, y: 0.14, z: 0}
+  displayOffset: {x: 0.46, y: 0.38, z: 0}
   detached: 0
+--- !u!114 &751694193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 751694186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fadead7c74f64d4ea7fd9faac6f9c72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  theory: {fileID: 11400000, guid: 94e58f48cfe3da140816526c6857aa87, type: 2}
+  manager: {fileID: 1373304207}
+  target: {fileID: 751694191}
+  state: 0
+  introduced: 0
+  page: 0
 --- !u!1 &751964610
 GameObject:
   m_ObjectHideFlags: 0
@@ -119894,6 +119989,7 @@ GameObject:
   - component: {fileID: 1373304204}
   - component: {fileID: 1373304205}
   - component: {fileID: 1373304206}
+  - component: {fileID: 1373304207}
   m_Layer: 0
   m_Name: "Organic Spatial Artery \u2014 3D Branching Lumen"
   m_TagString: Untagged
@@ -120035,6 +120131,7 @@ MonoBehaviour:
   - {fileID: 1158540737}
   - {fileID: 1940772073}
   hemodynamics: {fileID: 1373304205}
+  research: {fileID: 1373304207}
   remainingComplexes:
   - {fileID: 2142600732}
   - {fileID: 148431314}
@@ -120137,6 +120234,7 @@ MonoBehaviour:
     clotBalance: 0
     fibrin: 0
     repair: 0
+    researchObjects: []
   - scene: 0
     step: 0
     progress: 0
@@ -120155,6 +120253,7 @@ MonoBehaviour:
     clotBalance: 0
     fibrin: 0
     repair: 0
+    researchObjects: []
   - scene: 0
     step: 0
     progress: 0
@@ -120173,6 +120272,7 @@ MonoBehaviour:
     clotBalance: 0
     fibrin: 0
     repair: 0
+    researchObjects: []
   - scene: 0
     step: 0
     progress: 0
@@ -120191,6 +120291,7 @@ MonoBehaviour:
     clotBalance: 0
     fibrin: 0
     repair: 0
+    researchObjects: []
   - scene: 0
     step: 0
     progress: 0
@@ -120209,6 +120310,7 @@ MonoBehaviour:
     clotBalance: 0
     fibrin: 0
     repair: 0
+    researchObjects: []
   - scene: 0
     step: 0
     progress: 0
@@ -120227,6 +120329,7 @@ MonoBehaviour:
     clotBalance: 0
     fibrin: 0
     repair: 0
+    researchObjects: []
   - scene: 0
     step: 0
     progress: 0
@@ -120245,6 +120348,7 @@ MonoBehaviour:
     clotBalance: 0
     fibrin: 0
     repair: 0
+    researchObjects: []
   - scene: 0
     step: 0
     progress: 0
@@ -120263,6 +120367,7 @@ MonoBehaviour:
     clotBalance: 0
     fibrin: 0
     repair: 0
+    researchObjects: []
   - scene: 0
     step: 0
     progress: 0
@@ -120281,6 +120386,7 @@ MonoBehaviour:
     clotBalance: 0
     fibrin: 0
     repair: 0
+    researchObjects: []
   - scene: 0
     step: 0
     progress: 0
@@ -120299,6 +120405,7 @@ MonoBehaviour:
     clotBalance: 0
     fibrin: 0
     repair: 0
+    researchObjects: []
   - scene: 0
     step: 0
     progress: 0
@@ -120317,6 +120424,7 @@ MonoBehaviour:
     clotBalance: 0
     fibrin: 0
     repair: 0
+    researchObjects: []
   - scene: 0
     step: 0
     progress: 0
@@ -120335,6 +120443,7 @@ MonoBehaviour:
     clotBalance: 0
     fibrin: 0
     repair: 0
+    researchObjects: []
   - scene: 0
     step: 0
     progress: 0
@@ -120353,6 +120462,7 @@ MonoBehaviour:
     clotBalance: 0
     fibrin: 0
     repair: 0
+    researchObjects: []
   - scene: 0
     step: 0
     progress: 0
@@ -120371,6 +120481,7 @@ MonoBehaviour:
     clotBalance: 0
     fibrin: 0
     repair: 0
+    researchObjects: []
 --- !u!4 &1373304199
 Transform:
   m_ObjectHideFlags: 0
@@ -120752,6 +120863,7 @@ Transform:
   - {fileID: 1718171936}
   - {fileID: 1369047556}
   - {fileID: 976897074}
+  - {fileID: 1408785878}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1373304200
@@ -123098,6 +123210,33 @@ MonoBehaviour:
   - {fileID: 330530132}
   - {fileID: 27157731}
   continueButton: {fileID: 1543275961}
+--- !u!114 &1373304207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1373304197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f88b8a5e6a1373447a98d072e448ebca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  world: {fileID: 1373304198}
+  objects:
+  - {fileID: 1668641267}
+  - {fileID: 195483056}
+  - {fileID: 58070387}
+  - {fileID: 31545701}
+  - {fileID: 751694193}
+  - {fileID: 635182053}
+  - {fileID: 1646980825}
+  - {fileID: 1829922133}
+  hoverLabel: {fileID: 1408785879}
+  focused: {fileID: 0}
+  introductions: 0
+  uniqueScans: 0
+  completionReported: 0
 --- !u!1 &1374447561
 GameObject:
   m_ObjectHideFlags: 0
@@ -125581,6 +125720,109 @@ RectTransform:
   m_AnchoredPosition: {x: 94.203636, y: 0.23134267}
   m_SizeDelta: {x: 520, y: 85}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1408785877
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1408785878}
+  - component: {fileID: 1408785881}
+  - component: {fileID: 1408785880}
+  - component: {fileID: 1408785879}
+  m_Layer: 0
+  m_Name: Free research hover caption
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &1408785878
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1408785877}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.0018, y: 0.0018, z: 0.0018}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1373304199}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 340, y: 74}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1408785879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1408785877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.75, g: 0.98, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 78c7f42a7547f22448a621eaeeef3fd2, type: 3}
+    m_FontSize: 22
+    m_FontStyle: 1
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 4
+    m_AlignByGeometry: 0
+    m_RichText: 0
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 
+--- !u!222 &1408785880
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1408785877}
+  m_CullTransparentMesh: 1
+--- !u!223 &1408785881
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1408785877}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 15
+  m_TargetDisplay: 0
 --- !u!1 &1411939034
 GameObject:
   m_ObjectHideFlags: 0
@@ -141357,7 +141599,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1035892476}
         m_TargetAssemblyTypeName: BiologyVR.ArteryRoute.Journey.JourneyHolographicScreens,
           Assembly-CSharp
-        m_MethodName: TogglePractice
+        m_MethodName: NextTheoryPage
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -145833,6 +146075,7 @@ GameObject:
   - component: {fileID: 1646980821}
   - component: {fileID: 1646980820}
   - component: {fileID: 1646980824}
+  - component: {fileID: 1646980825}
   m_Layer: 8
   m_Name: "Research target \u2014 oxygen"
   m_TagString: Untagged
@@ -146050,7 +146293,7 @@ MonoBehaviour:
   label: oxygen
   mission: {fileID: 931878391}
   grabbed: 0
-  hoverEmission: 0
+  hoverEmission: 1
   hoverEmissionColor: {r: 0.02, g: 0.24, b: 0.42, a: 1}
 --- !u!114 &1646980824
 MonoBehaviour:
@@ -146066,8 +146309,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 1646980823}
   carrier: {fileID: 635182049}
-  displayOffset: {x: 0, y: 0.16, z: 0}
+  displayOffset: {x: 0, y: 0.31, z: 0}
   detached: 0
+--- !u!114 &1646980825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1646980818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fadead7c74f64d4ea7fd9faac6f9c72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  theory: {fileID: 11400000, guid: 302442712eee30b41bd5843f0255f61d, type: 2}
+  manager: {fileID: 1373304207}
+  target: {fileID: 1646980823}
+  state: 0
+  introduced: 0
+  page: 0
 --- !u!1 &1648437508
 GameObject:
   m_ObjectHideFlags: 0
@@ -147887,6 +148148,7 @@ GameObject:
   - component: {fileID: 1668641261}
   - component: {fileID: 1668641265}
   - component: {fileID: 1668641266}
+  - component: {fileID: 1668641267}
   m_Layer: 8
   m_Name: "Research target \u2014 rbc"
   m_TagString: Untagged
@@ -148153,6 +148415,24 @@ MonoBehaviour:
   poolIndex: 1
   startDistance: 1.15
   startLane: {x: 0.22, y: -0.12}
+--- !u!114 &1668641267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1668641259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fadead7c74f64d4ea7fd9faac6f9c72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  theory: {fileID: 11400000, guid: fee8009c881deec4f9e6784a009bb5a0, type: 2}
+  manager: {fileID: 1373304207}
+  target: {fileID: 1668641264}
+  state: 0
+  introduced: 0
+  page: 0
 --- !u!1 &1673745369
 GameObject:
   m_ObjectHideFlags: 0
@@ -160138,6 +160418,7 @@ GameObject:
   - component: {fileID: 1829922130}
   - component: {fileID: 1829922132}
   - component: {fileID: 1829922131}
+  - component: {fileID: 1829922133}
   m_Layer: 8
   m_Name: "Research target \u2014 co2"
   m_TagString: Untagged
@@ -160373,6 +160654,24 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1829922133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1829922126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fadead7c74f64d4ea7fd9faac6f9c72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  theory: {fileID: 11400000, guid: 5d012e2ebfab2914ba752e5ce130fd56, type: 2}
+  manager: {fileID: 1373304207}
+  target: {fileID: 1829922129}
+  state: 0
+  introduced: 0
+  page: 0
 --- !u!1 &1830694930
 GameObject:
   m_ObjectHideFlags: 0
@@ -161877,8 +162176,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 191, y: -27}
-  m_SizeDelta: {x: -418, y: 30}
+  m_AnchoredPosition: {x: 161, y: -27}
+  m_SizeDelta: {x: -358, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1847649358
 GameObject:

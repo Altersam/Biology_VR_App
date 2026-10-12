@@ -103,7 +103,9 @@ namespace BiologyVR.ArteryRoute.Editor
                 if(screens)
                 {
                     var view=mission.mover.viewCamera.transform;Pose(true,view.position+view.rotation*new Vector3(-.55f,-.50f,.55f),view.rotation);yield return GameSeconds(.10f);
-                    Require(!screens.hud.panelRoot.GetComponent<Canvas>().enabled&&screens.theoryText.text.Contains(mission.LearningNote),"Tracked view opens main theory without the old side-panel overlay");
+                    Require(!screens.hud.panelRoot.GetComponent<Canvas>().enabled&&(!mission.FreeBloodResearch||mission.world.research.RequiredInvestigated==0),"Tracked entry opens free research without an upfront lecture or ordered objective");
+                    if(!mission.FreeBloodResearch)
+                    {
                     var keyboard=InputSystem.AddDevice<Keyboard>();
                     try
                     {
@@ -115,6 +117,7 @@ namespace BiologyVR.ArteryRoute.Editor
                         InputSystem.QueueStateEvent(keyboard,new KeyboardState(Key.Tab));yield return GameSeconds(.08f);InputSystem.QueueStateEvent(keyboard,new KeyboardState());yield return GameSeconds(.08f);
                     }
                     finally{InputSystem.RemoveDevice(keyboard);}
+                    }
                 }
                 Require(input.scanAction.action.enabled&&input.toolAction.action.enabled,"Existing Scanner/BioTool actions enabled");
                 var tools=mission.GetComponent<JourneyInstrumentRig>();
@@ -133,6 +136,9 @@ namespace BiologyVR.ArteryRoute.Editor
                     Require(tools.scannerVR.GetComponentsInChildren<Collider>(true).Length==0&&tools.bioVR.GetComponentsInChildren<Collider>(true).Length==0,"Biomedical tool views add no physical contacts");
                     notes.Add("Installed device mesh triangles: Scanner="+tools.scannerVR.GetComponentsInChildren<MeshFilter>(true).Sum(f=>f.sharedMesh.triangles.Length/3)+"; BioTool="+tools.bioVR.GetComponentsInChildren<MeshFilter>(true).Sum(f=>f.sharedMesh.triangles.Length/3));
                 }
+                if(mission.FreeBloodResearch)yield return FreeResearchEpisode();
+                else
+                {
                 var rbc=w.Find("rbc");Vector3 centre=rbc.GetComponent<SphereCollider>().bounds.center;
                 Pose(false,centre+Vector3.right*.02f,Quaternion.identity);Pose(true,centre+Vector3.left*.4f,Quaternion.identity);
                 yield return new EditorWaitForSeconds(.3f);Grip(false,true);yield return new EditorWaitForSeconds(.45f);
@@ -206,6 +212,7 @@ namespace BiologyVR.ArteryRoute.Editor
                 Aim(false,w.Find("platelet").transform.position);Trigger(false,true);yield return new EditorWaitForSeconds(.15f);Trigger(false,false);yield return new EditorWaitForSeconds(.15f);
                 Require(mission.StepIndex==11,"BioTool comparison requires actual ray and trigger");
                 yield return Scan("plasma");Require(mission.Complete,"All Scene03 objectives completed without Accept/Primary/debug calls");
+                }
                 string folder=ArteryPolishReview.Reports+"/V7Input";Directory.CreateDirectory(folder);ArteryWallInteractionValidation.Capture(w,"V7Input/Scene03_XR_Input_Complete.png");
                 ArteryPolishReview.Capture(mission.mover.viewCamera,"V7Input/Scene03_Player_WithHUD.png");
                 var origin=mission.mover.origin.transform;Quaternion originRotation=origin.rotation,headRotation=mission.mover.viewCamera.transform.localRotation;
@@ -460,6 +467,67 @@ namespace BiologyVR.ArteryRoute.Editor
             Require(mission.AcceptedActions==accepted&&mission.SceneNumber==3&&mission.StepIndex==0,"Controller visual/UI checks never complete an unrelated biological goal");
             Directory.CreateDirectory(ArteryPolishReview.Reports+"/XRControllers");ArteryPolishReview.Capture(mission.mover.viewCamera,"XRControllers/Persistent_Aiming_Guides.png");
             Require(true,"Controller lifecycle input regression complete");
+        }
+        static IEnumerator TrackResearchScan(string id)
+        {
+            var research=mission.world.research;var target=mission.world.Find(id);var contact=target.GetComponent<Collider>();
+            int count=research.UniqueScans;bool repeat=research.Find(id).State==JourneyResearchState.Investigated;
+            LookWithHead(contact.bounds.center);yield return GameSeconds(.15f);Aim(true,contact.bounds.center);yield return GameSeconds(.12f);Trigger(true,true);float began=Time.time;
+            while(Time.time-began<1.1f||!repeat&&research.Find(id).State!=JourneyResearchState.Investigated&&Time.time-began<3)
+            {Aim(true,contact.bounds.center);yield return null;}
+            Trigger(true,false);yield return GameSeconds(.15f);
+            var input=mission.GetComponent<JourneyInput>();notes.Add("Free research scan "+id+": focused="+(research.Focused?research.Focused.theory.id:"none")+" status="+research.Find(id).State+" count="+research.RequiredInvestigated+" blocker="+(input.AimObstruction?input.AimObstruction.name:"none")+" uiBlocked="+input.ScannerBlockedByUi);
+            Require(research.Find(id).State==JourneyResearchState.Investigated&&research.Focused==research.Find(id)&&research.UniqueScans==count+(repeat?0:1),"Actual XR Scanner independently investigates or reopens "+id);
+            Require(mission.LearningTerm==research.Find(id).theory.displayName,"Object-specific theory is shown for XR selection "+id);
+        }
+        static IEnumerator FreeResearchEpisode()
+        {
+            var w=mission.world;var research=w.research;var screens=mission.GetComponent<JourneyHolographicScreens>();
+            Directory.CreateDirectory(FreeBloodResearchBuilder.Reports);
+            Require(research.objects.Length==8&&research.RequiredCount==4&&research.RequiredInvestigated==0,"Free first stage exposes eight independent research objects and four mandatory components");
+            ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.12f);
+            Require(mission.SceneNumber==3&&!mission.Complete,"Actual XR Continue cannot leave before mandatory free research");
+            var white=w.Find("leukocyte");Pose(false,white.GetComponent<Collider>().bounds.center,Quaternion.identity);yield return GameSeconds(.15f);Grip(false,true);yield return GameSeconds(.3f);
+            Require(white.grabbed&&white.GetComponent<XRGrabInteractable>().isSelected&&research.Find("leukocyte").State==JourneyResearchState.Investigating&&research.RequiredInvestigated==0,"XR grip can begin with leukocyte, open its theory, and preserve zero completed research");
+            Aim(true,white.GetComponent<Collider>().bounds.center);yield return GameSeconds(.12f);Trigger(true,true);yield return GameSeconds(.18f);Trigger(true,false);yield return GameSeconds(.15f);
+            Require(research.RequiredInvestigated==0,"Early release of the Scanner does not complete free research");
+            yield return TrackResearchScan("leukocyte");Require(research.RequiredInvestigated==1&&research.Find("rbc").State==JourneyResearchState.NotInvestigated,"Leukocyte can be completed before erythrocyte through actual XR input");
+            ArteryPolishReview.Capture(mission.mover.viewCamera,"FreeBloodResearch/04_XR_Leukocyte_First.png");
+            var release=white.transform.position;Grip(false,false);yield return GameSeconds(.08f);Require(!white.grabbed&&Vector3.Distance(release,white.transform.position)<.15f,"Free-research release keeps the cell's nearby pose without teleporting");yield return GameSeconds(.8f);
+            var pickup=white.GetComponent<JourneyFlowPickup>();Require(!pickup.Rejoining&&Vector3.Distance(white.transform.position,w.GetComponent<JourneyBloodFlow>().cells[pickup.poolIndex].position)<.02f,"Free-research WBC rejoins its original moving pool slot");
+            int intro=research.Introductions;yield return TrackResearchScan("leukocyte");Require(research.RequiredInvestigated==1&&research.Introductions==intro,"Repeated XR investigation reopens theory without progress or tutorial repetition");
+            foreach(var id in new[]{"oxygen","heme","hemoglobin","co2"})yield return TrackResearchScan(id);
+            Require(research.OptionalInvestigated==4&&research.RequiredInvestigated==1&&research.Find("rbc").State==JourneyResearchState.NotInvestigated,"All gas and hemoglobin/heme/Fe²⁺ details remain independently available before erythrocyte research");
+            var heme=w.Find("heme");Pose(true,heme.GetComponent<Collider>().bounds.center,Quaternion.identity);yield return GameSeconds(.15f);Grip(true,true);yield return GameSeconds(.25f);
+            var oxygen=w.Find("oxygen");Pose(false,oxygen.GetComponent<Collider>().bounds.center,Quaternion.identity);yield return GameSeconds(.15f);Grip(false,true);yield return GameSeconds(.25f);
+            Require(heme.grabbed&&oxygen.grabbed&&oxygen.GetComponent<JourneyBloodCargo>().detached,"Existing two-hand heme/O2 interaction stays available without ordered research prerequisites");
+            Vector3 start=rc.position,offset=oxygen.transform.position-rc.position;float began=Time.time;
+            while(Time.time-began<.65f){Pose(false,Vector3.Lerp(start,heme.transform.position-offset,Mathf.SmoothStep(0,1,Mathf.Clamp01((Time.time-began)/.65f))),Quaternion.identity);yield return null;}
+            yield return GameSeconds(.15f);Grip(false,false);yield return GameSeconds(.3f);
+            Require(!oxygen.GetComponent<JourneyBloodCargo>().detached&&research.RequiredInvestigated==1,"Physical O2 release near heme restores binding without adding mandatory research progress");Grip(true,false);yield return GameSeconds(.25f);
+            yield return TrackResearchScan("platelet");Require(research.RequiredInvestigated==2,"Player chooses platelet next without an erythrocyte gate");
+            Aim(false,w.Find("platelet").GetComponent<Collider>().bounds.center);yield return GameSeconds(.12f);int before=research.UniqueScans;Trigger(false,true);yield return GameSeconds(.15f);Trigger(false,false);yield return GameSeconds(.15f);
+            Require(research.Find("platelet").Page==1&&research.UniqueScans==before,"Existing BioTool opens platelet activation/aggregation detail without duplicate completion");
+            yield return TrackResearchScan("plasma");Require(research.RequiredInvestigated==3&&!mission.Complete,"Three mandatory objects cannot finish the stage prematurely");
+            var keyboard=InputSystem.AddDevice<Keyboard>();
+            try
+            {
+                InputSystem.QueueStateEvent(keyboard,new KeyboardState(Key.Tab));yield return GameSeconds(.08f);InputSystem.QueueStateEvent(keyboard,new KeyboardState());yield return GameSeconds(.15f);
+                Aim(false,screens.theoryRoot.position);yield return GameSeconds(.15f);float top=screens.theoryScroll.verticalNormalizedPosition;
+                rs.primary2DAxis=new Vector2(0,-.9f);yield return GameSeconds(.5f);rs.primary2DAxis=Vector2.zero;yield return GameSeconds(.15f);
+                Require(screens.theoryScroll.verticalNormalizedPosition<top-.1f&&screens.ScrollInputs>0&&research.RequiredInvestigated==3,"Actual XR thumbstick scrolls selected plasma theory while preserving independent progress");
+                ArteryPolishReview.Capture(mission.mover.viewCamera,"FreeBloodResearch/05_XR_Plasma_Details.png");InputSystem.QueueStateEvent(keyboard,new KeyboardState(Key.Tab));yield return GameSeconds(.08f);InputSystem.QueueStateEvent(keyboard,new KeyboardState());yield return GameSeconds(.15f);
+            }
+            finally{InputSystem.RemoveDevice(keyboard);}
+            yield return TrackResearchScan("rbc");Require(research.RequiredInvestigated==4&&mission.Complete&&mission.SceneNumber==3&&screens.hud.continueButton.gameObject.activeInHierarchy,"Final independent object unlocks Continue without an automatic transition");
+            var rbc=w.Find("rbc");Vector3 centre=rbc.GetComponent<Collider>().bounds.center;Pose(false,centre+Vector3.right*.02f,Quaternion.identity);yield return GameSeconds(.15f);Grip(false,true);yield return GameSeconds(.25f);Pose(true,rbc.transform.position+Vector3.left*.06f,Quaternion.identity);yield return GameSeconds(.15f);Grip(true,true);yield return GameSeconds(.25f);
+            Require(rbc.GetComponent<XRGrabInteractable>().interactorsSelecting.Count==2,"Both XR grips can inspect an already studied erythrocyte");
+            centre=rbc.transform.position;float original=rbc.transform.localScale.x;Pose(true,centre+Vector3.left*.30f,Quaternion.identity);Pose(false,centre+Vector3.right*.30f,Quaternion.identity);yield return GameSeconds(.5f);
+            Require(rbc.transform.localScale.x>original*1.3f&&research.RequiredInvestigated==4,"Two-hand educational enlargement remains independent of research order and completion");Grip(true,false);yield return GameSeconds(.12f);Require(rbc.GetComponent<XRGrabInteractable>().isSelected,"Releasing one research grip keeps the object in the other hand");Grip(false,false);yield return GameSeconds(.85f);
+            Require(!rbc.grabbed&&!rbc.GetComponent<JourneyFlowPickup>().Rejoining,"Studied enlarged RBC releases smoothly back into the live bloodstream");
+            before=research.UniqueScans;yield return TrackResearchScan("plasma");Require(research.UniqueScans==before&&mission.Complete,"Theory can still be reopened after all mandatory research without extra credit");
+            Require(true,"Free first-stage research completes through actual XR actions in player-selected order with molecular details preserved");
+            ArteryPolishReview.Capture(mission.mover.viewCamera,"FreeBloodResearch/06_XR_Research_Complete.png");
         }
         static IEnumerator ObserveBloodTravel(float seconds)
         {

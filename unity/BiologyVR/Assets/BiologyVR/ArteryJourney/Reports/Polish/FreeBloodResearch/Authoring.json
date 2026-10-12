@@ -1,0 +1,27 @@
+{
+  "utc": "2026-10-11T18:39:51.6864897Z",
+  "firstArterialEpisodeInternalNumber": 3,
+  "required": [
+    "rbc",
+    "leukocyte",
+    "platelet",
+    "plasma"
+  ],
+  "optional": [
+    "hemoglobin",
+    "heme",
+    "oxygen",
+    "co2"
+  ],
+  "data": "ScriptableObject pages / existing targets",
+  "states": "NotInvestigated / Investigating / Investigated",
+  "scannerWithoutPriorGrab": true,
+  "linearDependenciesRemoved": true,
+  "completionRequiresAllMandatory": true,
+  "noAutomaticTransition": true,
+  "progressLifetime": "current run, including normal stage re-entry",
+  "existingTargets": 77,
+  "bloodPool": 360,
+  "timeScaleFrozen": false,
+  "hardwareVerified": false
+}

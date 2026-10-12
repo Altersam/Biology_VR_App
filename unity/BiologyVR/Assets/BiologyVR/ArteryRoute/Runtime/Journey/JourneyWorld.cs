@@ -16,6 +16,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public GameObject fibrin,repairPatch,occlusion,labRoom;
         public GameObject[] debris,platelets;
         public JourneyHemodynamicsExperiment hemodynamics;
+        public JourneyResearchManager research;
         public GameObject[] remainingComplexes;
         public GameObject virusPrefab;
         public Renderer[] toneWall;
@@ -62,6 +63,7 @@ namespace BiologyVR.ArteryRoute.Journey
             public int treatedLipidZones,capDamage,attachedPlatelets,markedViruses,clearedDebris;
             public bool embolusCaptured,embolusStabilized,virusSourceRemoved;
             public float radius,pressure,clotBalance,fibrin,repair;
+            public JourneyResearchSnapshot[] researchObjects;
         }
         [SerializeField] EpisodeMemory[] episodeMemory=new EpisodeMemory[14];
         public bool IsEpisodeCompleted(int scene)=>scene>=3&&scene<=16&&episodeMemory!=null&&episodeMemory.Length>scene-3&&episodeMemory[scene-3]!=null&&episodeMemory[scene-3].completed;
@@ -75,9 +77,10 @@ namespace BiologyVR.ArteryRoute.Journey
             state.attachedPlatelets=AttachedPlatelets;state.markedViruses=MarkedViruses;state.clearedDebris=ClearedDebris;
             state.embolusCaptured=captured;state.embolusStabilized=mission.SceneNumber==7&&mission.Complete;state.virusSourceRemoved=sourceRemoved;
             state.radius=mission.ModelRadius;state.pressure=mission.PressureSystolic;state.clotBalance=mission.ClotBalance;state.fibrin=fibrinGrowth;state.repair=repairGrowth;
+            if(mission.SceneNumber==3&&research)state.researchObjects=research.Capture();
         }
-        public void ForgetEpisode(int scene){if(scene>=3&&scene<=16&&episodeMemory!=null)episodeMemory[scene-3]=new EpisodeMemory{scene=scene,visited=true};}
-        public void ResetJourneyMemory(){episodeMemory=new EpisodeMemory[14];}
+        public void ForgetEpisode(int scene){if(scene>=3&&scene<=16&&episodeMemory!=null)episodeMemory[scene-3]=new EpisodeMemory{scene=scene,visited=true};if(scene==3&&research)research.ResetRun();}
+        public void ResetJourneyMemory(){episodeMemory=new EpisodeMemory[14];if(research)research.ResetRun();}
         Vector3[] residualPositions;
         Vector3 repairStartScale=Vector3.one,clotBaseScale=Vector3.one,fibrinBaseScale=Vector3.one;
         public bool Returning{get;private set;}
@@ -303,7 +306,8 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         public void PrepareGoal(StudyGoal goal)
         {
-            if(goal!=null)FocusId=goal.target;
+            if(mission.FreeBloodResearch)FocusId=research.Focused?research.Focused.theory.id:"";
+            else if(goal!=null)FocusId=goal.target;
             if(art)art.PrepareGoal(goal);
             else if(mission.SceneNumber==3)PrepareBloodLesson();
             if(mission.SceneNumber==15&&!Victory)
@@ -318,25 +322,16 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         void PrepareBloodLesson()
         {
-            var visible=new HashSet<string>();
-            switch(mission.StepIndex)
-            {
-                case 0:case 1:case 2:visible.UnionWith(new[]{"rbc"});break;
-                case 3:case 4:case 5:case 6:case 7:visible.UnionWith(new[]{"rbc","hemoglobin","heme","oxygen"});break;
-                case 8:visible.UnionWith(new[]{"rbc","co2"});break;
-                case 9:visible.UnionWith(new[]{"rbc","leukocyte"});break;
-                case 10:case 11:visible.UnionWith(new[]{"rbc","platelet"});break;
-                default:visible.UnionWith(new[]{"rbc","plasma"});break;
-            }
+            if(research){research.RefreshAvailability();return;}
             foreach(var id in new[]{"rbc","hemoglobin","heme","oxygen","co2","leukocyte","platelet","plasma"})
             {
-                var target=Find(id);if(target)target.gameObject.SetActive(visible.Contains(id));
+                var target=Find(id);if(target)target.gameObject.SetActive(true);
             }
         }
         public bool CanApply(StudyAction action,string target)
         {
             if(hemodynamics&&target.StartsWith("hdx-"))return hemodynamics.CanApply(action,target);
-            if(mission.SceneNumber==3&&action==StudyAction.Scan&&!CanInspectBlood(Find(target)))return false;
+            if(mission.FreeBloodResearch)return research.CanInvestigate(Find(target));
             if(mission.SceneNumber==16&&target.StartsWith("check-"))
             {
                 switch(target){case "check-pressure":return mission.PressureSystolic>=110&&mission.PressureSystolic<=130;case "check-temperature":return mission.Temperature>=36.3f&&mission.Temperature<=37.2f;case "check-flow":return mission.FlowMultiplier>.95f&&(!occlusion||!occlusion.activeSelf);case "check-wall":return repairGrowth>.999f;case "check-virus":return mission.ViralLoad==0&&sourceRemoved&&ResidualsCleared&&incoming.Count==0;case "check-hemostasis":return mission.ClotBalance>.5f&&mission.ClotBalance<.72f&&repairGrowth>.999f;}
@@ -369,11 +364,12 @@ namespace BiologyVR.ArteryRoute.Journey
         {
             if(!target)return false;
             if(mission.SceneNumber!=3)return true;
-            var cargo=target.GetComponent<JourneyBloodCargo>();
-            return cargo?cargo.Extracted:target.grabbed||target.DesktopHeld;
+            return research&&research.CanInvestigate(target);
         }
         public void Primary(JourneyTarget target=null)
         {
+            if(mission.FreeBloodResearch)
+            {if(target)mission.Accept(target.targetId=="platelet"?StudyAction.Compare:StudyAction.Measure,target.targetId);return;}
             var goal=mission.Current;if(goal==null)return;
             string id=target?target.targetId:goal.target;
             var interactionTarget=target?target:Find(id);LastInteractionPoint=interactionTarget?interactionTarget.transform.position:Vector3.zero;

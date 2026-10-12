@@ -59,7 +59,7 @@ namespace BiologyVR.ArteryRoute.Journey
                 lastStep=m.StepIndex;lastScene=m.SceneNumber;lastTracked=tracked;
                 title.text=m.SceneNumber==3?"BIOLOGY VR • СОСТАВ КРОВИ":hud.title.text;
                 context.text=m.SceneNumber==3?"Вы внутри артерии. Перед вами учебные клетки; остальные движутся с кровотоком.":m.LearningTerm;
-                objective.text=m.SceneNumber==3?m.StepIndex==0?"1. Наведи мышь на эритроцит: ЛКМ удерживать":m.StepIndex==1?"2. Просканируйте: удерживайте F":m.StepIndex==2?"3. Увеличьте модель — нажмите Z":m.CurrentGoalLabel:m.CurrentGoalLabel;
+                objective.text=m.CurrentGoalLabel;
             }
             controls.text=hud.toolHint?hud.toolHint.text:"ПКМ + мышь — осмотр";
             if(m.SceneNumber==7&&m.world.EmbolusCaptured)

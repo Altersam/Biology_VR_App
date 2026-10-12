@@ -212,6 +212,7 @@ namespace BiologyVR.ArteryRoute.Journey
             keyboardHeld = false;
             restorePending = true;
             grabbed = CanBeginGrab();
+            if(grabbed&&mission.FreeBloodResearch&&targetId=="oxygen"){var cargo=GetComponent<JourneyBloodCargo>();if(cargo)cargo.detached=true;}
             if(grabbed&&mission.Current!=null&&targetId=="oxygen"&&mission.Current.action==StudyAction.Detach)mission.Accept(StudyAction.Detach,"oxygen");
             if(!grabbed&&grab&&grab.isSelected&&grab.interactionManager)
                 grab.interactionManager.CancelInteractableSelection((IXRSelectInteractable)grab);
@@ -222,6 +223,7 @@ namespace BiologyVR.ArteryRoute.Journey
             twoHandStart=0;
             if (grab && grab.isSelected) return;
             grabbed = false;
+            if(!disabling&&mission&&mission.FreeBloodResearch&&targetId=="oxygen")UpdateResearchOxygenBinding();
             if(!disabling&&targetId.StartsWith("antibody")&&mission&&mission.SceneNumber==15&&mission.world.PlaceAntibody(this))
             {restorePending=false;return;}
             if(!disabling&&targetId=="oxygen"&&mission&&mission.Goals!=null&&mission.Current!=null&&mission.Current.action==StudyAction.Bind)
@@ -259,17 +261,18 @@ namespace BiologyVR.ArteryRoute.Journey
                 transform.localPosition=Vector3.SmoothDamp(transform.localPosition,destination,ref desktopHoldVelocity,.14f,4,Time.deltaTime);transform.localRotation=Quaternion.Slerp(transform.localRotation,Quaternion.identity,1-Mathf.Exp(-Time.deltaTime*12));
             }
             if(!grab||!mission||mission.Goals==null||grab.interactorsSelecting.Count<2){twoHandStart=0;return;}
-            bool educational=lastAcceptedGrabId==targetId||enlargedForHome||(mission.Current!=null&&mission.Current.target==targetId&&mission.Current.action==StudyAction.Enlarge);
+            bool educational=mission.FreeBloodResearch&&mission.world.research.Find(targetId)||lastAcceptedGrabId==targetId||enlargedForHome||(mission.Current!=null&&mission.Current.target==targetId&&mission.Current.action==StudyAction.Enlarge);
             if(!educational)return;
             float distance=Vector3.Distance(grab.interactorsSelecting[0].transform.position,grab.interactorsSelecting[1].transform.position);
             if(twoHandStart<=0){twoHandStart=Mathf.Max(.06f,distance);twoHandScaleStart=transform.localScale;}
             float factor=Mathf.Clamp(distance/twoHandStart,.7f,2.4f);transform.localScale=twoHandScaleStart*factor;
-            if(!enlargedForHome&&distance>twoHandStart*1.25f&&distance-twoHandStart>.10f&&mission.Current!=null&&mission.Current.action==StudyAction.Enlarge)Enlarge();
+            if(!enlargedForHome&&distance>twoHandStart*1.25f&&distance-twoHandStart>.10f&&(mission.FreeBloodResearch||mission.Current!=null&&mission.Current.action==StudyAction.Enlarge))Enlarge();
         }
 
         bool CanBeginGrab()
         {
             if (mission == null || mission.Goals == null) return false;
+            if(mission.FreeBloodResearch)return mission.Accept(StudyAction.Grab,targetId);
             var current = mission.Current;
             if(mission.SceneNumber==15&&current?.action==StudyAction.Bind&&targetId.StartsWith("antibody"))return mission.Ready;
             if (current != null && current.action == StudyAction.Grab)
@@ -290,6 +293,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if (keyboardHeld)
             {
                 keyboardHeld = grabbed = false;
+                if(mission.FreeBloodResearch&&targetId=="oxygen")UpdateResearchOxygenBinding();
                 if(targetId=="oxygen"&&mission?.Current?.action==StudyAction.Bind)
                 {var heme=mission.world.Find("heme");if(heme&&Vector3.Distance(transform.position,heme.transform.position)<.16f)mission.Accept(StudyAction.Bind,"oxygen");}
                 BeginRestore();
@@ -305,6 +309,7 @@ namespace BiologyVR.ArteryRoute.Journey
             StopRestore();
             ClearVelocity();
             keyboardHeld = grabbed = true;
+            if(mission.FreeBloodResearch&&targetId=="oxygen"){var cargo=GetComponent<JourneyBloodCargo>();if(cargo)cargo.detached=true;}
             desktopHoldVelocity=Vector3.zero;desktopHoldDistance=1.05f;
             if(targetId=="oxygen"&&mission?.Current?.action==StudyAction.Detach)mission.Accept(StudyAction.Detach,"oxygen");
             transform.SetParent(camera.transform, true);
@@ -326,6 +331,11 @@ namespace BiologyVR.ArteryRoute.Journey
             var parentScale = transform.parent ? NonZeroScale(transform.parent.lossyScale) : Vector3.one;
             transform.localScale = new Vector3(desiredWorld.x / parentScale.x, desiredWorld.y / parentScale.y, desiredWorld.z / parentScale.z);
             if(wasRestoring && !grabbed && !keyboardHeld) BeginRestore();
+        }
+        void UpdateResearchOxygenBinding()
+        {
+            var cargo=GetComponent<JourneyBloodCargo>();var heme=mission.world.Find("heme");
+            if(cargo&&heme)cargo.detached=Vector3.Distance(transform.position,heme.transform.position)>=.16f;
         }
 
         void BeginRestore()

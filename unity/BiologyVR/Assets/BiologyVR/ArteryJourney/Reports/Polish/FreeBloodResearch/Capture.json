@@ -1,0 +1,16 @@
+{
+  "utc": "2026-10-11T20:06:30.651431+00:00",
+  "pcUtc": "2026-10-11T19:44:44.5670239Z",
+  "pcAll24Orders": true,
+  "xrSequential": "FULL SIMULATOR PASS",
+  "method": "Actual mouse, keyboard, XR InputActions/XRI and Unity camera renders",
+  "frames": [
+    "01_Leukocyte_First.png",
+    "02_Molecular_Details_Before_RBC.png",
+    "03_Four_Components_Complete.png",
+    "04_XR_Leukocyte_First.png",
+    "05_XR_Plasma_Details.png",
+    "06_XR_Research_Complete.png"
+  ],
+  "hardwareVerified": false
+}

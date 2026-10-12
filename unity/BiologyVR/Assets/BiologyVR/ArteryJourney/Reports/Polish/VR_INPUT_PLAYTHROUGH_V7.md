@@ -1,6 +1,6 @@
 # V8 Sequential XR Input Playthrough
 
-Generated UTC: 2026-10-11T15:07:32.1062382Z
+Generated UTC: 2026-10-11T19:59:45.4835926Z
 
 Status: FULL SIMULATOR PASS
 
@@ -8,9 +8,7 @@ Status: FULL SIMULATOR PASS
 
 XR Input System simulator layouts; controller states queued into actual action bindings and XRI. Not a physical headset test.
 
-PASS: Tracked view opens main theory without the old side-panel overlay
-
-PASS: Actual right XR thumbstick scrolls the aimed holographic theory panel
+PASS: Tracked entry opens free research without an upfront lecture or ordered objective
 
 PASS: Existing Scanner/BioTool actions enabled
 
@@ -36,145 +34,115 @@ PASS: Biomedical tool views add no physical contacts
 
 Installed device mesh triangles: Scanner=2168; BioTool=3136
 
-Diagnostic: step=1 ready=True RBC selected=True grabbed=True runtime right grip=1 button=True deviceEnabled=True focused=False controller=(0.58, -0.13, 5.07) RBC=(0.58, -0.12, 5.20) bounds=Center: (0.58, -0.12, 5.20), Extents: (0.13, 0.13, 0.13) collider=True grab=True
+PASS: Free first stage exposes eight independent research objects and four mandatory components
 
-RBC target enabled=True mission matches=True selecting=Near-Far Interactor
+PASS: Actual XR Continue cannot leave before mandatory free research
 
-RBC eventsAttached=True
+PASS: XR grip can begin with leukocyte, open its theory, and preserve zero completed research
 
-RBC grab=Research target — rbc (UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable)
+PASS: Early release of the Scanner does not complete free research
 
-RBC disabling=False
+Free research scan leukocyte: focused=leukocyte status=Investigated count=1 blocker=none uiBlocked=False
 
-RBC lastAcceptedGrabId=rbc
+PASS: Actual XR Scanner independently investigates or reopens leukocyte
 
-Interactor Gaze Interactor XRGazeInteractor enabled=False hover=False selected=False targets= selectActive=False pos=(0.00, 0.15, 0.00)
+PASS: Object-specific theory is shown for XR selection leukocyte
 
-Interactor Poke Interactor XRPokeInteractor enabled=True hover=False selected=False targets= selectActive=True pos=(0.16, -0.13, 5.07)
+PASS: Leukocyte can be completed before erythrocyte through actual XR input
 
-Interactor Near-Far Interactor NearFarInteractor enabled=True hover=False selected=False targets= selectActive=False pos=(0.16, -0.13, 5.07)
+PASS: Free-research release keeps the cell's nearby pose without teleporting
 
-Interactor Teleport Interactor XRRayInteractor enabled=False hover=False selected=False targets= selectActive=False pos=(0.16, -0.15, 5.03)
+PASS: Free-research WBC rejoins its original moving pool slot
 
-Interactor Poke Interactor XRPokeInteractor enabled=True hover=False selected=False targets= selectActive=True pos=(0.58, -0.13, 5.07)
+Free research scan leukocyte: focused=leukocyte status=Investigated count=1 blocker=none uiBlocked=False
 
-Interactor Near-Far Interactor NearFarInteractor enabled=True hover=False selected=True targets=Research target — rbc selectActive=True pos=(0.58, -0.13, 5.07)
+PASS: Actual XR Scanner independently investigates or reopens leukocyte
 
-Interactor Teleport Interactor XRRayInteractor enabled=False hover=False selected=False targets= selectActive=False pos=(0.58, -0.15, 5.03)
+PASS: Object-specific theory is shown for XR selection leukocyte
 
-Interactor Climb Teleport ClimbTeleportInteractor enabled=True hover=False selected=False targets= selectActive=False pos=(0.00, -1.21, 0.00)
+PASS: Repeated XR investigation reopens theory without progress or tutorial repetition
 
-Interactor Desktop mouse XRI hand JourneyDesktopInteractor enabled=True hover=False selected=False targets= selectActive=False pos=(-0.94, -0.44, 1.00)
+Free research scan oxygen: focused=oxygen status=Investigated count=1 blocker=none uiBlocked=False
 
-PASS: Right grip actually selects RBC and advances Grab
+PASS: Actual XR Scanner independently investigates or reopens oxygen
 
-PASS: Early Scanner release does not complete scan
+PASS: Object-specific theory is shown for XR selection oxygen
 
-During RBC scan: raw=True action=True enabled=True blocked=False progress=0,5419174 locked=Research target — rbc contact=Research target — rbc obstruction=none guideContact=True guideEnd=(0.55, -0.12, 5.07) source=(-0.18, -0.03, 0.48) target=(0.58, -0.12, 5.20) targetBounds=Center: (0.58, -0.12, 5.20), Extents: (0.13, 0.13, 0.13)
+Free research scan heme: focused=heme status=Investigated count=1 blocker=none uiBlocked=False
 
-Held RBC scan diagnostic: blocked=False held=False progress=0 contact=none obstruction=none
+PASS: Actual XR Scanner independently investigates or reopens heme
 
-PASS: Held real Scanner trigger completes raycast scan
+PASS: Object-specific theory is shown for XR selection heme
 
-PASS: Both grips select the same RBC
+Free research scan hemoglobin: focused=hemoglobin status=Investigated count=1 blocker=none uiBlocked=False
 
-PASS: Separating simulated hands triggers educational enlargement
+PASS: Actual XR Scanner independently investigates or reopens hemoglobin
 
-PASS: Bringing both hands together reduces scale without another objective
+PASS: Object-specific theory is shown for XR selection hemoglobin
 
-PASS: Releasing one hand leaves object in other hand
+Free research scan co2: focused=co2 status=Investigated count=1 blocker=none uiBlocked=False
 
-PASS: Scanning the wrong visible target does not complete Hb objective
+PASS: Actual XR Scanner independently investigates or reopens co2
 
-PASS: RBC re-extracted from flow for Hb/heme study
+PASS: Object-specific theory is shown for XR selection co2
 
-PASS: Scanner objective expected for hemoglobin
+PASS: All gas and hemoglobin/heme/Fe²⁺ details remain independently available before erythrocyte research
 
-Contact hemoglobin: Research target — hemoglobin / SphereCollider layerInspector=True
+PASS: Existing two-hand heme/O2 interaction stays available without ordered research prerequisites
 
-Scan hemoglobin: step=4 enabled=True lock=hemoglobin progress=1 blocker=none aim=(0.91, -0.03, 0.32) target=(0.27, 0.04, 6.49) contact=(0.27, 0.04, 6.49)
+PASS: Physical O2 release near heme restores binding without adding mandatory research progress
 
-PASS: Scanner completed hemoglobin
+Free research scan platelet: focused=platelet status=Investigated count=2 blocker=none uiBlocked=False
 
-PASS: Scanner objective expected for heme
+PASS: Actual XR Scanner independently investigates or reopens platelet
 
-Contact heme: Research target — heme / SphereCollider layerInspector=True
+PASS: Object-specific theory is shown for XR selection platelet
 
-Scan heme: step=5 enabled=True lock=heme progress=1 blocker=none aim=(0.91, -0.03, 0.32) target=(0.60, 0.18, 6.44) contact=(0.60, 0.18, 6.44)
+PASS: Player chooses platelet next without an erythrocyte gate
 
-PASS: Scanner completed heme
+PASS: Existing BioTool opens platelet activation/aggregation detail without duplicate completion
 
-PASS: Hb and heme actually scanned through device trigger
+Free research scan plasma: focused=plasma status=Investigated count=3 blocker=none uiBlocked=False
 
-PASS: Physically gripping oxygen detaches it
+PASS: Actual XR Scanner independently investigates or reopens plasma
 
-PASS: Placing and releasing O2 near heme binds it
+PASS: Object-specific theory is shown for XR selection plasma
 
-PASS: Scanner objective expected for co2
+PASS: Three mandatory objects cannot finish the stage prematurely
 
-PASS: Actual XR grip extracts co2 from blood before scanning
+PASS: Actual XR thumbstick scrolls selected plasma theory while preserving independent progress
 
-Contact co2: Research target — co2 / SphereCollider layerInspector=True
+Free research scan rbc: focused=rbc status=Investigated count=4 blocker=none uiBlocked=False
 
-Scan co2: step=8 enabled=True lock=co2 progress=1 blocker=none aim=(0.91, -0.03, 0.32) target=(0.88, 0.52, 10.89) contact=(0.88, 0.52, 10.89)
+PASS: Actual XR Scanner independently investigates or reopens rbc
 
-PASS: Scanner completed co2
+PASS: Object-specific theory is shown for XR selection rbc
 
-PASS: Extracted co2 returns smoothly into moving blood pool
+PASS: Final independent object unlocks Continue without an automatic transition
 
-PASS: WBC actually travels in blood flow before XR grip catch
+PASS: Both XR grips can inspect an already studied erythrocyte
 
-PASS: Right XR grip catches travelling WBC
+PASS: Two-hand educational enlargement remains independent of research order and completion
 
-PASS: Scanner objective expected for leukocyte
+PASS: Releasing one research grip keeps the object in the other hand
 
-Contact leukocyte: Research target — leukocyte / SphereCollider layerInspector=True
+PASS: Studied enlarged RBC releases smoothly back into the live bloodstream
 
-Scan leukocyte: step=9 enabled=True lock=leukocyte progress=1 blocker=none aim=(0.91, -0.03, 0.32) target=(0.82, -0.44, 11.53) contact=(0.82, -0.44, 11.53)
+Free research scan plasma: focused=plasma status=Investigated count=4 blocker=none uiBlocked=False
 
-PASS: Scanner completed leukocyte
+PASS: Actual XR Scanner independently investigates or reopens plasma
 
-PASS: WBC held scan changes goal to platelet without losing hold
+PASS: Object-specific theory is shown for XR selection plasma
 
-PASS: XR release removes WBC hold without an abrupt home teleport
+PASS: Theory can still be reopened after all mandatory research without extra credit
 
-PASS: Released XR WBC rejoins actual pool transform and continues downstream
-
-PASS: Scanner objective expected for platelet
-
-PASS: Actual XR grip extracts platelet from blood before scanning
-
-Contact platelet: Research target — platelet / SphereCollider layerInspector=True
-
-Scan platelet: step=10 enabled=True lock=platelet progress=1 blocker=none aim=(-0.18, -0.03, 0.48) target=(2.46, 0.24, 11.99) contact=(2.46, 0.24, 11.99)
-
-PASS: Scanner completed platelet
-
-PASS: Extracted platelet returns smoothly into moving blood pool
-
-PASS: Gas and formed elements scanned through actual Scanner action
-
-PASS: BioTool comparison requires actual ray and trigger
-
-PASS: Scanner objective expected for plasma
-
-PASS: Actual XR grip extracts plasma from blood before scanning
-
-Contact plasma: Research target — plasma / SphereCollider layerInspector=True
-
-Scan plasma: step=12 enabled=True lock=plasma progress=1 blocker=none aim=(-0.18, -0.03, 0.48) target=(3.27, -0.47, 13.35) contact=(3.27, -0.47, 13.35)
-
-PASS: Scanner completed plasma
-
-PASS: Extracted plasma returns smoothly into moving blood pool
-
-PASS: All Scene03 objectives completed without Accept/Primary/debug calls
+PASS: Free first-stage research completes through actual XR actions in player-selected order with molecular details preserved
 
 PASS: Actual left Y InputAction starts completed 03→04 travel
 
 PASS: Completed Scene03 location stays active during transition
 
-Travel blood samples=190661 maximum consecutive visible displacement=0,01916215
+Travel blood samples=213909 maximum consecutive visible displacement=0,09032257
 
 PASS: Moving visible blood remains continuous across the actual scene transition
 
@@ -190,7 +158,7 @@ Contact endothelium: Scene04_Band_endothelium / MeshCollider layerInspector=True
 
 PASS: Scanner uses actual wall shell contact for endothelium
 
-Scan endothelium: step=1 enabled=True lock=layers progress=1 blocker=none aim=(0.82, -0.03, 10.49) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
+Scan endothelium: step=1 enabled=True lock=layers progress=1 blocker=none aim=(0.86, -0.05, 10.49) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
 
 PASS: Scanner completed endothelium
 
@@ -202,7 +170,7 @@ Contact intima: Scene04_Band_intima / MeshCollider layerInspector=True
 
 PASS: Scanner uses actual wall shell contact for intima
 
-Scan intima: step=3 enabled=True lock=media progress=1 blocker=none aim=(0.82, -0.03, 10.49) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
+Scan intima: step=3 enabled=True lock=media progress=1 blocker=none aim=(0.86, -0.05, 10.49) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
 
 PASS: Scanner completed intima
 
@@ -212,7 +180,7 @@ Contact media: Scene04_Band_media / MeshCollider layerInspector=True
 
 PASS: Scanner uses actual wall shell contact for media
 
-Scan media: step=4 enabled=True lock=adventitia progress=1 blocker=none aim=(0.82, -0.03, 10.49) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
+Scan media: step=4 enabled=True lock=adventitia progress=1 blocker=none aim=(0.86, -0.05, 10.49) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
 
 PASS: Scanner completed media
 
@@ -222,7 +190,7 @@ Contact adventitia: Scene04_Band_adventitia / MeshCollider layerInspector=True
 
 PASS: Scanner uses actual wall shell contact for adventitia
 
-Scan adventitia: step=5 enabled=True lock=none progress=1 blocker=none aim=(0.82, -0.03, 10.49) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
+Scan adventitia: step=5 enabled=True lock=none progress=1 blocker=none aim=(0.86, -0.05, 10.49) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
 
 PASS: Scanner completed adventitia
 
@@ -388,7 +356,7 @@ PASS: BioTool completed pulse-mode
 
 PASS: Scene06 plaque inspection and pulse mode use real instruments
 
-Plaque XR diagnostic: before=2 destroyed=40 accepted=40 elapsed=8,840737 lock=none obstruction=none
+Plaque XR diagnostic: before=2 destroyed=40 accepted=40 elapsed=8,839971 lock=none obstruction=none
 
 PASS: Actual right trigger fragments the original pile plus newly arriving lipids before occlusion
 
@@ -456,13 +424,13 @@ Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True
 
 PASS: BioTool captured moving target embolus
 
-Transport result: bubble=(19.73, 1.97, 98.79) trap=(22.33, 1.92, 94.66) stability=1
+Transport result: bubble=(19.72, 1.97, 98.79) trap=(22.33, 1.92, 94.66) stability=1
 
 PASS: Only sustained in-trap placement completes geometric deposit
 
 PASS: Moving BioTool capture objective expected for embolus
 
-Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.93, 2.69, 93.41) target=(19.65, 1.94, 98.93)
+Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.93, 2.69, 93.41) target=(19.64, 1.94, 98.93)
 
 PASS: BioTool captured moving target embolus
 
@@ -476,7 +444,7 @@ Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True
 
 PASS: BioTool captured moving target embolus
 
-Transport result: bubble=(18.24, 2.62, 102.22) trap=(22.33, 1.92, 94.66) stability=1
+Transport result: bubble=(18.23, 2.62, 102.23) trap=(22.33, 1.92, 94.66) stability=1
 
 PASS: Only sustained in-trap placement completes geometric deposit
 
@@ -486,13 +454,13 @@ Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True
 
 PASS: BioTool captured moving target embolus
 
-Transport result: bubble=(18.29, 1.11, 104.63) trap=(22.33, 1.92, 94.66) stability=1
+Transport result: bubble=(18.29, 1.11, 104.64) trap=(22.33, 1.92, 94.66) stability=1
 
 PASS: Only sustained in-trap placement completes geometric deposit
 
 PASS: Moving BioTool capture objective expected for embolus
 
-Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.93, 2.69, 93.41) target=(18.29, 1.15, 104.82)
+Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.93, 2.69, 93.41) target=(18.29, 1.15, 104.83)
 
 PASS: BioTool captured moving target embolus
 
@@ -532,7 +500,7 @@ PASS: Scanner objective expected for genome
 
 Contact genome: Research target — genome / SphereCollider layerInspector=True
 
-Scan genome: step=3 enabled=True lock=capsid progress=1 blocker=none aim=(42.32, 14.29, 124.28) target=(43.40, 14.33, 124.93) contact=(43.40, 14.33, 124.93)
+Scan genome: step=3 enabled=True lock=capsid progress=1 blocker=none aim=(42.32, 14.29, 124.28) target=(43.42, 14.30, 124.94) contact=(43.42, 14.30, 124.94)
 
 PASS: Scanner completed genome
 
@@ -796,7 +764,7 @@ PASS: Eleven flow platelets and three balance reserves authored at existing woun
 
 PASS: Real right grip selects Flow-caught platelet 0
 
-Released Flow-caught platelet 0 position=(91.50, 2.51, 178.96) intended=(91.68, 2.77, 181.87) accepted=False
+Released Flow-caught platelet 0 position=(91.50, 2.52, 179.00) intended=(91.68, 2.77, 181.87) accepted=False
 
 PASS: Wrong physical platelet placement stays unaccepted and can be re-grabbed
 

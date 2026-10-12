@@ -19,7 +19,7 @@ namespace BiologyVR.ArteryRoute.Editor
     {
         static Keyboard keyboard;static Mouse mouse;static KeyboardState keys;
         static Vector2 pendingDelta,pendingScroll,pointer;static ushort buttons;
-        static JourneyMission mission;static bool running,testingEmbolus,cursorMode,continuousOnly,plaqueOnly,lacerationOnly,persistenceOnly,mobilePersistence,hemodynamicsOnly;
+        static JourneyMission mission;static bool running,testingEmbolus,cursorMode,continuousOnly,plaqueOnly,lacerationOnly,persistenceOnly,mobilePersistence,hemodynamicsOnly,freeResearchOnly;
         static readonly List<string> checks=new List<string>();
         const string Folder=ArteryPolishReview.Reports+"/FlowPickup";
         [MenuItem("Biology VR/Test Flow Cell Catch And Release Through PC Input")]
@@ -40,11 +40,13 @@ namespace BiologyVR.ArteryRoute.Editor
         public static void RunMobilePersistence()=>Start(false,false,false,false,false,true,true);
         [MenuItem("Biology VR/Test Hemodynamic Experiment Through PC Input")]
         public static void RunHemodynamics()=>Start(false,true,false,false,false,false,false,true);
-        static void Start(bool embolus,bool cursor=false,bool continuous=false,bool plaque=false,bool laceration=false,bool persistence=false,bool mobilePool=false,bool hemodynamics=false)
+        [MenuItem("Biology VR/Test All Free Blood Research Orders Through PC Input")]
+        public static void RunFreeResearch()=>Start(false,true,false,false,false,false,false,false,true);
+        static void Start(bool embolus,bool cursor=false,bool continuous=false,bool plaque=false,bool laceration=false,bool persistence=false,bool mobilePool=false,bool hemodynamics=false,bool freeResearch=false)
         {
             mission=UnityEngine.Object.FindFirstObjectByType<JourneyMission>();
             if(!EditorApplication.isPlaying||running||!mission||(!embolus&&(mission.SceneNumber!=3||mission.StepIndex!=0)))throw new InvalidOperationException("Fresh Scene03 required: playing="+EditorApplication.isPlaying+" running="+running+" scene="+(mission?mission.SceneNumber:-1)+" step="+(mission?mission.StepIndex:-1));
-            testingEmbolus=embolus;cursorMode=cursor;continuousOnly=continuous;plaqueOnly=plaque;lacerationOnly=laceration;persistenceOnly=persistence;mobilePersistence=mobilePool;hemodynamicsOnly=hemodynamics;running=true;EditorCoroutineUtility.StartCoroutineOwnerless(Guard(Test()));
+            testingEmbolus=embolus;cursorMode=cursor;continuousOnly=continuous;plaqueOnly=plaque;lacerationOnly=laceration;persistenceOnly=persistence;mobilePersistence=mobilePool;hemodynamicsOnly=hemodynamics;freeResearchOnly=freeResearch;running=true;EditorCoroutineUtility.StartCoroutineOwnerless(Guard(Test()));
         }
         static void Check(bool success,string text)
         {checks.Add((success?"PASS: ":"BLOCKED: ")+text);if(!success)throw new InvalidOperationException(text);}
@@ -65,7 +67,9 @@ namespace BiologyVR.ArteryRoute.Editor
             finally
             {
                 while(stack.Count>0)(stack.Pop() as IDisposable)?.Dispose();running=false;
-                Directory.CreateDirectory(Folder);File.WriteAllText(Folder+(hemodynamicsOnly?"/Hemodynamics_PC_Input.json":mobilePersistence?"/Mobile_All_Scenes_Persistent_Blood.json":persistenceOnly?"/All_Scenes_Persistent_Blood.json":lacerationOnly?"/Laceration_PC_Input.json":plaqueOnly?"/Plaque_Challenge_PC.json":continuousOnly?"/Continuous_Random_Flow.json":cursorMode?"/NativeCursor_PC_Input.json":testingEmbolus?"/Scene07_PC_Input.json":"/PC_Input.json"),JsonConvert.SerializeObject(new{utc=DateTime.UtcNow,passed=!checks.Exists(c=>c.StartsWith("BLOCKED")),mobilePoolBudget=mobilePersistence?180:360,method=hemodynamicsOnly?"Isolated Scene05/10 entry fixtures; actual Scanner F, held E/wheel TONUS, XRI physical card placement and normal Continue; no success APIs":persistenceOnly?"Isolated scene-entry fixtures 03–16 with normal travel; actual RMB mouse look, 90-second final-stage dwell; no mission success APIs":lacerationOnly?"Isolated Enter(11,false); real held E field capture/automatic adhesion, scanner and XRI biochemical cards; normal Continue; no mission success APIs":plaqueOnly?"Isolated Enter(6,false) fixture; real mouse/keyboard scan, shots, failure, automatic local retry and Continue; no success APIs":continuousOnly?"240 simulated seconds at timeScale 5; real forward/back mouse look; no scene reset or mission success APIs":cursorMode?"Native MouseState position/buttons/scroll and KeyboardState; Scene03 fresh start, isolated Enter(scene,false) fixtures for Scene09/07/12/10/14; no success APIs":testingEmbolus?"Isolated Scene07 fixture: initial Enter(7,false) only; all scan/capture/release/transport/deposit through actual keyboard/mouse events, no success APIs":"Actual keyboard/mouse Input System events; no mission success/enter APIs",checks},Formatting.Indented));
+                string output=freeResearchOnly?"/Free_Blood_Research_PC_Input.json":hemodynamicsOnly?"/Hemodynamics_PC_Input.json":mobilePersistence?"/Mobile_All_Scenes_Persistent_Blood.json":persistenceOnly?"/All_Scenes_Persistent_Blood.json":lacerationOnly?"/Laceration_PC_Input.json":plaqueOnly?"/Plaque_Challenge_PC.json":continuousOnly?"/Continuous_Random_Flow.json":cursorMode?"/NativeCursor_PC_Input.json":testingEmbolus?"/Scene07_PC_Input.json":"/PC_Input.json";
+                string method=freeResearchOnly?"Fresh Scene03; real mouse/keyboard/XRI. Explicit Enter(3,false,true) fixtures reset only between 24 permutations; normal Enter fixtures test partial re-entry; no mission success API calls":hemodynamicsOnly?"Isolated Scene05/10 entry fixtures; actual Scanner F, held E/wheel TONUS, XRI physical card placement and normal Continue; no success APIs":persistenceOnly?"Isolated scene-entry fixtures 03–16 with normal travel; actual RMB mouse look, 90-second final-stage dwell; no mission success APIs":lacerationOnly?"Isolated Enter(11,false); real held E field capture/automatic adhesion, scanner and XRI biochemical cards; normal Continue; no mission success APIs":plaqueOnly?"Isolated Enter(6,false) fixture; real mouse/keyboard scan, shots, failure, automatic local retry and Continue; no success APIs":continuousOnly?"240 simulated seconds at timeScale 5; real forward/back mouse look; no scene reset or mission success APIs":cursorMode?"Native MouseState position/buttons/scroll and KeyboardState; isolated episode fixtures; no success APIs":testingEmbolus?"Isolated Scene07 fixture: all actions through keyboard/mouse input":"Actual keyboard/mouse Input System events; no mission success/enter APIs";
+                Directory.CreateDirectory(Folder);File.WriteAllText(Folder+output,JsonConvert.SerializeObject(new{utc=DateTime.UtcNow,passed=!checks.Exists(c=>c.StartsWith("BLOCKED")),mobilePoolBudget=mobilePersistence?180:360,method,checks},Formatting.Indented));
             }
         }
         static void Queue()
@@ -95,6 +99,7 @@ namespace BiologyVR.ArteryRoute.Editor
                 keyboard=InputSystem.AddDevice<Keyboard>();mouse=InputSystem.AddDevice<Mouse>();InputSystem.EnableDevice(keyboard);InputSystem.EnableDevice(mouse);keys=new KeyboardState();buttons=0;pendingDelta=pendingScroll=Vector2.zero;
                 pointer=new Vector2(Screen.width*.5f,Screen.height*.5f);
                 InputSystem.onBeforeUpdate+=Queue;InputSystem.onAfterUpdate+=UseTestDevices;
+                if(freeResearchOnly){yield return TestFreeResearch();yield break;}
                 if(hemodynamicsOnly){yield return TestHemodynamics();yield break;}
                 if(persistenceOnly){yield return TestPersistentAllScenes();yield break;}
                 if(lacerationOnly){yield return TestLaceration();yield break;}
@@ -466,6 +471,7 @@ namespace BiologyVR.ArteryRoute.Editor
         }
         static IEnumerator TestCursor()
         {
+            if(mission.FreeBloodResearch){yield return TestFreeResearchEntry();yield break;}
             var target=mission.world.Find("rbc");var camera=mission.mover.viewCamera;Quaternion rotation=camera.transform.rotation;
             yield return AimAt(target.transform.position);buttons=1;yield return Wait(.4f);
             var controls=mission.GetComponent<JourneyInput>().DesktopControls;var grab=target.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
@@ -493,6 +499,65 @@ namespace BiologyVR.ArteryRoute.Editor
             }
             pendingScroll=new Vector2(0,-JourneyDesktopControls.WheelUnitsPerStep);yield return Wait(.3f);buttons=0;yield return Wait(.9f);
             Check(!target.grabbed&&!target.GetComponent<JourneyFlowPickup>().Rejoining,"Mouse release returns RBC smoothly to real flow");
+        }
+        static IEnumerator TestFreeResearchEntry()
+        {
+            var research=mission.world.research;var white=mission.world.Find("leukocyte");cursorMode=false;yield return AimAt(white.transform.position);cursorMode=true;yield return AimAt(white.transform.position);buttons=1;yield return Wait(.3f);
+            Check(white.grabbed&&research.Find("leukocyte").State==JourneyResearchState.Investigating&&research.RequiredInvestigated==0,"Actual first LMB catch opens leukocyte research without requiring an erythrocyte or granting premature completion");
+            yield return ResearchScan("leukocyte");buttons=0;yield return Wait(.9f);
+            Check(!white.grabbed&&research.RequiredInvestigated==1,"Release preserves completed research and returns the cell to the existing moving pool");
+        }
+        static IEnumerator ResearchScan(string id)
+        {
+            var target=mission.world.Find(id);var camera=mission.mover.viewCamera;var research=mission.world.research;
+            if(Vector3.Distance(target.transform.position,camera.transform.position)>15)
+            {
+                cursorMode=false;yield return AimAt(camera.transform.position+mission.mover.path.Up(mission.mover.Distance)*5);cursorMode=true;float waiting=Time.time;
+                while(Vector3.Distance(target.transform.position,camera.transform.position)>15&&Time.time-waiting<25)yield return Wait(.08f);
+            }
+            cursorMode=false;yield return AimAt(target.GetComponent<Collider>().bounds.center);cursorMode=true;keys=new KeyboardState();float began=Time.time,hold=0;int scans=research.UniqueScans;bool repeated=research.Find(id).State==JourneyResearchState.Investigated;
+            var input=mission.GetComponent<JourneyInput>();
+            while(Time.time-began<15&&hold<1.05f)
+            {
+                pointer=camera.WorldToScreenPoint(target.GetComponent<Collider>().bounds.center);yield return Wait(.03f);
+                // Wait for a genuine clear ray to this moving cell. Overlapping
+                // species must not be mistaken for an ordered-object restriction.
+                if(input.LockedTarget==target){keys=new KeyboardState(Key.F);hold+=.03f;}
+                else{keys=new KeyboardState();hold=0;}
+                if(!repeated&&research.Find(id).State==JourneyResearchState.Investigated&&research.Focused==research.Find(id))break;
+            }
+            keys=new KeyboardState();yield return Wait(.12f);
+            if(research.Find(id).State!=JourneyResearchState.Investigated||research.Focused!=research.Find(id))checks.Add("Research scan diagnostic: id="+id+" actual="+(research.Focused?research.Focused.theory.id:"none")+" lock="+(input.LockedTarget?input.LockedTarget.name:"none")+" blocker="+(input.AimObstruction?input.AimObstruction.name:"none")+" distance="+Vector3.Distance(target.transform.position,camera.transform.position));
+            Check(research.Find(id).State==JourneyResearchState.Investigated&&research.Focused==research.Find(id)&&research.UniqueScans==scans+(repeated?0:1),"Actual Scanner independently investigates or reopens: "+id);
+            Check(mission.LearningTerm==research.Find(id).theory.displayName&&mission.GetComponent<JourneyHolographicScreens>().theoryTitle.text==mission.LearningTerm,"Theory belongs to selected object: "+id);
+        }
+        static IEnumerator TestFreeResearch()
+        {
+            var research=mission.world.research;var screens=mission.GetComponent<JourneyHolographicScreens>();Directory.CreateDirectory(FreeBloodResearchBuilder.Reports);
+            Check(research&&research.objects.Length==8&&research.RequiredCount==4&&research.RequiredInvestigated==0&&research.objects.All(o=>o.State==JourneyResearchState.NotInvestigated),"All eight existing objects start independently; only four main blood components are mandatory");
+            yield return Wait(.35f);Check(research.RequiredInvestigated==0&&research.Introductions==0,"Proximity and passive hovering never investigate an object or start a professor lecture");
+            yield return Press(Key.RightArrow,.1f);Check(mission.SceneNumber==3&&!mission.Complete,"Continue is unavailable before all mandatory research");
+            yield return TestFreeResearchEntry();ArteryPolishReview.Capture(mission.mover.viewCamera,"FreeBloodResearch/01_Leukocyte_First.png");
+            int intro=research.Introductions;yield return ResearchScan("leukocyte");Check(research.RequiredInvestigated==1&&research.Introductions==intro,"Repeat scan opens the card without duplicated progress or tutorial introduction");
+            var buttonRect=screens.referenceButton.GetComponent<RectTransform>();pointer=mission.mover.viewCamera.WorldToScreenPoint(buttonRect.TransformPoint(buttonRect.rect.center));yield return Wait(.1f);buttons=1;yield return Wait(.12f);buttons=0;yield return Wait(.2f);
+            Check(research.Focused.Page==1&&research.RequiredInvestigated==1,"Actual More button reveals the next short theory block without changing research progress");
+            yield return ResearchScan("plasma");var snapshot=research.Capture().Select(s=>s.id+":"+s.state+":"+s.page).ToArray();int partial=research.RequiredInvestigated;
+            mission.Enter(4,false);yield return Wait(.2f);mission.Enter(3,false);yield return Wait(.3f);Check(partial==2&&research.RequiredInvestigated==2&&snapshot.SequenceEqual(research.Capture().Select(s=>s.id+":"+s.state+":"+s.page)),"Normal stage re-entry preserves independent partial states and theory pages");
+            mission.Enter(3,false,true);yield return Wait(.3f);
+            foreach(var id in new[]{"oxygen","hemoglobin","heme","co2"})yield return ResearchScan(id);
+            Check(research.RequiredInvestigated==0&&research.OptionalInvestigated==4&&!mission.Complete&&research.Find("rbc").State==JourneyResearchState.NotInvestigated,"Oxygen, hemoglobin, heme/Fe²⁺ and CO2 can all be investigated before erythrocyte and do not replace mandatory components");
+            Check(research.Find("heme").theory.pages.Any(p=>p.text.Contains("Fe²⁺"))&&research.Find("co2").theory.pages.Any(p=>p.text.Contains("HCO₃⁻"))&&research.Find("plasma").theory.pages.Any(p=>p.text.Contains("Электролиты")),"Molecular data includes heme iron, bicarbonate gas transport and plasma electrolytes");ArteryPolishReview.Capture(mission.mover.viewCamera,"FreeBloodResearch/02_Molecular_Details_Before_RBC.png");
+            string[] core={"rbc","leukocyte","platelet","plasma"};int orders=0;
+            foreach(var a in core)foreach(var b in core.Where(x=>x!=a))foreach(var c in core.Where(x=>x!=a&&x!=b))
+            {
+                var d=core.First(x=>x!=a&&x!=b&&x!=c);var order=new[]{a,b,c,d};mission.Enter(3,false,true);yield return Wait(.2f);
+                for(int i=0;i<order.Length;i++){yield return ResearchScan(order[i]);Check(research.RequiredInvestigated==i+1&&mission.Complete==(i==3),"Independent completion count for order "+string.Join(" → ",order)+" at "+(i+1)+"/4");}
+                orders++;int before=research.UniqueScans;int announced=research.Introductions;yield return ResearchScan(order[0]);Check(research.UniqueScans==before&&research.Introductions==announced&&research.RequiredInvestigated==4,"Completed research remains idempotent in order "+orders);
+                yield return Wait(.2f);Check(mission.SceneNumber==3&&screens.hud.continueButton.gameObject.activeInHierarchy,"Last object unlocks Continue without auto-transition in order "+orders);
+            }
+            Check(orders==24,"All twenty-four permutations passed through actual Scanner input");ArteryPolishReview.Capture(mission.mover.viewCamera,"FreeBloodResearch/03_Four_Components_Complete.png");
+            var blood=mission.world.GetComponent<JourneyContinuousBloodstream>();Check(Time.timeScale>0&&blood.NearbyMainCells>=90,"World, wall and saturated bloodstream continue during research and theory");
+            yield return Press(Key.RightArrow,.12f);yield return Wait(10f);Check(mission.SceneNumber==4&&mission.Ready&&mission.world.IsEpisodeCompleted(3),"Actual Continue proceeds to existing wall lesson and remembers completed free research");
         }
         static IEnumerator TestPlacement()
         {

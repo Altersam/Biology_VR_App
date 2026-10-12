@@ -34,7 +34,7 @@ namespace BiologyVR.ArteryRoute.Editor
             if(EditorApplication.isPlaying)throw new InvalidOperationException("Exit Play Mode first");
             UniversalMobileBuild.ConfigureAndroidPlayer();
             PlayerSettings.productName="Biology VR";PlayerSettings.companyName="BiologyVR";
-            PlayerSettings.bundleVersion="0.2.0";PlayerSettings.Android.bundleVersionCode=3;
+            PlayerSettings.bundleVersion=BiologyReleaseVersion.Version;PlayerSettings.Android.bundleVersionCode=BiologyReleaseVersion.AndroidCode;
             PlayerSettings.Android.minSdkVersion=AndroidSdkVersions.AndroidApiLevel29;
             PlayerSettings.Android.targetSdkVersion=AndroidSdkVersions.AndroidApiLevel34;
             PlayerSettings.Android.applicationEntry=AndroidApplicationEntry.Activity;
@@ -117,7 +117,7 @@ namespace BiologyVR.ArteryRoute.Editor
             EditorUserBuildSettings.selectedBuildTargetGroup=BuildTargetGroup.Android;
             Configure();
             string folder=Path.GetFullPath("Builds/MetaQuest");Directory.CreateDirectory(folder);
-            var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=new[]{UniversalMobileBuild.ScenePath},locationPathName=Path.Combine(folder,"BiologyVR_MetaQuest.apk"),target=BuildTarget.Android,options=BuildOptions.Development});
+            var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=new[]{UniversalMobileBuild.ScenePath},locationPathName=Path.Combine(folder,"BiologyVR_MetaQuest.apk"),target=BuildTarget.Android,options=BuildOptions.None});
             bool exists=File.Exists(report.summary.outputPath)&&new FileInfo(report.summary.outputPath).Length>0;
             File.WriteAllText(Reports+"/MetaQuestBuildReport.json",JsonConvert.SerializeObject(new{utc=DateTime.UtcNow,result=report.summary.result==BuildResult.Succeeded&&exists?"Succeeded":"Failed",unityResult=report.summary.result.ToString(),apkExists=exists,errors=report.summary.totalErrors,warnings=report.summary.totalWarnings,sizeBytes=exists?(ulong)new FileInfo(report.summary.outputPath).Length:0,seconds=report.summary.totalTime.TotalSeconds,path=report.summary.outputPath,device="Meta Quest",headsetVerified=false},Formatting.Indented));
         }

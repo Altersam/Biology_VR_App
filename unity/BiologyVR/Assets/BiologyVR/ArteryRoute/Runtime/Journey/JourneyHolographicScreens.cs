@@ -55,6 +55,10 @@ namespace BiologyVR.ArteryRoute.Journey
         {
             if(!hud||!hud.mission||hud.mission.Goals==null)return;
             var m=hud.mission;
+            if(m.FreeBloodResearch){RefreshResearch(m.world.research);RefreshVitals();return;}
+            shortTheory.resizeTextForBestFit=false;
+            if(referenceButton)referenceButton.GetComponentInChildren<Text>().text="Подробнее";
+            if(practiceButton)practiceButton.GetComponentInChildren<Text>().text="К практике";
             theoryTitle.text=m.LearningTerm;
             if(shortTheory)shortTheory.text=ShortExplanation(m.SceneNumber);
             if(illustrationText)illustrationText.text=MiniDiagram(m.SceneNumber);
@@ -63,7 +67,6 @@ namespace BiologyVR.ArteryRoute.Journey
             text.Append("\n\n<b>Профессор</b>\n«").Append(m.ProfessorLine).Append("»");
             text.Append("\n\n<b>Практика</b>\n").Append(m.CurrentGoalLabel);
             if(ShowPractice){text.Append("\n\n<b>План исследования</b>\n");foreach(var goal in m.Goals)text.Append("• ").Append(goal.label).Append('\n');text.Append("\n").Append(m.PerformanceSummary);}
-            if(m.SceneNumber==3)text.Append("\n\nHb, гем и O₂ показаны в увеличенном учебном масштабе и перемещаются с эритроцитом. CO₂ и компоненты плазмы представлены учебными моделями. Достань объект из потока перед сканированием.");
             if(theoryText.text!=text.ToString())theoryText.text=text.ToString();
             taskText.text=m.CurrentGoalLabel;
             taskHint.text=ShortControls(m);
@@ -81,6 +84,27 @@ namespace BiologyVR.ArteryRoute.Journey
             if(hud.continueButton)hud.continueButton.gameObject.SetActive(m.Complete);
             if(chapter!=m.SceneNumber){chapter=m.SceneNumber;Canvas.ForceUpdateCanvases();theoryScroll.verticalNormalizedPosition=1;}
             RefreshVitals();
+        }
+        void RefreshResearch(JourneyResearchManager research)
+        {
+            var m=hud.mission;var focused=research.Focused;var data=focused?focused.theory:null;
+            theoryTitle.text=data?data.displayName:"Состав крови";
+            shortTheory.resizeTextForBestFit=true;shortTheory.resizeTextMinSize=24;shortTheory.resizeTextMaxSize=30;
+            shortTheory.text=data?data.pages[focused.Page].text:"Осмотрись: клетки и молекулы движутся рядом.\nВыбери любой объект — порядок свободный.";
+            illustrationText.text=data?data.pages[focused.Page].visualConnection:"КЛЕТКИ · ПЛАЗМА · ГАЗООБМЕН";
+            var text=new StringBuilder();
+            if(data){text.Append("<b>").Append(data.displayName).Append("</b>\n\n");foreach(var page in data.pages)text.Append("<b>").Append(page.heading).Append("</b>\n").Append(page.text).Append("\n\n");text.Append("Учебный масштаб условный; молекулярные модели связаны с их переносчиком.");}
+            else text.Append("Возьми или просканируй любой объект, чтобы открыть его карточку. Эритроцит, лейкоцит, тромбоцит и плазма доступны одновременно. Гемоглобин, гем/Fe²⁺, O₂ и CO₂ можно изучать независимо.");
+            theoryText.text=text.ToString();
+            taskText.text=!string.IsNullOrEmpty(m.ProfessorLine)?m.ProfessorLine:m.CurrentGoalLabel;
+            taskHint.text=data&&focused.State==JourneyResearchState.Investigated?"Изучено • можно открыть снова или выбрать другой объект":"Scanner: F / левый Trigger • Grip / ЛКМ — рассмотреть";
+            taskProgress.text=$"Состав крови {research.RequiredInvestigated}/{research.RequiredCount}";
+            pageLabel.text=data?$"{(focused.State==JourneyResearchState.Investigated?"ИЗУЧЕНО":"ИССЛЕДУЕМ")} • {focused.Page+1:00} / {data.pages.Length:00}":$"СВОБОДНАЯ ЛАБОРАТОРИЯ • детали {research.OptionalInvestigated}/4";
+            if(referenceButton)referenceButton.GetComponentInChildren<Text>().text=data?"Ещё →":"Подробнее";
+            if(practiceButton){practiceButton.GetComponentInChildren<Text>().text="Объекты";practiceButton.SetActive(!m.Complete);}
+            if(hud.continueButton)hud.continueButton.gameObject.SetActive(m.Complete);
+            if(overview)overview.SetActive(!ShowPractice);if(referenceView)referenceView.SetActive(ShowPractice);theoryScroll.enabled=ShowPractice;
+            if(chapter!=3){chapter=3;Canvas.ForceUpdateCanvases();theoryScroll.verticalNormalizedPosition=1;}
         }
         void RefreshVitals()
         {
@@ -101,7 +125,9 @@ namespace BiologyVR.ArteryRoute.Journey
             for(int i=0;i<5;i++){vitalValues[i].text=values[i];vitalStatuses[i].text=states[i];vitalStatuses[i].color=(i==0&&(m.PressureSystolic<110||m.PressureSystolic>130)||i==3&&m.Temperature>37.2f||i==4&&(infection||plaque&&!plaque.Cleared)||plaque&&((i==1&&plaque.PulseBpm>90)||(i==2&&plaque.OxygenPercent<95)))?HolographicStyle.Amber:HolographicStyle.Secondary;}
         }
         public void TogglePractice(){ShowPractice=!ShowPractice;Refresh();}
-        public void ShowOverview(){ShowPractice=false;Refresh();}
+        public void ShowOverview(){if(hud.mission.FreeBloodResearch&&!ShowPractice){hud.mission.world.research.TurnPage(-1);return;}ShowPractice=false;Refresh();}
+        public void NextTheoryPage(){if(hud.mission.FreeBloodResearch&&hud.mission.world.research.Focused){ShowPractice=false;hud.mission.world.research.TurnPage(1);}else TogglePractice();}
+        public void ShowResearchOverview(){if(hud.mission.FreeBloodResearch){ShowPractice=false;hud.mission.world.research.ShowOverview();}else ShowOverview();}
         public void ScrollDown(){ScrollBy(-.20f);}
         public void ScrollUp(){ScrollBy(.20f);}
         void ScrollBy(float amount){theoryScroll.verticalNormalizedPosition=Mathf.Clamp01(theoryScroll.verticalNormalizedPosition+amount);ScrollInputs++;}
@@ -128,7 +154,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(m.Complete)return "Продолжить → / левая Y";
             var goal=m.Current;if(goal==null)return "";
             if(goal.target=="hemostasis-stable")return "Наблюдай фибрин и постепенное уменьшение утечки";
-            if(goal.action==StudyAction.Scan)return m.SceneNumber==3?"Grip / ЛКМ — взять · Trigger / F — сканировать":"Scanner: левый Trigger / F · навести на цель";
+            if(goal.action==StudyAction.Scan)return "Scanner: левый Trigger / F · навести на цель";
             if(goal.action==StudyAction.Grab)return "Grip / ЛКМ — достать из потока";
             if(goal.action==StudyAction.Enlarge)return "Две руки / Z — учебное увеличение";
             if(goal.target=="oxygen")return "Взять O₂ · перенести · отпустить у гема";

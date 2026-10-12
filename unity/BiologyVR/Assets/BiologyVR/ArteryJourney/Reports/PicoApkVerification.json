@@ -1,11 +1,11 @@
 {
-  "utc": "2026-10-11T15:25:05.191422+00:00",
-  "version": "0.4.0",
-  "version_code": 5,
+  "utc": "2026-10-12T04:45:57.820761+00:00",
+  "version": "0.5.0",
+  "version_code": 6,
   "passed": true,
   "path": "Z:\\YandexDisk\\ПетПроекты\\Biology_VR\\3д\\Unity\\bio_v0.2\\Builds\\Pico4Enterprise\\BiologyVR_Pico4Enterprise.apk",
-  "size_bytes": 77238537,
-  "sha256": "eebbf0396a197c01399db0e69dff5dd641703de0b512ceab5f1062513ce2f596",
+  "size_bytes": 77256609,
+  "sha256": "0dede3a705c09620280706680ad0f7a5a024aa62396be97ec0a717e3001e98a9",
   "checks": {
     "manifest_readable": true,
     "application_id": true,
@@ -38,7 +38,7 @@
     "lib/arm64-v8a/libswappywrapper.so",
     "lib/arm64-v8a/libunity.so"
   ],
-  "badging": "package: name='com.biologyvr.arteryjourney' versionCode='5' versionName='0.4.0' platformBuildVersionName='14' platformBuildVersionCode='34' compileSdkVersion='34' compileSdkVersionCodename='14'\ninstall-location:'auto'\nsdkVersion:'29'\ntargetSdkVersion:'34'\nuses-permission: name='android.permission.INTERNET'\nuses-permission: name='com.pvr.tobactivate.permission.AUTH_CHECK'\napplication-label:'Biology VR'\napplication-icon-160:'res/Qu.xml'\napplication-icon-65534:'res/Qu.xml'\napplication: label='Biology VR' icon='res/Qu.xml'\nlaunchable-activity: name='com.unity3d.player.UnityPlayerActivity'  label='' icon=''\nfeature-group: label=''\n  uses-gl-es: '0x30000'\n  uses-feature-not-required: name='android.hardware.touchscreen'\n  uses-feature-not-required: name='android.hardware.touchscreen.multitouch'\n  uses-feature-not-required: name='android.hardware.touchscreen.multitouch.distinct'\nmain\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--'\ndensities: '160' '65534'\nnative-code: 'arm64-v8a'\n",
+  "badging": "package: name='com.biologyvr.arteryjourney' versionCode='6' versionName='0.5.0' platformBuildVersionName='14' platformBuildVersionCode='34' compileSdkVersion='34' compileSdkVersionCodename='14'\ninstall-location:'auto'\nsdkVersion:'29'\ntargetSdkVersion:'34'\nuses-permission: name='android.permission.INTERNET'\nuses-permission: name='com.pvr.tobactivate.permission.AUTH_CHECK'\napplication-label:'Biology VR'\napplication-icon-160:'res/Qu.xml'\napplication-icon-65534:'res/Qu.xml'\napplication: label='Biology VR' icon='res/Qu.xml'\nlaunchable-activity: name='com.unity3d.player.UnityPlayerActivity'  label='' icon=''\nfeature-group: label=''\n  uses-gl-es: '0x30000'\n  uses-feature-not-required: name='android.hardware.touchscreen'\n  uses-feature-not-required: name='android.hardware.touchscreen.multitouch'\n  uses-feature-not-required: name='android.hardware.touchscreen.multitouch.distinct'\nmain\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--'\ndensities: '160' '65534'\nnative-code: 'arm64-v8a'\n",
   "signature": "Verifies\nVerified using v1 scheme (JAR signing): false\nVerified using v2 scheme (APK Signature Scheme v2): true\nVerified using v3 scheme (APK Signature Scheme v3): false\nVerified using v3.1 scheme (APK Signature Scheme v3.1): false\nVerified using v4 scheme (APK Signature Scheme v4): false\nVerified for SourceStamp: false\nNumber of signers: 1\n",
   "headset_verified": false
 }

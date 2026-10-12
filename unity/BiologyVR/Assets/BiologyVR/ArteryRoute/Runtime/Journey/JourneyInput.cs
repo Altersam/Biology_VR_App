@@ -127,7 +127,8 @@ namespace BiologyVR.ArteryRoute.Journey
                 if (keyboard.zKey.wasPressedThisFrame)
                 {
                     var goal = CurrentGoal();
-                    if (world != null) world.Find(goal != null ? goal.target : "rbc")?.Enlarge();
+                    if(mission.FreeBloodResearch){var target=Aim(AimSource(bioTool));if(!target&&world.research.Focused)target=world.research.Focused.target;if(target)target.Enlarge();}
+                    else if (world != null) world.Find(goal != null ? goal.target : "rbc")?.Enlarge();
                 }
                 if (keyboard.qKey.wasPressedThisFrame && mission != null)
                 {
@@ -206,6 +207,24 @@ namespace BiologyVR.ArteryRoute.Journey
             var goal=CurrentGoal();
             var source=AimSource(scanning?scanner:bioTool);
             var hit=Aim(source);LockedTarget=hit;
+            if(mission.FreeBloodResearch)
+            {
+                bool correct=world.research.CanInvestigate(hit);
+                if(scanning&&scanConsumed&&correct&&hit!=scanTarget){scanConsumed=false;ScanProgress=0;scanTarget=null;}
+                if(scanning&&!scanConsumed)
+                {
+                    if(!correct){ScanProgress=0;scanTarget=null;}
+                    else
+                    {
+                        if(scanTarget!=hit){scanTarget=hit;ScanProgress=0;mission.Accept(StudyAction.Measure,hit.targetId);}
+                        ScanProgress=Mathf.Clamp01(ScanProgress+Mathf.Max(0,deltaTime)/scanDuration);
+                        if(ScanProgress>=1){scanConsumed=true;mission.Accept(StudyAction.Scan,hit.targetId);}
+                    }
+                }
+                else if(firing&&!toolConsumed&&!previousPhysicalTool&&correct){toolConsumed=true;world.Primary(hit);}
+                if(instrumentFeedback)instrumentFeedback.PresentLock(correct?hit:null,scanning?ScanProgress:0,correct,scanning,source);
+                previousPhysicalTool=firing;return;
+            }
             if(world.hemodynamics)world.hemodynamics.ObserveScanner(scanning,hit);
             if(bioModes&&firing&&!scanning&&!bioModes.AllowsCurrentGoal())
             {
@@ -530,6 +549,7 @@ namespace BiologyVR.ArteryRoute.Journey
 
         void SetHovered(JourneyTarget target)
         {
+            if(world&&world.research)world.research.SetHovered(target);
             if (hoveredTarget == target) return;
             if (hoveredTarget) hoveredTarget.SetHovered(false);
             hoveredTarget = target;
@@ -542,7 +562,7 @@ namespace BiologyVR.ArteryRoute.Journey
             var goal = CurrentGoal();
             var target = Aim(AimSource(scanner));
             // Retain the explicit desktop focus fallback; XR always requires pointing.
-            if (!target && !XRSettings.isDeviceActive && world != null)
+            if (!target && !mission.FreeBloodResearch&&!XRSettings.isDeviceActive && world != null)
                 target = world.Find(goal != null ? goal.target : (mission.FreeResearchUnlocked ? "rbc" : ""));
 
             if (!IsUsableTarget(target))
@@ -557,6 +577,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public void Primary()
         {
             if (mission == null || mission.Goals == null || world == null) return;
+            if(mission.FreeBloodResearch){var researchTarget=Aim(AimSource(bioTool));if(researchTarget)world.Primary(researchTarget);return;}
             var goal = CurrentGoal();
             // World.Primary supports Scan for the generic HUD/validation API. The
             // instrument-specific BioTool must not invoke that scanner route.

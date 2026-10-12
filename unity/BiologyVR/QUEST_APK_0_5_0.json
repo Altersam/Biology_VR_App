@@ -1,0 +1,28 @@
+{
+  "utc": "2026-10-12T04:51:25.153893+00:00",
+  "version": "0.5.0",
+  "version_code": 6,
+  "device": "Meta Quest 2 / Pro / 3 / 3S",
+  "file": "BiologyVR_MetaQuest_v0.5.0.apk",
+  "local_path": "Z:\\YandexDisk\\ПетПроекты\\Biology_VR\\3д\\Unity\\bio_v0.2\\Builds\\MetaQuest\\BiologyVR_MetaQuest_v0.5.0.apk",
+  "bytes": 76372394,
+  "sha256": "faf3f11d6efa0a9a5f5fc69062681c03847b363aab955eec1e86cf524d11a959",
+  "verification": {
+    "manifest_readable": true,
+    "application_id": true,
+    "version_matches": true,
+    "min_sdk_29": true,
+    "target_sdk_34": true,
+    "arm64_only": true,
+    "unity_il2cpp": true,
+    "openxr_loader": true,
+    "quest_supported_devices": true,
+    "quest_vr_category": true,
+    "headtracking_feature": true,
+    "no_pico_manifest": true,
+    "no_pico_libraries": true,
+    "signature_valid": true
+  },
+  "hardware_verified": false,
+  "github_release_uploaded": false
+}

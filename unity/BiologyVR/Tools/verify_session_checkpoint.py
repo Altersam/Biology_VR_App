@@ -32,7 +32,11 @@ expected = {
     runtime / 'JourneyHemodynamicsCard.cs': ['ResolveCard', 'Released'],
     runtime / 'JourneyHemodynamicsInterface.cs': ['compactTheory', 'ГОТОВО'],
     editor / 'HemodynamicsExperimentBuilder.cs': ['Install In Vessel Hemodynamics Experiment', 'ProjectionMaterial'],
-    editor / 'BiologyReleaseVersion.cs': ['"0.4.0"', 'AndroidCode=5'],
+    editor / 'BiologyReleaseVersion.cs': ['"0.5.0"', 'AndroidCode=6'],
+    runtime / 'JourneyResearchTheory.cs': ['ScriptableObject', 'requiredForCompletion'],
+    runtime / 'JourneyResearchableObject.cs': ['NotInvestigated,Investigating,Investigated'],
+    runtime / 'JourneyResearchManager.cs': ['RequiredInvestigated', 'CompleteResearch', 'Capture()'],
+    editor / 'FreeBloodResearchBuilder.cs': ['Install Free First Blood Research', 'Гем и железо Fe²⁺'],
     scene: ['flowLayering: 1', 'splitMainFlow: 1', 'Flow-caught platelet 10', 'Reserve balance platelet 13', 'plateletCapture: {fileID: 1035892481}', 'm_DynamicPixelsPerUnit: 2.5', 'Projection frame brackets'],
 }
 for path, markers in expected.items():
@@ -54,10 +58,14 @@ files.update((root / 'Tools').glob('*controller_lifecycle*'))
 files.update((root / 'Tools').glob('*futuristic_holograms*'))
 files.update((root / 'Tools').glob('*futuristic_hologram*'))
 files.update((root / 'Tools').glob('*hemodynamics*'))
+files.update((root / 'Tools').glob('*free_blood_research*'))
+files.update((root / 'Tools').glob('*free_research*'))
 files.add(root / 'Tools/saved_journey_verify_ws.json')
 files.add(Path(__file__).resolve())
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Generated/HolographicScreens').rglob('*'))
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Generated/HemodynamicsExperiment').rglob('*'))
+files.update((root / 'Assets/BiologyVR/ArteryJourney/Generated/FreeBloodResearch').rglob('*'))
+files.update((root / 'Assets/BiologyVR/ArteryJourney/Reports/Polish/FreeBloodResearch').rglob('*'))
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Reports/Polish/HemodynamicsExperiment').rglob('*'))
 files.add(root / 'Assets/BiologyVR/ArteryRoute/Shaders/ArteryVisualV2.shader')
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Reports/Polish/FuturisticHolograms').rglob('*'))
@@ -65,7 +73,7 @@ files.update((root / 'Assets/BiologyVR/ArteryJourney/Generated/LacerationHemosta
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Reports/LacerationHemostasis').rglob('*'))
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Reports/Polish/XRControllers').rglob('*'))
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Reports/SessionRecovery').rglob('*'))
-for name in ['Hemodynamics_PC_Input.json', 'Laceration_PC_Input.json', 'Plaque_Challenge_PC.json', 'All_Scenes_Persistent_Blood.json', 'Mobile_All_Scenes_Persistent_Blood.json']:
+for name in ['Free_Blood_Research_PC_Input.json', 'Hemodynamics_PC_Input.json', 'Laceration_PC_Input.json', 'Plaque_Challenge_PC.json', 'All_Scenes_Persistent_Blood.json', 'Mobile_All_Scenes_Persistent_Blood.json']:
     files.add(root / 'Assets/BiologyVR/ArteryJourney/Reports/Polish/FlowPickup' / name)
 files.add(root / 'Assets/BiologyVR/ArteryJourney/Reports/Polish/VR_INPUT_PLAYTHROUGH_V7.md')
 for path in list(files):

@@ -43,7 +43,7 @@ def main():
             relative=source.relative_to(ROOT);expected.add(relative.as_posix())
             target=project/relative;target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
             copied.append((source,target))
-    for name in ('.gitignore','.gitattributes','README.md','READY_TO_OPEN_RU.md','WORKING_VERSION_RU.md','ARTERY_CORAL_V6_RU.md','GITHUB_UPLOAD_RU.md','META_QUEST_RU.md','PICO4_ENTERPRISE_RU.md','ACTIVE_TOOLS_AND_HOLOGRAMS_RU.md','CLEAN_HOLOGRAPHIC_FIRST_PASS_RU.md','HOLOGRAPHIC_SECOND_PASS_RU.md','BIOMEDICAL_LIVING_PASS_RU.md','GROWING_PLAQUE_CHALLENGE_RU.md','INFLUX_EMBOLI_AND_CONTROLS_RU.md','PICO4_BUILD_0_3_0_RU.md','PICO4_APK_0_3_0.json','LACERATION_HEMOSTASIS_RU.md','PERSISTENT_BLOOD_ALL_SCENES_RU.md','XR_CONTROLLER_LIFECYCLE_RU.md','FUTURISTIC_HOLOGRAMS_RU.md','HEMODYNAMICS_EXPERIMENT_RU.md','RELEASE_0_4_0_RU.md','PICO4_APK_0_4_0.json'):
+    for name in ('.gitignore','.gitattributes','README.md','READY_TO_OPEN_RU.md','WORKING_VERSION_RU.md','ARTERY_CORAL_V6_RU.md','GITHUB_UPLOAD_RU.md','META_QUEST_RU.md','PICO4_ENTERPRISE_RU.md','ACTIVE_TOOLS_AND_HOLOGRAMS_RU.md','CLEAN_HOLOGRAPHIC_FIRST_PASS_RU.md','HOLOGRAPHIC_SECOND_PASS_RU.md','BIOMEDICAL_LIVING_PASS_RU.md','GROWING_PLAQUE_CHALLENGE_RU.md','INFLUX_EMBOLI_AND_CONTROLS_RU.md','PICO4_BUILD_0_3_0_RU.md','PICO4_APK_0_3_0.json','LACERATION_HEMOSTASIS_RU.md','PERSISTENT_BLOOD_ALL_SCENES_RU.md','XR_CONTROLLER_LIFECYCLE_RU.md','FUTURISTIC_HOLOGRAMS_RU.md','HEMODYNAMICS_EXPERIMENT_RU.md','FREE_BLOOD_RESEARCH_RU.md','RELEASE_0_4_0_RU.md','PICO4_APK_0_4_0.json',f"RELEASE_{VERSION.replace('.', '_')}_RU.md",f"PICO4_APK_{VERSION.replace('.', '_')}.json",f"QUEST_APK_{VERSION.replace('.', '_')}.json"):
         if (ROOT/name).is_file():
             shutil.copy2(ROOT/name,project/name);copied.append((ROOT/name,project/name))
     # These are managed subtrees. Obsolete files are preserved in the verified backup.
@@ -68,7 +68,7 @@ def main():
         if relative.parts[:2]==('unity','BiologyVR') and relative.parts[2] in ('Library','Temp','Logs','UserSettings','GitHubUpload'):forbidden.append(relative.as_posix())
     oversized=[p.relative_to(REPO).as_posix() for p in upload if p.stat().st_size>=100*1024*1024]
     after=git('rev-parse','HEAD')
-    report={'utc':datetime.now(timezone.utc).isoformat(),'version':VERSION,'art':'Coral V6 + in-vessel hemodynamics + staged hemostasis + persistent bloodstream + XR lifecycle + futuristic holographic UI','repository':str(REPO),'remote':remote,
+    report={'utc':datetime.now(timezone.utc).isoformat(),'version':VERSION,'art':'Coral V6 + free blood research and molecular journal + in-vessel hemodynamics + staged hemostasis + persistent bloodstream + XR lifecycle + futuristic holographic UI','repository':str(REPO),'remote':remote,
             'passed':not failures and not forbidden and not oversized and before==after,'head_unchanged':before==after,'committed':False,'pushed':False,
             'verified_copies':len(copied),'upload_files':len(upload),'upload_bytes':sum(p.stat().st_size for p in upload),
             'mismatches':failures,'forbidden':forbidden,'oversized':oversized,'release_files':releases,'backup':backup['backup']}
