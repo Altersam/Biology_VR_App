@@ -23,5 +23,9 @@
     "signature_valid": true
   },
   "hardware_verified": false,
-  "github_release_uploaded": false
+  "github_release_uploaded": true,
+  "release_url": "https://github.com/Altersam/Biology_VR_App/releases/tag/v0.5.0",
+  "download_url": "https://github.com/Altersam/Biology_VR_App/releases/download/v0.5.0/BiologyVR_Pico4_v0.5.0.apk",
+  "source_commit": "e89446b073bd9bc00680ca2525174e7ebff4ad21",
+  "github_asset_digest_matches": true
 }

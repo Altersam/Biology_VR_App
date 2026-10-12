@@ -217,3 +217,10 @@ Quest: 76 372 394 байта, 0 errors / 12 warnings, Meta devices/category/head
 Ссылки, параметры и SHA-256 — **RELEASE_0_5_0_RU.md**.
 Локальные APK: `Builds/Pico4/BiologyVR_Pico4_v0.5.0.apk` и
 `Builds/MetaQuest/BiologyVR_MetaQuest_v0.5.0.apk`.
+
+Публикация: source/build commit `e89446b073bd9bc00680ca2525174e7ebff4ad21`
+отправлен в `Altersam/Biology_VR_App`. Release **v0.5.0** содержит оба APK
+и `SHA256SUMS_0_5_0.txt`; GitHub asset digest обоих APK совпадает с локальными.
+Pages deployment **success**, run **38206216380**; опубликованный WebGL
+подтверждает `productVersion: 0.5.0`. Unity возвращена к оригинальному проекту
+на Z: / Desktop target; master сохранён, Console 0 errors.
