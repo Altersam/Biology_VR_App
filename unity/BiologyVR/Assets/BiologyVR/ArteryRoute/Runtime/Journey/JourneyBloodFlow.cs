@@ -134,7 +134,7 @@ namespace BiologyVR.ArteryRoute.Journey
             {
                 if(!cells[i]||i>=offsets.Length||i>=lanesX.Length||i>=lanesY.Length)continue;
                 if(i>=visibleCellLimit){SetVisible(i,false);continue;}
-                if(continuousBackground&&continuousBackground.isActiveAndEnabled&&!pickups.ContainsKey(i))continue;
+                if(continuousBackground&&continuousBackground.isActiveAndEnabled&&(mission.world.bloodEntities||!pickups.ContainsKey(i)))continue;
                 pickups.TryGetValue(i,out var pickup);bool studying=pickup&&pickup.InStudyFlow;
                 if(studying&&pickup.Held){SetVisible(i,false);continue;}
                 float radial=Mathf.Sqrt(lanesX[i]*lanesX[i]+lanesY[i]*lanesY[i]);

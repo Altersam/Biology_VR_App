@@ -19,7 +19,7 @@ namespace BiologyVR.ArteryRoute.Editor
     {
         static Keyboard keyboard;static Mouse mouse;static KeyboardState keys;
         static Vector2 pendingDelta,pendingScroll,pointer;static ushort buttons;
-        static JourneyMission mission;static bool running,testingEmbolus,cursorMode,continuousOnly,plaqueOnly,lacerationOnly,persistenceOnly,mobilePersistence,hemodynamicsOnly,freeResearchOnly;
+        static JourneyMission mission;static bool running,testingEmbolus,cursorMode,continuousOnly,plaqueOnly,lacerationOnly,persistenceOnly,mobilePersistence,hemodynamicsOnly,freeResearchOnly,organismOnly,waveOnly;
         static readonly List<string> checks=new List<string>();
         const string Folder=ArteryPolishReview.Reports+"/FlowPickup";
         [MenuItem("Biology VR/Test Flow Cell Catch And Release Through PC Input")]
@@ -42,14 +42,18 @@ namespace BiologyVR.ArteryRoute.Editor
         public static void RunHemodynamics()=>Start(false,true,false,false,false,false,false,true);
         [MenuItem("Biology VR/Test All Free Blood Research Orders Through PC Input")]
         public static void RunFreeResearch()=>Start(false,true,false,false,false,false,false,false,true);
-        static void Start(bool embolus,bool cursor=false,bool continuous=false,bool plaque=false,bool laceration=false,bool persistence=false,bool mobilePool=false,bool hemodynamics=false,bool freeResearch=false)
+        [MenuItem("Biology VR/Test Connected Living Organism Through PC Input")]
+        public static void RunOrganism()=>Start(false,true,false,false,false,false,false,false,false,true);
+        [MenuItem("Biology VR/Test Connected Viral Wave Through PC Input")]
+        public static void RunImmuneWave()=>Start(false,true,false,false,false,false,false,false,false,true,true);
+        static void Start(bool embolus,bool cursor=false,bool continuous=false,bool plaque=false,bool laceration=false,bool persistence=false,bool mobilePool=false,bool hemodynamics=false,bool freeResearch=false,bool organism=false,bool wave=false)
         {
             mission=UnityEngine.Object.FindFirstObjectByType<JourneyMission>();
             if(!EditorApplication.isPlaying||running||!mission||(!embolus&&(mission.SceneNumber!=3||mission.StepIndex!=0)))throw new InvalidOperationException("Fresh Scene03 required: playing="+EditorApplication.isPlaying+" running="+running+" scene="+(mission?mission.SceneNumber:-1)+" step="+(mission?mission.StepIndex:-1));
-            testingEmbolus=embolus;cursorMode=cursor;continuousOnly=continuous;plaqueOnly=plaque;lacerationOnly=laceration;persistenceOnly=persistence;mobilePersistence=mobilePool;hemodynamicsOnly=hemodynamics;freeResearchOnly=freeResearch;running=true;EditorCoroutineUtility.StartCoroutineOwnerless(Guard(Test()));
+            testingEmbolus=embolus;cursorMode=cursor;continuousOnly=continuous;plaqueOnly=plaque;lacerationOnly=laceration;persistenceOnly=persistence;mobilePersistence=mobilePool;hemodynamicsOnly=hemodynamics;freeResearchOnly=freeResearch;organismOnly=organism;waveOnly=wave;running=true;EditorCoroutineUtility.StartCoroutineOwnerless(Guard(Test()));
         }
         static void Check(bool success,string text)
-        {checks.Add((success?"PASS: ":"BLOCKED: ")+text);if(!success)throw new InvalidOperationException(text);}
+        {checks.Add((success?"PASS: ":"BLOCKED: ")+text);if(organismOnly){Directory.CreateDirectory(Folder);File.WriteAllText(Folder+"/Connected_Organism_Progress.json",JsonConvert.SerializeObject(new{utc=DateTime.UtcNow,running,checks},Formatting.Indented));}if(!success)throw new InvalidOperationException(text);}
         static IEnumerator Guard(IEnumerator routine)
         {
             var stack=new Stack<IEnumerator>();stack.Push(routine);
@@ -67,9 +71,10 @@ namespace BiologyVR.ArteryRoute.Editor
             finally
             {
                 while(stack.Count>0)(stack.Pop() as IDisposable)?.Dispose();running=false;
-                string output=freeResearchOnly?"/Free_Blood_Research_PC_Input.json":hemodynamicsOnly?"/Hemodynamics_PC_Input.json":mobilePersistence?"/Mobile_All_Scenes_Persistent_Blood.json":persistenceOnly?"/All_Scenes_Persistent_Blood.json":lacerationOnly?"/Laceration_PC_Input.json":plaqueOnly?"/Plaque_Challenge_PC.json":continuousOnly?"/Continuous_Random_Flow.json":cursorMode?"/NativeCursor_PC_Input.json":testingEmbolus?"/Scene07_PC_Input.json":"/PC_Input.json";
-                string method=freeResearchOnly?"Fresh Scene03; real mouse/keyboard/XRI. Explicit Enter(3,false,true) fixtures reset only between 24 permutations; normal Enter fixtures test partial re-entry; no mission success API calls":hemodynamicsOnly?"Isolated Scene05/10 entry fixtures; actual Scanner F, held E/wheel TONUS, XRI physical card placement and normal Continue; no success APIs":persistenceOnly?"Isolated scene-entry fixtures 03–16 with normal travel; actual RMB mouse look, 90-second final-stage dwell; no mission success APIs":lacerationOnly?"Isolated Enter(11,false); real held E field capture/automatic adhesion, scanner and XRI biochemical cards; normal Continue; no mission success APIs":plaqueOnly?"Isolated Enter(6,false) fixture; real mouse/keyboard scan, shots, failure, automatic local retry and Continue; no success APIs":continuousOnly?"240 simulated seconds at timeScale 5; real forward/back mouse look; no scene reset or mission success APIs":cursorMode?"Native MouseState position/buttons/scroll and KeyboardState; isolated episode fixtures; no success APIs":testingEmbolus?"Isolated Scene07 fixture: all actions through keyboard/mouse input":"Actual keyboard/mouse Input System events; no mission success/enter APIs";
+                string output=waveOnly?"/Connected_Wave_PC.json":organismOnly?"/Connected_Organism_PC.json":freeResearchOnly?(mission.world.bloodEntities?"/Connected_Research_Orders_PC.json":"/Free_Blood_Research_PC_Input.json"):hemodynamicsOnly?"/Hemodynamics_PC_Input.json":mobilePersistence?"/Mobile_All_Scenes_Persistent_Blood.json":persistenceOnly?"/All_Scenes_Persistent_Blood.json":lacerationOnly?"/Laceration_PC_Input.json":plaqueOnly?"/Plaque_Challenge_PC.json":continuousOnly?"/Continuous_Random_Flow.json":cursorMode?"/NativeCursor_PC_Input.json":testingEmbolus?"/Scene07_PC_Input.json":"/PC_Input.json";
+                string method=freeResearchOnly?(mission.world.bloodEntities?"120 five-type permutations at timeScale 2; real MouseState/KeyboardState; explicit Enter/release fixtures between orders, normal partial re-entry, no success APIs":"Fresh Scene03; real mouse/keyboard/XRI. Explicit Enter(3,false,true) fixtures reset only between 24 permutations; normal Enter fixtures test partial re-entry; no mission success API calls"):hemodynamicsOnly?"Isolated Scene05/10 entry fixtures; actual Scanner F, held E/wheel TONUS, XRI physical card placement and normal Continue; no success APIs":persistenceOnly?"Isolated scene-entry fixtures 03–16 with normal travel; actual RMB mouse look, 90-second final-stage dwell; no mission success APIs":lacerationOnly?"Isolated Enter(11,false); real held E field capture/automatic adhesion, scanner and XRI biochemical cards; normal Continue; no success APIs":plaqueOnly?"Isolated Enter(6,false) fixture; real mouse/keyboard scan, shots, failure, automatic local retry and Continue; no success APIs":continuousOnly?"240 simulated seconds at timeScale 5; real forward/back mouse look; no scene reset or mission success APIs":cursorMode?"Native MouseState position/buttons/scroll and KeyboardState; isolated episode fixtures; no success APIs":testingEmbolus?"Isolated Scene07 fixture: all actions through keyboard/mouse input":"Actual keyboard/mouse Input System events; no mission success/enter APIs";
                 Directory.CreateDirectory(Folder);File.WriteAllText(Folder+output,JsonConvert.SerializeObject(new{utc=DateTime.UtcNow,passed=!checks.Exists(c=>c.StartsWith("BLOCKED")),mobilePoolBudget=mobilePersistence?180:360,method,checks},Formatting.Indented));
+                if(organismOnly)File.WriteAllText(Folder+"/Connected_Organism_Progress.json",JsonConvert.SerializeObject(new{utc=DateTime.UtcNow,running,checks},Formatting.Indented));
             }
         }
         static void Queue()
@@ -99,7 +104,9 @@ namespace BiologyVR.ArteryRoute.Editor
                 keyboard=InputSystem.AddDevice<Keyboard>();mouse=InputSystem.AddDevice<Mouse>();InputSystem.EnableDevice(keyboard);InputSystem.EnableDevice(mouse);keys=new KeyboardState();buttons=0;pendingDelta=pendingScroll=Vector2.zero;
                 pointer=new Vector2(Screen.width*.5f,Screen.height*.5f);
                 InputSystem.onBeforeUpdate+=Queue;InputSystem.onAfterUpdate+=UseTestDevices;
-                if(freeResearchOnly){yield return TestFreeResearch();yield break;}
+                if(waveOnly){mission.Enter(9,false);yield return Wait(.4f);yield return TestConnectedWave();yield break;}
+                if(organismOnly){yield return TestOrganism();yield break;}
+                if(freeResearchOnly){if(mission.world.bloodEntities)yield return TestConnectedResearchOrders();else yield return TestFreeResearch();yield break;}
                 if(hemodynamicsOnly){yield return TestHemodynamics();yield break;}
                 if(persistenceOnly){yield return TestPersistentAllScenes();yield break;}
                 if(lacerationOnly){yield return TestLaceration();yield break;}
@@ -559,6 +566,175 @@ namespace BiologyVR.ArteryRoute.Editor
             var blood=mission.world.GetComponent<JourneyContinuousBloodstream>();Check(Time.timeScale>0&&blood.NearbyMainCells>=90,"World, wall and saturated bloodstream continue during research and theory");
             yield return Press(Key.RightArrow,.12f);yield return Wait(10f);Check(mission.SceneNumber==4&&mission.Ready&&mission.world.IsEpisodeCompleted(3),"Actual Continue proceeds to existing wall lesson and remembers completed free research");
         }
+        static Transform FindBackgroundType(string type)
+        {
+            var stream=mission.world.bloodEntities.stream;var camera=mission.mover.viewCamera.transform;Transform result=null;float best=10;
+            foreach(var slot in mission.world.bloodEntities.slots)if(slot.index>=0&&slot.type==type&&slot.contact.enabled&&ClearBloodSight(slot.target.transform)&&(type!="phagocyte"||slot.target.GetComponent<JourneyPhagocyteEntity>().RemainingCapacity>0&&!slot.target.GetComponent<JourneyPhagocyteEntity>().Busy)){float distance=Vector3.Distance(camera.position,slot.target.transform.position);if(distance<best){best=distance;result=slot.target.transform;}}
+            for(int i=0;i<stream.flow.VisibleCellLimit;i++)
+            {
+                var cell=stream.flow.cells[i];if(stream.Leased(i)||!cell.GetComponent<Renderer>().enabled||JourneyBloodInteractionPool.ResearchType(stream.flow.species[i])!=type||type=="phagocyte"&&!mission.world.bloodEntities.HasPhagocyteCapacity(i))continue;
+                float distance=Vector3.Distance(camera.position,cell.position);if(distance<best&&distance>1.4f&&ClearBloodSight(cell)){best=distance;result=cell;}
+            }
+            return result;
+        }
+        static bool ClearBloodSight(Transform target)
+        {
+            var camera=mission.mover.viewCamera.transform;var delta=target.position-camera.position;var owner=target.GetComponent<JourneyTarget>();
+            foreach(var hit in Physics.RaycastAll(new Ray(camera.position,delta.normalized),delta.magnitude,~0,QueryTriggerInteraction.Collide))
+            {if(hit.collider.transform.IsChildOf(mission.mover.origin.transform)||hit.collider.GetComponentInParent<JourneyTarget>()==owner&&owner)continue;if(hit.collider.isTrigger&&!hit.collider.GetComponentInParent<JourneyTarget>())continue;if(hit.distance<delta.magnitude-.15f)return false;}return true;
+        }
+        static IEnumerable<string[]> ResearchPermutations(string[] remaining)
+        {
+            if(remaining.Length==0){yield return new string[0];yield break;}
+            foreach(var first in remaining)foreach(var rest in ResearchPermutations(remaining.Where(id=>id!=first).ToArray()))yield return new[]{first}.Concat(rest).ToArray();
+        }
+        static IEnumerator TestConnectedResearchOrders()
+        {
+            var world=mission.world;var research=world.research;float timeScale=Time.timeScale;int orders=0;
+            try
+            {
+                Time.timeScale=2;
+                foreach(var order in ResearchPermutations(new[]{"phagocyte","rbc","leukocyte","platelet","plasma"}))
+                {
+                    world.analysis.Close();foreach(var slot in world.bloodEntities.slots)world.bloodEntities.Release(slot.target,true);
+                    mission.Enter(3,false,true);yield return Wait(.2f);
+                    Check(research.RequiredInvestigated==0&&research.OptionalInvestigated==0&&world.analysis.molecules.All(t=>!t.gameObject.activeInHierarchy),"Independent empty journal and no ambient molecules at order "+(orders+1));
+                    yield return Press(Key.RightArrow,.06f);Check(mission.SceneNumber==3&&!mission.Complete,"Continue is gated before research in order "+(orders+1));
+                    for(int i=0;i<order.Length;i++)
+                    {
+                        yield return ScanBloodType(order[i]);if(research.RequiredInvestigated!=i+1)checks.Add("Order count diagnostic: "+string.Join(",",research.Capture().Select(s=>s.id+":"+s.state)));Check(research.RequiredInvestigated==i+1&&mission.Complete==(i==4),"Exact independent progress "+(i+1)+"/5: "+string.Join(" → ",order));
+                        if(orders==0&&i==1){var snapshot=research.Capture().Select(s=>s.id+":"+s.state+":"+s.page).ToArray();mission.Enter(4,false);yield return Wait(.2f);mission.Enter(3,false);yield return Wait(.2f);Check(research.RequiredInvestigated==2&&snapshot.SequenceEqual(research.Capture().Select(s=>s.id+":"+s.state+":"+s.page)),"Normal partial stage re-entry preserves journal states and pages");}
+                    }
+                    int before=research.UniqueScans,announced=research.Introductions;yield return ScanBloodType(order[0]);
+                    Check(research.UniqueScans==before&&research.Introductions==announced&&research.RequiredInvestigated==5&&mission.SceneNumber==3,"Repeat investigation is idempotent and never auto-transitions in order "+(orders+1));
+                    orders++;File.WriteAllText(Folder+"/Connected_Research_Orders_Progress.json",JsonConvert.SerializeObject(new{utc=DateTime.UtcNow,running=true,orders,total=120,lastOrder=order},Formatting.Indented));
+                }
+                Check(orders==120,"All 120 five-population orders complete through actual Scanner input");
+            }
+            finally{Time.timeScale=timeScale;File.WriteAllText(Folder+"/Connected_Research_Orders_Progress.json",JsonConvert.SerializeObject(new{utc=DateTime.UtcNow,running=false,orders,total=120},Formatting.Indented));}
+            yield return Press(Key.RightArrow,.12f);yield return Wait(10);Check(mission.SceneNumber==4&&mission.Ready&&world.IsEpisodeCompleted(3),"Normal Continue follows completed five-type research to the original vessel-wall lesson");
+        }
+        static IEnumerator ScanBloodType(string type)
+        {
+            Transform candidate=null;float began=Time.time;mission.world.bloodEntities.stream.RequestInflux(type=="rbc"?"erythrocyte":type=="plasma"?"albumin":type);
+            if(!FindBackgroundType(type)){cursorMode=false;yield return AimAt(mission.mover.viewCamera.transform.position+mission.mover.path.Forward(mission.mover.Distance)*5);cursorMode=true;}
+            float requested=Time.time;
+            while(!(candidate=FindBackgroundType(type))&&Time.time-began<60){if(Time.time-requested>6){mission.world.bloodEntities.stream.RequestInflux(type=="rbc"?"erythrocyte":type=="plasma"?"albumin":type);cursorMode=false;yield return AimAt(mission.mover.viewCamera.transform.position+mission.mover.path.Forward(mission.mover.Distance)*5);cursorMode=true;requested=Time.time;}yield return Wait(.15f);}
+            Check(candidate,"A concrete "+type+" enters from the ordinary blood population");
+            if(freeResearchOnly){yield return ScanResearchTypeHeld(type,candidate);yield break;}
+            cursorMode=false;yield return AimAt(candidate.position);cursorMode=true;keys=new KeyboardState();began=Time.time;
+            while(Time.time-began<25)
+            {
+                if(!candidate.gameObject.activeInHierarchy||!ClearBloodSight(candidate)){keys=new KeyboardState();var next=FindBackgroundType(type);if(next)candidate=next;}
+                JourneyTarget promoted=null;float closest=10;foreach(var slot in mission.world.bloodEntities.slots)if(slot.type==type&&slot.index>=0&&ClearBloodSight(slot.target.transform)&&(type!="phagocyte"||slot.target.GetComponent<JourneyPhagocyteEntity>().RemainingCapacity>0&&!slot.target.GetComponent<JourneyPhagocyteEntity>().Busy)){float distance=Vector3.Distance(slot.target.transform.position,mission.mover.viewCamera.transform.position);if(distance<closest){closest=distance;promoted=slot.target;}}
+                var targetPoint=promoted?promoted.GetComponent<Collider>().bounds.center:candidate.position;var viewport=mission.mover.viewCamera.WorldToViewportPoint(targetPoint);
+                if(viewport.z<=0||viewport.x<.05f||viewport.x>.95f||viewport.y<.05f||viewport.y>.95f){keys=new KeyboardState();cursorMode=false;yield return AimAt(targetPoint);cursorMode=true;}
+                pointer=mission.mover.viewCamera.WorldToScreenPoint(targetPoint);yield return Wait(.03f);
+                var ray=mission.GetComponent<JourneyInput>().DesktopControls.PointerRay();bool correct=false;float nearest=12;
+                foreach(var slot in mission.world.bloodEntities.slots)if(slot.index>=0&&slot.contact.enabled&&slot.contact.Raycast(ray,out var contact,nearest)){nearest=contact.distance;correct=slot.type==type;}
+                if(nearest==12&&mission.world.bloodEntities.stream.Pick(ray,12,out int picked,out _))correct=JourneyBloodInteractionPool.ResearchType(mission.world.bloodEntities.stream.flow.species[picked])==type;
+                var liveInput=mission.GetComponent<JourneyInput>();if(liveInput.ScannerBlockedByUi){keys=new KeyboardState();yield return Wait(.08f);cursorMode=false;yield return AimAt(targetPoint);cursorMode=true;}
+                keys=new KeyboardState(Key.F);
+                if(mission.SceneNumber==3&&mission.world.research.Find(type).State==JourneyResearchState.Investigated&&mission.world.research.Focused?.theory.id==type&&mission.GetComponent<JourneyInput>().ScanProgress>=.99f)break;
+                if(mission.SceneNumber!=3&&promoted&&mission.GetComponent<JourneyInput>().LockedTarget==promoted&&promoted.GetComponent<JourneyPhagocyteEntity>()?.State==JourneyPhagocyteState.Activated)break;
+            }
+            keys=new KeyboardState();yield return Wait(.15f);
+            if(mission.SceneNumber!=3&&!mission.world.immunity.phagocytes.Any(c=>c.State==JourneyPhagocyteState.Activated&&c.gameObject.activeInHierarchy&&c.RemainingCapacity>0)){var input=mission.GetComponent<JourneyInput>();checks.Add("Late activation diagnostic: hit="+(input.LockedTarget?input.LockedTarget.name:"none")+" step="+mission.StepIndex+" blocked="+input.ScannerBlockedByUi+" obstacle="+(input.AimObstruction?input.AimObstruction.name:"none")+" candidate="+candidate.position+" phagStates="+string.Join(",",mission.world.immunity.phagocytes.Select(c=>c.name+":"+c.State+":"+c.RemainingCapacity+":"+c.gameObject.activeSelf)));}
+            if(mission.SceneNumber==3&&mission.world.research.Find(type).State!=JourneyResearchState.Investigated){var input=mission.GetComponent<JourneyInput>();checks.Add("Live type scan diagnostic: requested="+type+" focused="+(mission.world.research.Focused?mission.world.research.Focused.theory.id:"none")+" lock="+(input.LockedTarget?input.LockedTarget.name:"none")+" progress="+input.ScanProgress+" canInvestigate="+mission.world.research.CanInvestigate(input.LockedTarget)+" leases="+string.Join(",",mission.world.bloodEntities.slots.Select(s=>s.type+":"+s.index+":"+s.target.gameObject.activeSelf)));}
+            Check(mission.SceneNumber==3?mission.world.research.Find(type).State==JourneyResearchState.Investigated:mission.world.immunity.phagocytes.Any(c=>c.State==JourneyPhagocyteState.Activated),"Real Scanner promotes and investigates/activates selected flowing "+type);
+        }
+        static IEnumerator ScanResearchTypeHeld(string type,Transform candidate)
+        {
+            JourneyTarget held=null;float began=Time.time;keys=new KeyboardState();
+            while(!held&&Time.time-began<30)
+            {
+                if(!candidate||!candidate.gameObject.activeInHierarchy)candidate=FindBackgroundType(type);
+                if(!candidate){mission.world.bloodEntities.stream.RequestInflux(type=="rbc"?"erythrocyte":type=="plasma"?"albumin":type);cursorMode=false;yield return AimAt(mission.mover.viewCamera.transform.position+mission.mover.path.Forward(mission.mover.Distance)*5);cursorMode=true;yield return Wait(.3f);continue;}
+                cursorMode=false;yield return AimAt(candidate.position);cursorMode=true;pointer=mission.mover.viewCamera.WorldToScreenPoint(candidate.position);yield return null;buttons=1;
+                float catching=Time.time;
+                while(Time.time-catching<.6f&&!held){pointer=mission.mover.viewCamera.WorldToScreenPoint(candidate.position);yield return null;held=mission.world.bloodEntities.slots.Where(s=>s.type==type&&s.index>=0&&s.grab.isSelected&&s.target.grabbed).Select(s=>s.target).FirstOrDefault();}
+                if(!held){buttons=0;yield return Wait(.1f);candidate=FindBackgroundType(type);}
+            }
+            Check(held,"Actual LMB selects the requested concrete pool instance: "+type);
+            pendingScroll=new Vector2(0,Mathf.Round((1.5f-mission.GetComponent<JourneyInput>().DesktopControls.GrabDepth)/JourneyDesktopControls.DepthPerWheelStep)*JourneyDesktopControls.WheelUnitsPerStep);yield return Wait(.4f);began=Time.time;
+            var input=mission.GetComponent<JourneyInput>();
+            while(Time.time-began<8)
+            {
+                if(input.LockedTarget!=held){keys=new KeyboardState();pointer=mission.mover.viewCamera.WorldToScreenPoint(held.GetComponent<Collider>().bounds.center);}
+                else keys=new KeyboardState(Key.F);
+                yield return null;
+                if(mission.world.research.Find(type).State==JourneyResearchState.Investigated&&mission.world.research.Focused?.theory.id==type&&input.ScanProgress>=.99f)break;
+            }
+            keys=new KeyboardState();buttons=0;yield return Wait(.15f);
+            Check(mission.world.research.Find(type).State==JourneyResearchState.Investigated&&mission.world.research.Focused?.theory.id==type,"Real held Scanner investigates the selected population: "+type);
+        }
+        static IEnumerator TestOrganism()
+        {
+            var world=mission.world;var stream=world.bloodEntities.stream;Directory.CreateDirectory(LivingOrganismJourneyBuilder.Reports);yield return Wait(.4f);
+            Check(stream.flow.cells.Length==360&&stream.BackgroundCount==360&&stream.flow.cells.All(c=>c.GetComponents<Collider>().Length==0&&c.GetComponents<Rigidbody>().Length==0),"Existing 360-cell background pool remains lightweight without mass physics or XR components");
+            Check(world.bloodEntities.slots.Length==7&&world.research.RequiredCount==5,"Seven bounded interactive representatives serve five mandatory blood populations");
+            Check(world.analysis.molecules.All(t=>!t.gameObject.activeInHierarchy),"Large O2/CO2/Hb/heme are absent from ordinary flow before nested analysis");
+            ArteryPolishReview.Capture(mission.mover.viewCamera,"LivingOrganismJourney/01_Live_Blood_Background.png");
+            foreach(var type in new[]{"phagocyte","platelet","leukocyte","plasma","rbc"})yield return ScanBloodType(type);
+            Check(mission.Complete&&world.research.RequiredInvestigated==5,"Phagocyte-first free research independently completes five populations");
+            ArteryPolishReview.Capture(mission.mover.viewCamera,"LivingOrganismJourney/02_Selected_Pool_Cell_Research.png");
+            var rbc=world.Find("rbc");keys=new KeyboardState(Key.F);float deepStart=Time.time;while(!world.analysis.Opened&&Time.time-deepStart<6){var point=rbc.GetComponent<Collider>().bounds.center;var v=mission.mover.viewCamera.WorldToViewportPoint(point);if(v.z<=0||v.x<.05f||v.x>.95f||v.y<.05f||v.y>.95f){cursorMode=false;yield return AimAt(point);cursorMode=true;}pointer=mission.mover.viewCamera.WorldToScreenPoint(point);yield return Wait(.03f);}keys=new KeyboardState();yield return Wait(.15f);if(!world.analysis.Opened){var input=mission.GetComponent<JourneyInput>();checks.Add("Deep diagnostic: rootActive="+rbc.gameObject.activeSelf+" focus="+(world.research.Focused?world.research.Focused.theory.id:"none")+" hit="+(input.LockedTarget?input.LockedTarget.name:"none")+" status="+world.research.Find("rbc").State);}Check(world.analysis.Opened,"Held Deep Scan opens the selected RBC's local educational content");
+            yield return ResearchScan("hemoglobin");yield return ResearchScan("heme");yield return ResearchScan("oxygen");yield return ResearchScan("co2");Check(world.research.OptionalInvestigated==4,"Hb, heme/Fe2+, O2 and CO2 are accessible only through nested analysis");
+            ArteryPolishReview.Capture(mission.mover.viewCamera,"LivingOrganismJourney/03_Deep_Scan_RBC_Contents.png");
+            mission.Enter(8,false);yield return Wait(.3f);Check(world.immunity.LiveCount==1&&mission.Goals.Count==4,"First encounter contains one flowing virus and one cell-manipulation tutorial");
+            var virus=world.immunity.TutorialVirus;cursorMode=false;yield return AimAt(virus.transform.position);cursorMode=true;yield return Scan("virus-study");
+            ArteryPolishReview.Capture(mission.mover.viewCamera,"LivingOrganismJourney/04_First_Flowing_Virus.png");
+            yield return ScanBloodType("phagocyte");Check(mission.Current?.action==StudyAction.Capture,"Scanner initiates active phagocyte state in the model before BioTool capture");
+            ArteryPolishReview.Capture(mission.mover.viewCamera,"LivingOrganismJourney/05_Scanner_Activated_Phagocyte.png");
+            yield return LaunchPhagocytePC(true);yield return Wait(3.1f);Check(!mission.Complete&&world.immunity.LiveCount==1&&world.immunity.phagocytes.Any(c=>c.RemainingCapacity==3),"First miss preserves virus and phagocyte capacity for reuse without punishment");
+            yield return LaunchPhagocytePC(false);float start=Time.time;bool engulfCaptured=false;while(!mission.Complete&&Time.time-start<8){if(!engulfCaptured&&world.immunity.phagocytes.Any(c=>c.State==JourneyPhagocyteState.Phagocytosis&&c.stateAge>.55f)){ArteryPolishReview.Capture(mission.mover.viewCamera,"LivingOrganismJourney/08_Gradual_Phagocytosis.png");engulfCaptured=true;}yield return Wait(.1f);}
+            Check(mission.Complete&&world.immunity.TutorialCompleted&&world.immunity.Neutralized==1&&world.immunity.LiveCount==0,"One actual launch and gradual phagocytosis complete the tutorial, without a wave");
+            yield return Press(Key.RightArrow,.12f);yield return Wait(4f);Check(mission.SceneNumber==9&&world.immunity.TutorialCompleted&&mission.Current?.target=="immune-engulf","Normal continuation reuses the learned mechanism in a blood-filled wave");
+            yield return TestConnectedWave();
+            mission.Enter(8,false);yield return Wait(.25f);Check(mission.Complete&&world.immunity.LiveCount==0,"Completed first-virus tutorial is remembered and does not spawn or repeat on normal re-entry");
+        }
+        static IEnumerator TestConnectedWave()
+        {
+            var world=mission.world;var stream=world.bloodEntities.stream;
+            float waveStart=Time.time;int attempts=0;
+            while(!mission.Complete&&Time.time-waveStart<220)
+            {
+                if(!world.immunity.phagocytes.Any(c=>c.gameObject.activeInHierarchy&&c.State==JourneyPhagocyteState.Activated&&c.RemainingCapacity>0))yield return ScanBloodType("phagocyte");
+                while(world.immunity.LiveCount==0&&!mission.Complete)yield return Wait(.1f);if(mission.Complete)break;
+                int before=world.immunity.Neutralized;yield return LaunchPhagocytePC(false);float awaiting=Time.time;
+                while(world.immunity.Neutralized==before&&Time.time-awaiting<5)yield return Wait(.1f);attempts++;
+                if(world.immunity.Neutralized>0&&world.immunity.Neutralized%3==0)ArteryPolishReview.Capture(mission.mover.viewCamera,"LivingOrganismJourney/09_Later_Wave_Within_Blood.png");
+            }
+            checks.Add("Later wave elapsed="+(Time.time-waveStart)+" attempts="+attempts+" neutralized="+world.immunity.Neutralized+" missed="+world.immunity.Missed+" load="+mission.ViralLoad+" maximumLive="+world.immunity.MaximumLive+" nearbyCells="+stream.NearbyMainCells);
+            Check(mission.Complete&&world.immunity.Neutralized>=12&&world.immunity.MaximumLive>1&&mission.ViralLoad<1&&stream.NearbyMainCells>70,"Later multi-phase viral population uses the same cells inside normal saturated blood and clears Viral Load before completion");
+        }
+        static IEnumerator LaunchPhagocytePC(bool miss)
+        {
+            var immunity=mission.world.immunity;float recovery=Time.time;while(!immunity.phagocytes.Any(c=>c.State==JourneyPhagocyteState.Activated&&c.gameObject.activeInHierarchy&&c.RemainingCapacity>0)&&Time.time-recovery<5)yield return Wait(.08f);
+            var cell=immunity.phagocytes.Where(c=>c.State==JourneyPhagocyteState.Activated&&c.gameObject.activeInHierarchy&&c.RemainingCapacity>0).OrderBy(c=>Vector3.Distance(c.transform.position,mission.mover.viewCamera.transform.position)).First();cursorMode=false;yield return AimAt(cell.target.GetComponent<Collider>().bounds.center);cursorMode=true;keys=new KeyboardState(Key.E);float began=Time.time;
+            while(!immunity.Held&&Time.time-began<3){var capturePoint=cell.target.GetComponent<Collider>().bounds.center;var v=mission.mover.viewCamera.WorldToViewportPoint(capturePoint);if(v.z<=0||v.x<.05f||v.x>.95f||v.y<.05f||v.y>.95f){cursorMode=false;yield return AimAt(capturePoint);cursorMode=true;}pointer=mission.mover.viewCamera.WorldToScreenPoint(capturePoint);yield return Wait(.03f);}
+            if(immunity.Held!=cell){var input=mission.GetComponent<JourneyInput>();var contact=cell.target.GetComponent<Collider>();checks.Add("Immune capture diagnostic: state="+cell.State+" held="+(immunity.Held?immunity.Held.name:"none")+" mode="+input.GetComponent<BioToolModeController>().CurrentMode+" hit="+(input.LockedTarget?input.LockedTarget.name:"none")+" position="+cell.transform.position+" distance="+Vector3.Distance(cell.transform.position,mission.mover.viewCamera.transform.position)+" collider="+contact.enabled+" bounds="+contact.bounds+" blocked="+input.ToolBlockedByUi+" step="+mission.StepIndex);}
+            Check(immunity.Held==cell,"Actual held BioTool Capture attracts the active phagocyte rather than firing a projectile");yield return Wait(.9f);
+            var slot=mission.world.bloodEntities.Slot(cell.target);var meshSize=Vector3.Scale(slot.body.sharedMesh.bounds.size,slot.body.transform.lossyScale);float diameter=Mathf.Max(meshSize.x,Mathf.Max(meshSize.y,meshSize.z));
+            if(diameter>.46f||slot.legacyRenderers.Any(r=>r.enabled))checks.Add("Held geometry diagnostic: cell="+cell.name+" rootScale="+cell.transform.lossyScale+" diameter="+diameter+" bodyScale="+cell.body.transform.lossyScale+" legacy="+string.Join(",",slot.legacyRenderers.Select(r=>r.name+":"+r.enabled)));
+            Check(diameter<=.46f&&slot.legacyRenderers.All(r=>!r.enabled),"Held cell retains lightweight pool size and hides its legacy study display");
+            if(immunity.Tutorial)ArteryPolishReview.Capture(mission.mover.viewCamera,"LivingOrganismJourney/06_BioTool_Holds_Phagocyte.png");
+            pendingScroll=new Vector2(0,-13*JourneyDesktopControls.WheelUnitsPerStep);yield return Wait(.2f);Check(immunity.PullDistance>.24f&&immunity.ChargeProgress>.99f&&immunity.trajectory.enabled,"Continuous held field clamps pull to 25cm and shows blood-drift trajectory");
+            var camera=mission.mover.viewCamera;var virus=immunity.Tutorial?immunity.TutorialVirus:immunity.viruses.Where(v=>v.Live&&v.State!=JourneyImmuneVirusState.Engaged&&v.State!=JourneyImmuneVirusState.BeingPhagocytosed).OrderBy(v=>Vector3.Distance(camera.transform.position,v.transform.position)).First();var point=miss?camera.transform.position+mission.mover.path.Up(mission.mover.Distance)*4:ImmuneInterceptPoint(immunity,virus,camera.transform.position,1.2f);
+            cursorMode=false;yield return AimAt(point);cursorMode=true;float settling=Time.time;
+            while(Time.time-settling<1.1f){point=miss?camera.transform.position+mission.mover.path.Up(mission.mover.Distance)*4:ImmuneInterceptPoint(immunity,virus,camera.transform.position,1.2f);yield return AimAt(point);yield return Wait(.03f);}
+            if(immunity.Tutorial)ArteryPolishReview.Capture(mission.mover.viewCamera,"LivingOrganismJourney/07_Pulled_Cell_And_Trajectory.png");keys=new KeyboardState();yield return Wait(.15f);
+            Check(cell.State==JourneyPhagocyteState.Launched||cell.State==JourneyPhagocyteState.Phagocytosis,"Trigger release launches the actual phagocyte with additive blood-flow velocity");
+        }
+        internal static Vector3 ImmuneInterceptPoint(JourneyInnateImmunity immunity,JourneyImmuneVirus virus,Vector3 origin,float heldDistance)
+        {
+            // Solve a lead from observable motion and the public trajectory model;
+            // the only intervention is still normal mouse/controller aiming.
+            Vector3 viralVelocity=immunity.world.mover.path.Forward(virus.arc)*virus.speed;
+            Vector3 drift=immunity.BloodVelocity(origin),bestDirection=(virus.transform.position-origin).normalized;float error=float.MaxValue;
+            for(float t=.06f;t<=2.7f;t+=.03f){Vector3 delta=virus.transform.position+viralVelocity*t-origin-drift*t;float travel=heldDistance+4.2f*(1-Mathf.Exp(-.7f*t))/.7f;float difference=Mathf.Abs(delta.magnitude-travel);if(difference<error){error=difference;bestDirection=delta.normalized;}}
+            return origin+bestDirection*8;
+        }
         static IEnumerator TestPlacement()
         {
             mission.Enter(12,false);yield return Wait(.4f);var puzzle=mission.world.hemostasisPuzzle;
@@ -664,7 +840,7 @@ namespace BiologyVR.ArteryRoute.Editor
         {keys=new KeyboardState(key);yield return Wait(duration);keys=new KeyboardState();yield return Wait(.12f);}
         static IEnumerator Wait(float time)
         {
-            float start=Time.time;double deadline=EditorApplication.timeSinceStartup+10;
+            float start=Time.time;double deadline=EditorApplication.timeSinceStartup+Mathf.Max(12,time*2+5);
             while(Time.time-start<time){if(!EditorApplication.isPlaying||EditorApplication.isPaused||EditorApplication.timeSinceStartup>deadline)throw new InvalidOperationException("Player input loop did not advance");yield return null;}
         }
     }

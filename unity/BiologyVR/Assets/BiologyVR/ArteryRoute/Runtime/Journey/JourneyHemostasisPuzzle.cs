@@ -164,7 +164,7 @@ namespace BiologyVR.ArteryRoute.Journey
             bool accepted=m.SceneNumber==13||m.Accept(StudyAction.Direct,item.strand?"fibrin":"platelet");ProcessingPlacement=false;
             if(!accepted)return;
             item.SetPlacementSlot(slot);item.SetPlaced(true);StartCoroutine(Snap(item.transform,destination));
-            if(item.strand)Connections++;else{Attached++;SetPlatelet(item,Activated||adhesion);}
+            if(item.strand)Connections++;else{Attached++;SetPlatelet(item,Activated||adhesion);if(Attached>1)foreach(var platelet in platelets)if(platelet.Placed){var state=platelet.GetComponent<JourneyPlateletEntity>();if(state)state.SetState(JourneyPlateletState.Aggregated);}}
             if(hand){var node=hand.name.Contains("Left")?XRNode.LeftHand:XRNode.RightHand;var device=InputDevices.GetDeviceAtXRNode(node);if(device.isValid)device.SendHapticImpulse(0,.12f,.04f);}
             if(item.strand&&Connections==strands.Length&&m.SceneNumber==12)world.StartPhysicalFibrinGrowth();
             if(m.SceneNumber==13)world.SetPhysicalPlateletCount(Attached);

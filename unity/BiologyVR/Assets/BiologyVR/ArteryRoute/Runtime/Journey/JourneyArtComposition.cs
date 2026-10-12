@@ -83,7 +83,7 @@ namespace BiologyVR.ArteryRoute.Journey
         {
             point=Vector3.zero;if(!world||!world.mission)return false;
             int scene=world.mission.SceneNumber;var path=world.mover.path;
-            if(scene==8&&world.virusInspection){point=world.virusInspection.FocusPoint;return true;}
+            if(scene==8&&world.virusInspection&&!world.immunity){point=world.virusInspection.FocusPoint;return true;}
             if(scene==9){point=path.Offset(path.Anchor(9)+7,0,0);return true;}
             if(scene==4||scene==6){float s=path.Anchor(scene)+(scene==4?3:4);point=path.Offset(s,path.Radius(s)-.5f,0);return true;}
             if(scene==7||scene==8||scene==9||scene==15)

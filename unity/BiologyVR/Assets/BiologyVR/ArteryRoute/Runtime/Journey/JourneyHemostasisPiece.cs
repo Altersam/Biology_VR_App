@@ -33,7 +33,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(args.isCanceled||Held||!puzzle||!isActiveAndEnabled)return;
             puzzle.PlaceReleased(this,args.interactorObject.transform);
         }
-        public void SetPlaced(bool value){Placed=value;if(Grab)Grab.enabled=!value;}
+        public void SetPlaced(bool value){Placed=value;if(Grab)Grab.enabled=!value;var state=GetComponent<JourneyPlateletEntity>();if(state)state.SetState(value?JourneyPlateletState.Adhered:JourneyPlateletState.Flowing);}
         public void SetPlacementSlot(int slot){PlacementSlot=slot;}
         public void EnableBalanceGrab(){if(Grab)Grab.enabled=true;}
     }

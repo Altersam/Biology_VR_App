@@ -63,6 +63,8 @@ namespace BiologyVR.ArteryRoute.Journey
         BioToolModeController bioModes;
         float nextAssaultShot;
         float nextPlaqueShot;
+        float deepScanAge;
+        Transform leftHand,rightHand;
         public const float AssaultFireInterval=.18f;
         void Awake()
         {
@@ -158,6 +160,16 @@ namespace BiologyVR.ArteryRoute.Journey
             // OnDisable clears the queue; public HUD methods remain callable while disabled.
             pendingScan = pendingTool = false;
             if (!isActiveAndEnabled) return;
+            if(world.bloodEntities&&world.bloodEntities.Active&&(useExplicitAimSources||mover.UsingTrackedInput||XRSettings.isDeviceActive))
+            {
+                if(!leftHand||!rightHand)foreach(var hand in mover.origin.GetComponentsInChildren<Transform>(true)){if(hand.name=="Left Controller")leftHand=hand;else if(hand.name=="Right Controller")rightHand=hand;}
+                int before=world.bloodEntities.Acquisitions;
+                // Register the bounded near-hover proxy before XRI's grip edge.
+                // Proximity alone does not begin or complete journal research.
+                if(leftHand)world.bloodEntities.PromoteNear(leftHand.position);
+                if(rightHand)world.bloodEntities.PromoteNear(rightHand.position);
+                if(world.bloodEntities.Acquisitions!=before)Physics.SyncTransforms();
+            }
             // Poll live actions as well as subscribing: UI/focus cancellations or
             // enable cycles must not leave a cached held/released state stranded.
             if(!uiGuard){var hud=GetComponent<JourneyHud>();if(hud)uiGuard=hud.inputGuard;}
@@ -176,7 +188,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public void SetUiBlocking(bool scannerBlocked,bool toolBlocked)
         {
             if(scannerBlocked&&!ScannerBlockedByUi){ScanProgress=0;scanTarget=null;scanConsumed=false;ScannerHeld=false;}
-            if(toolBlocked&&!ToolBlockedByUi){ChargeProgress=0;chargeTarget=null;toolConsumed=false;ToolHeld=false;AdjustingTone=false;ToneStability=0;if(world&&world.EmbolusCaptured)world.ReleaseEmbolus();if(plateletCapture)plateletCapture.Release();}
+            if(toolBlocked&&!ToolBlockedByUi){ChargeProgress=0;chargeTarget=null;toolConsumed=false;ToolHeld=false;AdjustingTone=false;ToneStability=0;if(world&&world.EmbolusCaptured)world.ReleaseEmbolus();if(world&&world.immunity)world.immunity.CancelHold();if(plateletCapture)plateletCapture.Release();}
             ScannerBlockedByUi=scannerBlocked;ToolBlockedByUi=toolBlocked;
         }
         public Vector3 GuideEndpoint(Transform source,out bool targetContact)
@@ -193,7 +205,7 @@ namespace BiologyVR.ArteryRoute.Journey
             return ray.GetPoint(distance);
         }
         public void CancelInstrumentProgress()
-        {ScannerHeld=ToolHeld=false;ScanProgress=ChargeProgress=0;scanTarget=chargeTarget=LockedTarget=null;LockedContact=null;scanConsumed=toolConsumed=previousPhysicalTool=desktopFieldActive=false;AdjustingTone=false;ToneStability=0;if(world)world.ReleaseEmbolus();if(plateletCapture)plateletCapture.Release();}
+        {ScannerHeld=ToolHeld=false;ScanProgress=ChargeProgress=0;scanTarget=chargeTarget=LockedTarget=null;LockedContact=null;scanConsumed=toolConsumed=previousPhysicalTool=desktopFieldActive=false;AdjustingTone=false;ToneStability=0;if(world)world.ReleaseEmbolus();if(world&&world.immunity)world.immunity.CancelHold();if(plateletCapture)plateletCapture.Release();}
 
         /// <summary>Shared controller/keyboard hold path. Uses real scene raycasts; no focused-target fallback.</summary>
         public void UpdateHeldInstruments(float deltaTime,bool scanning,bool firing)
@@ -207,9 +219,15 @@ namespace BiologyVR.ArteryRoute.Journey
             var goal=CurrentGoal();
             var source=AimSource(scanning?scanner:bioTool);
             var hit=Aim(source);LockedTarget=hit;
+            if(world.bloodEntities&&hit)world.bloodEntities.Touch(hit);
+            if(world.immunity&&world.immunity.HandleInput(deltaTime,scanning,firing&&bioModes.CurrentMode==BioToolMode.Capture,hit,AimSource(bioTool),desktopControls&&desktopControls.Active))
+            {ScanProgress=world.immunity.ScanProgress;ChargeProgress=world.immunity.ChargeProgress;if(instrumentFeedback)instrumentFeedback.PresentLock(hit,ScanProgress,hit,scanning,source);previousPhysicalTool=firing;return;}
             if(mission.FreeBloodResearch)
             {
                 bool correct=world.research.CanInvestigate(hit);
+                if(correct)world.research.SelectInstance(hit);
+                if(!scanning)deepScanAge=0;
+                if(scanning&&scanConsumed&&correct&&hit.targetId=="rbc"&&world.analysis&&!world.analysis.Opened){deepScanAge+=deltaTime;if(deepScanAge>.65f)world.analysis.Open(hit);}
                 if(scanning&&scanConsumed&&correct&&hit!=scanTarget){scanConsumed=false;ScanProgress=0;scanTarget=null;}
                 if(scanning&&!scanConsumed)
                 {
@@ -456,6 +474,11 @@ namespace BiologyVR.ArteryRoute.Journey
 
             var ray = new Ray(source.position, source.forward);
             float distance = Mathf.Max(.01f, maxAimDistance);
+            // Local analysis owns its interaction space. A momentary miss between
+            // small content models must not promote a distant cell and close it.
+            float contentsDistance=0;bool contents=world.analysis&&world.analysis.RayThroughContents(ray,out contentsDistance);
+            if(contents)distance=Mathf.Min(distance,contentsDistance);
+            else if(world.bloodEntities&&(RawScannerPressed||RawToolPressed||GripPressed()||Mouse.current!=null&&Mouse.current.leftButton.isPressed)){world.bloodEntities.Promote(ray,Mathf.Min(maxAimDistance,12));Physics.SyncTransforms();}
             int count = Physics.RaycastNonAlloc(ray, targetHits, distance, targetMask.value, QueryTriggerInteraction.Collide);
             // NonAlloc does not promise the nearest hits if its buffer is full.
             // Fail closed instead of aiming through an omitted nearer target.
@@ -499,6 +522,11 @@ namespace BiologyVR.ArteryRoute.Journey
                 return piece.puzzle.world.Find(piece.strand?"fibrin":"platelet");
             }
             return null;
+        }
+        static bool GripPressed()
+        {
+            foreach(var device in InputSystem.devices)if(device.enabled&&device.layout.Contains("Controller")){var grip=device.TryGetChildControl<UnityEngine.InputSystem.Controls.ButtonControl>("gripButton");if(grip!=null&&grip.isPressed)return true;}
+            return false;
         }
 
         static bool IsUsableTarget(JourneyTarget target)

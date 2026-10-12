@@ -23,6 +23,7 @@ namespace BiologyVR.ArteryRoute.Journey
         void LateUpdate()
         {
             if(!world||!world.mission||targets==null)return;
+            if(world.immunity){model.gameObject.SetActive(false);return;}
             var m=world.mission;bool active=m.SceneNumber==8;bool dormant=m.SceneNumber<=16&&world.IsEpisodeCompleted(8)&&!active;var study=targets[0];
             if(active&&(lastScene!=8||(m.StepIndex==0&&lastStep>0)))
             {

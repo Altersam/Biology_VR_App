@@ -68,7 +68,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(!Active||!input.mission||!input.mission.Ready)return null;
             if(screens&&screens.PointerOverTheory)return null;
             foreach(var target in input.world.targets)if(target&&target.DesktopHeld)return null;
-            var ray=PointerRay();int count=Physics.RaycastNonAlloc(ray,hits,35,~0,QueryTriggerInteraction.Collide);
+            var ray=PointerRay();if(input.world.bloodEntities&&Mouse.current!=null&&Mouse.current.leftButton.isPressed){input.world.bloodEntities.Promote(ray,12);Physics.SyncTransforms();}int count=Physics.RaycastNonAlloc(ray,hits,35,~0,QueryTriggerInteraction.Collide);
             if(count==hits.Length)return null;
             System.Array.Sort(hits,0,count,Comparer<RaycastHit>.Create((a,b)=>a.distance.CompareTo(b.distance)));
             for(int i=0;i<count;i++)

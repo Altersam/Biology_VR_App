@@ -1,0 +1,86 @@
+{
+  "utc": "2026-10-12T16:18:45.044809+00:00",
+  "sources": [
+    {
+      "file": "01_Live_Blood_Background.png",
+      "size": [
+        1440,
+        900
+      ],
+      "caption": "01 / Ordinary living bloodstream"
+    },
+    {
+      "file": "02_Selected_Pool_Cell_Research.png",
+      "size": [
+        1440,
+        900
+      ],
+      "caption": "02 / Researching a selected pool instance"
+    },
+    {
+      "file": "03_Deep_Scan_RBC_Contents.png",
+      "size": [
+        1440,
+        900
+      ],
+      "caption": "03 / Nested RBC content analysis"
+    },
+    {
+      "file": "04_First_Flowing_Virus.png",
+      "size": [
+        1440,
+        900
+      ],
+      "caption": "04 / One first viral particle"
+    },
+    {
+      "file": "05_Scanner_Activated_Phagocyte.png",
+      "size": [
+        1440,
+        900
+      ],
+      "caption": "05 / Scanner-activated phagocyte"
+    },
+    {
+      "file": "06_BioTool_Holds_Phagocyte.png",
+      "size": [
+        1440,
+        900
+      ],
+      "caption": "06 / Capture field holds the real cell"
+    },
+    {
+      "file": "07_Pulled_Cell_And_Trajectory.png",
+      "size": [
+        1440,
+        900
+      ],
+      "caption": "07 / Pull charge and advection preview"
+    },
+    {
+      "file": "08_Gradual_Phagocytosis.png",
+      "size": [
+        1440,
+        900
+      ],
+      "caption": "08 / Gradual engulfment in progress"
+    },
+    {
+      "file": "09_Later_Wave_Within_Blood.png",
+      "size": [
+        1440,
+        900
+      ],
+      "caption": "09 / Later wave inside circulating blood"
+    },
+    {
+      "file": "14_XR_Captured_Pulled_Cell.png",
+      "size": [
+        1440,
+        900
+      ],
+      "caption": "10 / Actual XR hand-pull input"
+    }
+  ],
+  "method": "Only actual Unity PC/XR captures, resized into a contact sheet; no concept imagery"
+}

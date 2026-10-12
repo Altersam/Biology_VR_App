@@ -1,11 +1,11 @@
 {
-  "utc": "2026-10-12T04:51:05.478459+00:00",
-  "version": "0.5.0",
-  "version_code": 6,
+  "utc": "2026-10-12T18:48:16.489551+00:00",
+  "version": "0.6.0",
+  "version_code": 7,
   "passed": true,
   "path": "Z:\\YandexDisk\\ПетПроекты\\Biology_VR\\3д\\Unity\\bio_v0.2\\Builds\\MetaQuest\\BiologyVR_MetaQuest.apk",
-  "size_bytes": 76372394,
-  "sha256": "faf3f11d6efa0a9a5f5fc69062681c03847b363aab955eec1e86cf524d11a959",
+  "size_bytes": 76472676,
+  "sha256": "d50c611d94973a89274606ef3489d75668752bd4c1101c66bf1e47a8d91dcafa",
   "checks": {
     "manifest_readable": true,
     "application_id": true,
@@ -34,7 +34,7 @@
     "lib/arm64-v8a/libswappywrapper.so",
     "lib/arm64-v8a/libunity.so"
   ],
-  "badging": "package: name='com.biologyvr.arteryjourney' versionCode='6' versionName='0.5.0' platformBuildVersionName='14' platformBuildVersionCode='34' compileSdkVersion='34' compileSdkVersionCodename='14'\ninstall-location:'auto'\nsdkVersion:'29'\ntargetSdkVersion:'34'\nuses-permission: name='android.permission.INTERNET'\nuses-permission: name='org.khronos.openxr.permission.OPENXR'\nuses-permission: name='org.khronos.openxr.permission.OPENXR_SYSTEM'\napplication-label:'Biology VR'\napplication-icon-160:'res/Qu.xml'\napplication-icon-65534:'res/Qu.xml'\napplication: label='Biology VR' icon='res/Qu.xml'\nlaunchable-activity: name='com.unity3d.player.UnityPlayerActivity'  label='' icon=''\nfeature-group: label=''\n  uses-gl-es: '0x30000'\n  uses-feature-not-required: name='android.hardware.touchscreen'\n  uses-feature-not-required: name='android.hardware.touchscreen.multitouch'\n  uses-feature-not-required: name='android.hardware.touchscreen.multitouch.distinct'\n  uses-feature: name='android.hardware.vr.headtracking' version='1'\nmain\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--'\ndensities: '160' '65534'\nnative-code: 'arm64-v8a'\n",
+  "badging": "package: name='com.biologyvr.arteryjourney' versionCode='7' versionName='0.6.0' platformBuildVersionName='14' platformBuildVersionCode='34' compileSdkVersion='34' compileSdkVersionCodename='14'\ninstall-location:'auto'\nsdkVersion:'29'\ntargetSdkVersion:'34'\nuses-permission: name='android.permission.INTERNET'\nuses-permission: name='org.khronos.openxr.permission.OPENXR'\nuses-permission: name='org.khronos.openxr.permission.OPENXR_SYSTEM'\napplication-label:'Biology VR'\napplication-icon-160:'res/Qu.xml'\napplication-icon-65534:'res/Qu.xml'\napplication: label='Biology VR' icon='res/Qu.xml'\nlaunchable-activity: name='com.unity3d.player.UnityPlayerActivity'  label='' icon=''\nfeature-group: label=''\n  uses-gl-es: '0x30000'\n  uses-feature-not-required: name='android.hardware.touchscreen'\n  uses-feature-not-required: name='android.hardware.touchscreen.multitouch'\n  uses-feature-not-required: name='android.hardware.touchscreen.multitouch.distinct'\n  uses-feature: name='android.hardware.vr.headtracking' version='1'\nmain\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--'\ndensities: '160' '65534'\nnative-code: 'arm64-v8a'\n",
   "signature": "Verifies\nVerified using v1 scheme (JAR signing): false\nVerified using v2 scheme (APK Signature Scheme v2): true\nVerified using v3 scheme (APK Signature Scheme v3): false\nVerified using v3.1 scheme (APK Signature Scheme v3.1): false\nVerified using v4 scheme (APK Signature Scheme v4): false\nVerified for SourceStamp: false\nNumber of signers: 1\n",
   "headset_verified": false
 }

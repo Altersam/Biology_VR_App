@@ -32,11 +32,18 @@ expected = {
     runtime / 'JourneyHemodynamicsCard.cs': ['ResolveCard', 'Released'],
     runtime / 'JourneyHemodynamicsInterface.cs': ['compactTheory', 'ГОТОВО'],
     editor / 'HemodynamicsExperimentBuilder.cs': ['Install In Vessel Hemodynamics Experiment', 'ProjectionMaterial'],
-    editor / 'BiologyReleaseVersion.cs': ['"0.5.0"', 'AndroidCode=6'],
+    editor / 'BiologyReleaseVersion.cs': ['"0.6.0"', 'AndroidCode=7'],
     runtime / 'JourneyResearchTheory.cs': ['ScriptableObject', 'requiredForCompletion'],
     runtime / 'JourneyResearchableObject.cs': ['NotInvestigated,Investigating,Investigated'],
     runtime / 'JourneyResearchManager.cs': ['RequiredInvestigated', 'CompleteResearch', 'Capture()'],
     editor / 'FreeBloodResearchBuilder.cs': ['Install Free First Blood Research', 'Гем и железо Fe²⁺'],
+    runtime / 'JourneyBloodInteractionPool.cs': ['Promote(Ray', 'HasPhagocyteCapacity', 'CancelInteractableSelection'],
+    runtime / 'JourneyErythrocyteAnalysis.cs': ['Subject', 'Available(string id)', 'Close()'],
+    runtime / 'JourneyPhagocyteEntity.cs': ['RemainingCapacity', 'Phagocytosis,Recovering'],
+    runtime / 'JourneyImmuneVirus.cs': ['BeingPhagocytosed', 'Generation'],
+    runtime / 'JourneyInnateImmunity.cs': ['mission.Progress+LiveCount', 'world.mission.ViralLoad<=0', 'Predict(Vector3', 'TickEngulf'],
+    runtime / 'JourneyPlateletEntity.cs': ['Flowing,Inactive,Activated,Adhered,Aggregated'],
+    editor / 'LivingOrganismJourneyBuilder.cs': ['Install Connected Living Blood And Innate Immunity', 'controller.viruses=new JourneyImmuneVirus[8]'],
     scene: ['flowLayering: 1', 'splitMainFlow: 1', 'Flow-caught platelet 10', 'Reserve balance platelet 13', 'plateletCapture: {fileID: 1035892481}', 'm_DynamicPixelsPerUnit: 2.5', 'Projection frame brackets'],
 }
 for path, markers in expected.items():
@@ -60,11 +67,14 @@ files.update((root / 'Tools').glob('*futuristic_hologram*'))
 files.update((root / 'Tools').glob('*hemodynamics*'))
 files.update((root / 'Tools').glob('*free_blood_research*'))
 files.update((root / 'Tools').glob('*free_research*'))
+files.update((root / 'Tools').glob('*living_organism*'))
 files.add(root / 'Tools/saved_journey_verify_ws.json')
 files.add(Path(__file__).resolve())
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Generated/HolographicScreens').rglob('*'))
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Generated/HemodynamicsExperiment').rglob('*'))
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Generated/FreeBloodResearch').rglob('*'))
+files.update((root / 'Assets/BiologyVR/ArteryJourney/Generated/LivingOrganismJourney').rglob('*'))
+files.update((root / 'Assets/BiologyVR/ArteryJourney/Reports/Polish/LivingOrganismJourney').rglob('*'))
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Reports/Polish/FreeBloodResearch').rglob('*'))
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Reports/Polish/HemodynamicsExperiment').rglob('*'))
 files.add(root / 'Assets/BiologyVR/ArteryRoute/Shaders/ArteryVisualV2.shader')
@@ -73,7 +83,7 @@ files.update((root / 'Assets/BiologyVR/ArteryJourney/Generated/LacerationHemosta
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Reports/LacerationHemostasis').rglob('*'))
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Reports/Polish/XRControllers').rglob('*'))
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Reports/SessionRecovery').rglob('*'))
-for name in ['Free_Blood_Research_PC_Input.json', 'Hemodynamics_PC_Input.json', 'Laceration_PC_Input.json', 'Plaque_Challenge_PC.json', 'All_Scenes_Persistent_Blood.json', 'Mobile_All_Scenes_Persistent_Blood.json']:
+for name in ['Connected_Organism_PC.json', 'Connected_Wave_PC.json', 'Connected_Organism_Progress.json', 'Connected_Research_Orders_PC.json', 'Connected_Research_Orders_Progress.json', 'Free_Blood_Research_PC_Input.json', 'Hemodynamics_PC_Input.json', 'Laceration_PC_Input.json', 'Plaque_Challenge_PC.json', 'All_Scenes_Persistent_Blood.json', 'Mobile_All_Scenes_Persistent_Blood.json']:
     files.add(root / 'Assets/BiologyVR/ArteryJourney/Reports/Polish/FlowPickup' / name)
 files.add(root / 'Assets/BiologyVR/ArteryJourney/Reports/Polish/VR_INPUT_PLAYTHROUGH_V7.md')
 for path in list(files):
@@ -94,7 +104,7 @@ for path in sorted(p for p in files if p.is_file()):
         raise SystemExit(f'Checkpoint hash mismatch: {rel}')
     rows.append({'path': rel.as_posix(), 'bytes': path.stat().st_size, 'sha256': source_hash})
 report = {'utc': stamp.isoformat(), 'passed': True, 'checkpoint': str(dest),
-          'scope': 'Persisted critical code, master scene, wound assets, docs and available reports; runtime verification is separate',
+          'scope': 'Persisted critical code, connected living blood/immunity, master scene, wound assets, docs and available reports; runtime verification is separate',
           'files': rows}
 (dest / 'Manifest.json').write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding='utf-8')
 (root / 'SESSION_CHECKPOINT_VERIFICATION.json').write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding='utf-8')

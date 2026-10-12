@@ -74,6 +74,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(m.SceneNumber==6&&m.world.plaqueChallenge&&m.Current?.action==StudyAction.Pulse)
             {var plaque=m.world.plaqueChallenge;taskProgress.text=$"Осталось {plaque.RemainingCount} • {plaque.RemainingSeconds:0}с";taskHint.text=plaque.Failed?"ОККЛЮЗИЯ • повтор через 3 секунды":$"Trigger / E — очередь • прибыло +{plaque.ReinforcementCount}";}
             if(m.SceneNumber==7&&m.world.embolusWave)taskProgress.text=$"Ловушка {m.world.embolusWave.StabilizedCount}/6";
+            if(m.world.immunity&&m.Current?.target=="immune-engulf")taskProgress.text=m.SceneNumber==8?"НАБЛЮДАЙ КОНТАКТ":$"Нагрузка {m.ViralLoad:0}%";
             if(m.SceneNumber==12&&m.world.hemostasisPuzzle&&m.world.hemostasisPuzzle.flowLayering)
             {var puzzle=m.world.hemostasisPuzzle;taskProgress.text=puzzle.Activated?$"Фибрин {m.world.FibrinGrowth:P0}":puzzle.Attached<11?$"Первичная {puzzle.Attached}/11":$"Цепочка {puzzle.activationPuzzle.Progress}/3";if(m.Current?.action==StudyAction.Activate)taskHint.text="Grip / ЛКМ — три этапа стабилизации по порядку";else if(m.Current?.target=="platelet")taskHint.text="Удерживай Capture • подведи: адгезия автоматическая";}
             if(overview)overview.SetActive(!ShowPractice);
@@ -90,16 +91,16 @@ namespace BiologyVR.ArteryRoute.Journey
             var m=hud.mission;var focused=research.Focused;var data=focused?focused.theory:null;
             theoryTitle.text=data?data.displayName:"Состав крови";
             shortTheory.resizeTextForBestFit=true;shortTheory.resizeTextMinSize=24;shortTheory.resizeTextMaxSize=30;
-            shortTheory.text=data?data.pages[focused.Page].text:"Осмотрись: клетки и молекулы движутся рядом.\nВыбери любой объект — порядок свободный.";
+            shortTheory.text=data?data.pages[focused.Page].text:"Осмотрись: клетки движутся рядом.\nВыбери элемент потока — порядок свободный.\nМолекулярные детали откроются в анализе.";
             illustrationText.text=data?data.pages[focused.Page].visualConnection:"КЛЕТКИ · ПЛАЗМА · ГАЗООБМЕН";
             var text=new StringBuilder();
             if(data){text.Append("<b>").Append(data.displayName).Append("</b>\n\n");foreach(var page in data.pages)text.Append("<b>").Append(page.heading).Append("</b>\n").Append(page.text).Append("\n\n");text.Append("Учебный масштаб условный; молекулярные модели связаны с их переносчиком.");}
-            else text.Append("Возьми или просканируй любой объект, чтобы открыть его карточку. Эритроцит, лейкоцит, тромбоцит и плазма доступны одновременно. Гемоглобин, гем/Fe²⁺, O₂ и CO₂ можно изучать независимо.");
+            else text.Append("Выбери конкретный элемент общего потока. Эритроцит, лейкоцит, фагоцит, тромбоцит и плазма доступны в любом порядке. Гемоглобин, гем/Fe²⁺, O₂ и CO₂ открываются в режиме анализа эритроцита и транспорта газов.");
             theoryText.text=text.ToString();
             taskText.text=!string.IsNullOrEmpty(m.ProfessorLine)?m.ProfessorLine:m.CurrentGoalLabel;
             taskHint.text=data&&focused.State==JourneyResearchState.Investigated?"Изучено • можно открыть снова или выбрать другой объект":"Scanner: F / левый Trigger • Grip / ЛКМ — рассмотреть";
             taskProgress.text=$"Состав крови {research.RequiredInvestigated}/{research.RequiredCount}";
-            pageLabel.text=data?$"{(focused.State==JourneyResearchState.Investigated?"ИЗУЧЕНО":"ИССЛЕДУЕМ")} • {focused.Page+1:00} / {data.pages.Length:00}":$"СВОБОДНАЯ ЛАБОРАТОРИЯ • детали {research.OptionalInvestigated}/4";
+            pageLabel.text=data?$"{(focused.State==JourneyResearchState.Investigated?"ИЗУЧЕНО":"ИССЛЕДУЕМ")} • {focused.Page+1:00} / {data.pages.Length:00}":"СВОБОДНАЯ ЛАБОРАТОРИЯ / ВЫБЕРИ КЛЕТКУ";
             if(referenceButton)referenceButton.GetComponentInChildren<Text>().text=data?"Ещё →":"Подробнее";
             if(practiceButton){practiceButton.GetComponentInChildren<Text>().text="Объекты";practiceButton.SetActive(!m.Complete);}
             if(hud.continueButton)hud.continueButton.gameObject.SetActive(m.Complete);
@@ -126,7 +127,7 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         public void TogglePractice(){ShowPractice=!ShowPractice;Refresh();}
         public void ShowOverview(){if(hud.mission.FreeBloodResearch&&!ShowPractice){hud.mission.world.research.TurnPage(-1);return;}ShowPractice=false;Refresh();}
-        public void NextTheoryPage(){if(hud.mission.FreeBloodResearch&&hud.mission.world.research.Focused){ShowPractice=false;hud.mission.world.research.TurnPage(1);}else TogglePractice();}
+        public void NextTheoryPage(){if(hud.mission.FreeBloodResearch&&hud.mission.world.research.Focused){var world=hud.mission.world;if(world.analysis&&(world.research.Focused.theory.id=="rbc"||world.research.Focused.theory.id=="plasma")&&!world.analysis.Opened){world.analysis.Open(world.research.FocusedTarget);return;}ShowPractice=false;world.research.TurnPage(1);}else TogglePractice();}
         public void ShowResearchOverview(){if(hud.mission.FreeBloodResearch){ShowPractice=false;hud.mission.world.research.ShowOverview();}else ShowOverview();}
         public void ScrollDown(){ScrollBy(-.20f);}
         public void ScrollUp(){ScrollBy(.20f);}
@@ -161,7 +162,8 @@ namespace BiologyVR.ArteryRoute.Journey
             if(m.SceneNumber==12&&goal.action==StudyAction.Direct&&goal.target=="platelet")return "BioTool Capture: удерживать Trigger / E • подвести к ране";
             if(goal.action==StudyAction.Bind||((m.SceneNumber==12||m.SceneNumber==13)&&(goal.action==StudyAction.Direct||goal.action==StudyAction.Balance)))return "Grip / ЛКМ — взять · перенести · отпустить";
             if(goal.action==StudyAction.Capture||goal.action==StudyAction.Deposit)return "Удерживать Trigger / E — поле захвата";
-            if(m.SceneNumber==9&&goal.action==StudyAction.Mark)return "Trigger / E — импульс · удержание — очередь";
+            if(goal.target=="phagocyte"&&goal.action==StudyAction.Activate)return "Scanner: удерживать левый Trigger / F • реакция в модели";
+            if(goal.target=="immune-engulf")return m.SceneNumber==8?"CAPTURE: удерживать → отвести руку → направить → отпустить":"Вирусная нагрузка • используй ранее изученный цикл";
             if(goal.target=="tone")return "Удерживать Trigger · движение руки / колесо";
             return "BioTool: Trigger / E · A/B — режимы · C — ПК";
         }
@@ -172,8 +174,8 @@ namespace BiologyVR.ArteryRoute.Journey
             5=>"Небольшое изменение радиуса\nсильно влияет на кровоток.\nМеняй один параметр и сравнивай.",
             6=>"Растущая масса сужает просвет.\nПоток и доставка кислорода падают.\nРаздроби все элементы до окклюзии.",
             7=>"Пузырёк переносится кровотоком.\nВ узком участке он мешает потоку.\nПоле позволяет удержать пузырёк.",
-            8=>"Геном окружён капсидом.\nПоверхностный антиген помогает\nиммунной системе распознать вирус.",
-            9=>"Метка помогает иммунной клетке\nраспознать и поглотить вирион.\nПропуски повышают вирусную нагрузку.",
+            8=>"Вирус — не клетка. Он использует\nклетку хозяина для размножения.\nИсследуй его, затем найди фагоцит.",
+            9=>"Фагоцит — один из типов\nлейкоцитов. Используй изученный\nцикл взаимодействия в потоке.",
             10=>"Тонус временно поддерживает АД.\nУмеренное сужение сохраняет поток.\nПричину падения давления нужно найти.",
             11=>"Целостность стенки нарушена.\nУтечка ↑ • обнажён субэндотелий.\nЧасть потока идёт наружу, основная — дальше.",
             12=>"Адгезия образует первичную пробку.\nАктивация и агрегация её усиливают.\nФибрин стабилизирует; утечка снижается.",
@@ -184,6 +186,6 @@ namespace BiologyVR.ArteryRoute.Journey
             _=>"Исследование завершено.\nСравни результаты и повтори\nнаблюдения в свободном режиме."
         };
         static string MiniDiagram(int scene)=>scene switch
-        {3=>"Hb + O₂ ⇄ HbO₂",4=>"ЭНДОТЕЛИЙ · МЕДИА",5=>"Q ∝ ΔP · r⁴",6=>"ПОКРЫШКА / ЛИПИДЫ",7=>"ПОТОК → ЛОВУШКА",8=>"ГЕНОМ · КАПСИД · ЭПИТОП",9=>"МЕТКА → ФАГОЦИТ",10=>"РАДИУС ↔ ДАВЛЕНИЕ",11=>"СТЕНКА → ПОТОК",12=>"ТРОМБОЦИТЫ + ФИБРИН",13=>"УТЕЧКА ← БАЛАНС → ПРОСВЕТ",14=>"ОЧИСТКА → REPAIR",15=>"Ag + Ab ⇄ AgAb",_=>"ПОТОК · ЗАЩИТА · БАЛАНС"};
+        {3=>"Hb + O₂ ⇄ HbO₂",4=>"ЭНДОТЕЛИЙ · МЕДИА",5=>"Q ∝ ΔP · r⁴",6=>"ПОКРЫШКА / ЛИПИДЫ",7=>"ПОТОК → ЛОВУШКА",8=>"РАСПОЗНАТЬ → НАПРАВИТЬ → ПОГЛОТИТЬ",9=>"ОКРУЖЕНИЕ → ПОГЛОЩЕНИЕ",10=>"РАДИУС ↔ ДАВЛЕНИЕ",11=>"СТЕНКА → ПОТОК",12=>"ТРОМБОЦИТЫ + ФИБРИН",13=>"УТЕЧКА ← БАЛАНС → ПРОСВЕТ",14=>"ОЧИСТКА → REPAIR",15=>"Ag + Ab ⇄ AgAb",_=>"ПОТОК · ЗАЩИТА · БАЛАНС"};
     }
 }

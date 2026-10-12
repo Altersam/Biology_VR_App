@@ -1,6 +1,6 @@
 # V8 Sequential XR Input Playthrough
 
-Generated UTC: 2026-10-11T19:59:45.4835926Z
+Generated UTC: 2026-10-12T13:04:38.8496225Z
 
 Status: FULL SIMULATOR PASS
 
@@ -34,115 +34,75 @@ PASS: Biomedical tool views add no physical contacts
 
 Installed device mesh triangles: Scanner=2168; BioTool=3136
 
-PASS: Free first stage exposes eight independent research objects and four mandatory components
+PASS: Five blood populations are independent; large molecular models remain absent until analysis
 
-PASS: Actual XR Continue cannot leave before mandatory free research
+PASS: An ordinary phagocyte is available for a first grip without prior Scanner promotion
 
-PASS: XR grip can begin with leukocyte, open its theory, and preserve zero completed research
+Near grip: acquisitions=1 right=(-0.82, -0.49, -6.06) source=(-0.81, -0.50, -5.98) states=rbc:-1:False:False,leukocyte:-1:False:False,platelet:-1:False:False,plasma:-1:False:False,phagocyte:0:True:True,phagocyte:-1:False:False,phagocyte:-1:False:False journal=Investigating
 
-PASS: Early release of the Scanner does not complete free research
+PASS: First XR grip promotes a real background instance and begins research without scan credit
 
-Free research scan leukocyte: focused=leukocyte status=Investigated count=1 blocker=none uiBlocked=False
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
 
-PASS: Actual XR Scanner independently investigates or reopens leukocyte
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
 
-PASS: Object-specific theory is shown for XR selection leukocyte
+PASS: Requested species exists in the ordinary moving blood population: platelet
 
-PASS: Leukocyte can be completed before erythrocyte through actual XR input
+PASS: Actual left Trigger identifies or activates a concrete flowing platelet
 
-PASS: Free-research release keeps the cell's nearby pose without teleporting
+PASS: Requested species exists in the ordinary moving blood population: leukocyte
 
-PASS: Free-research WBC rejoins its original moving pool slot
+PASS: Actual left Trigger identifies or activates a concrete flowing leukocyte
 
-Free research scan leukocyte: focused=leukocyte status=Investigated count=1 blocker=none uiBlocked=False
+PASS: Requested species exists in the ordinary moving blood population: plasma
 
-PASS: Actual XR Scanner independently investigates or reopens leukocyte
+PASS: Actual left Trigger identifies or activates a concrete flowing plasma
 
-PASS: Object-specific theory is shown for XR selection leukocyte
+PASS: Requested species exists in the ordinary moving blood population: rbc
 
-PASS: Repeated XR investigation reopens theory without progress or tutorial repetition
+PASS: Actual left Trigger identifies or activates a concrete flowing rbc
 
-Free research scan oxygen: focused=oxygen status=Investigated count=1 blocker=none uiBlocked=False
+PASS: Player-selected pool instances complete free research with phagocyte first
 
-PASS: Actual XR Scanner independently investigates or reopens oxygen
+PASS: Existing XR grip selects the promoted blood instance
 
-PASS: Object-specific theory is shown for XR selection oxygen
+PASS: Deep Scan reveals local hemoglobin content inside the selected erythrocyte
 
-Free research scan heme: focused=heme status=Investigated count=1 blocker=none uiBlocked=False
-
-PASS: Actual XR Scanner independently investigates or reopens heme
-
-PASS: Object-specific theory is shown for XR selection heme
-
-Free research scan hemoglobin: focused=hemoglobin status=Investigated count=1 blocker=none uiBlocked=False
+Free research scan hemoglobin: focused=hemoglobin status=Investigated count=5 blocker=none uiBlocked=False analysis=True targetActive=True collider=True position=(-1.32, 1.20, 1.32) scanner=(-0.52, 0.18, 0.15) lock=none
 
 PASS: Actual XR Scanner independently investigates or reopens hemoglobin
 
 PASS: Object-specific theory is shown for XR selection hemoglobin
 
-Free research scan co2: focused=co2 status=Investigated count=1 blocker=none uiBlocked=False
+Free research scan heme: focused=heme status=Investigated count=5 blocker=none uiBlocked=False analysis=True targetActive=True collider=True position=(-1.70, 1.18, 0.77) scanner=(-0.54, 0.20, -0.03) lock=none
+
+PASS: Actual XR Scanner independently investigates or reopens heme
+
+PASS: Object-specific theory is shown for XR selection heme
+
+Free research scan oxygen: focused=oxygen status=Investigated count=5 blocker=none uiBlocked=False analysis=True targetActive=True collider=True position=(-1.62, 1.28, 0.76) scanner=(-0.54, 0.24, -0.02) lock=none
+
+PASS: Actual XR Scanner independently investigates or reopens oxygen
+
+PASS: Object-specific theory is shown for XR selection oxygen
+
+Free research scan co2: focused=co2 status=Investigated count=5 blocker=none uiBlocked=False analysis=True targetActive=True collider=True position=(-1.52, 0.71, 1.38) scanner=(-0.53, 0.09, 0.12) lock=none
 
 PASS: Actual XR Scanner independently investigates or reopens co2
 
 PASS: Object-specific theory is shown for XR selection co2
 
-PASS: All gas and hemoglobin/heme/Fe²⁺ details remain independently available before erythrocyte research
+PASS: XR molecular investigation follows RBC → Hb → heme/Fe2+ and gas transport, not ambient molecules
 
-PASS: Existing two-hand heme/O2 interaction stays available without ordered research prerequisites
+PASS: Nested educational O2 can be extracted by the existing grip
 
-PASS: Physical O2 release near heme restores binding without adding mandatory research progress
-
-Free research scan platelet: focused=platelet status=Investigated count=2 blocker=none uiBlocked=False
-
-PASS: Actual XR Scanner independently investigates or reopens platelet
-
-PASS: Object-specific theory is shown for XR selection platelet
-
-PASS: Player chooses platelet next without an erythrocyte gate
-
-PASS: Existing BioTool opens platelet activation/aggregation detail without duplicate completion
-
-Free research scan plasma: focused=plasma status=Investigated count=3 blocker=none uiBlocked=False
-
-PASS: Actual XR Scanner independently investigates or reopens plasma
-
-PASS: Object-specific theory is shown for XR selection plasma
-
-PASS: Three mandatory objects cannot finish the stage prematurely
-
-PASS: Actual XR thumbstick scrolls selected plasma theory while preserving independent progress
-
-Free research scan rbc: focused=rbc status=Investigated count=4 blocker=none uiBlocked=False
-
-PASS: Actual XR Scanner independently investigates or reopens rbc
-
-PASS: Object-specific theory is shown for XR selection rbc
-
-PASS: Final independent object unlocks Continue without an automatic transition
-
-PASS: Both XR grips can inspect an already studied erythrocyte
-
-PASS: Two-hand educational enlargement remains independent of research order and completion
-
-PASS: Releasing one research grip keeps the object in the other hand
-
-PASS: Studied enlarged RBC releases smoothly back into the live bloodstream
-
-Free research scan plasma: focused=plasma status=Investigated count=4 blocker=none uiBlocked=False
-
-PASS: Actual XR Scanner independently investigates or reopens plasma
-
-PASS: Object-specific theory is shown for XR selection plasma
-
-PASS: Theory can still be reopened after all mandatory research without extra credit
-
-PASS: Free first-stage research completes through actual XR actions in player-selected order with molecular details preserved
+PASS: Closing analysis removes standalone molecular objects while preserving type journal
 
 PASS: Actual left Y InputAction starts completed 03→04 travel
 
 PASS: Completed Scene03 location stays active during transition
 
-Travel blood samples=213909 maximum consecutive visible displacement=0,09032257
+Travel blood samples=20498 maximum consecutive visible displacement=0,07033127
 
 PASS: Moving visible blood remains continuous across the actual scene transition
 
@@ -158,7 +118,7 @@ Contact endothelium: Scene04_Band_endothelium / MeshCollider layerInspector=True
 
 PASS: Scanner uses actual wall shell contact for endothelium
 
-Scan endothelium: step=1 enabled=True lock=layers progress=1 blocker=none aim=(0.86, -0.05, 10.49) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
+Scan endothelium: step=1 enabled=True lock=layers progress=1 blocker=none aim=(0.47, 0.09, 10.13) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
 
 PASS: Scanner completed endothelium
 
@@ -170,7 +130,7 @@ Contact intima: Scene04_Band_intima / MeshCollider layerInspector=True
 
 PASS: Scanner uses actual wall shell contact for intima
 
-Scan intima: step=3 enabled=True lock=media progress=1 blocker=none aim=(0.86, -0.05, 10.49) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
+Scan intima: step=3 enabled=True lock=media progress=1 blocker=none aim=(0.47, 0.09, 10.13) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
 
 PASS: Scanner completed intima
 
@@ -180,7 +140,7 @@ Contact media: Scene04_Band_media / MeshCollider layerInspector=True
 
 PASS: Scanner uses actual wall shell contact for media
 
-Scan media: step=4 enabled=True lock=adventitia progress=1 blocker=none aim=(0.86, -0.05, 10.49) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
+Scan media: step=4 enabled=True lock=adventitia progress=1 blocker=none aim=(0.47, 0.09, 10.13) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
 
 PASS: Scanner completed media
 
@@ -190,7 +150,7 @@ Contact adventitia: Scene04_Band_adventitia / MeshCollider layerInspector=True
 
 PASS: Scanner uses actual wall shell contact for adventitia
 
-Scan adventitia: step=5 enabled=True lock=none progress=1 blocker=none aim=(0.86, -0.05, 10.49) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
+Scan adventitia: step=5 enabled=True lock=none progress=1 blocker=none aim=(0.47, 0.09, 10.13) target=(1.86, -0.08, 12.87) contact=(1.86, -0.08, 12.87)
 
 PASS: Scanner completed adventitia
 
@@ -356,7 +316,7 @@ PASS: BioTool completed pulse-mode
 
 PASS: Scene06 plaque inspection and pulse mode use real instruments
 
-Plaque XR diagnostic: before=2 destroyed=40 accepted=40 elapsed=8,839971 lock=none obstruction=none
+Plaque XR diagnostic: before=2 destroyed=44 accepted=44 elapsed=9,729377 lock=none obstruction=none
 
 PASS: Actual right trigger fragments the original pile plus newly arriving lipids before occlusion
 
@@ -430,7 +390,7 @@ PASS: Only sustained in-trap placement completes geometric deposit
 
 PASS: Moving BioTool capture objective expected for embolus
 
-Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.93, 2.69, 93.41) target=(19.64, 1.94, 98.93)
+Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True aim=(22.93, 2.69, 93.41) target=(19.65, 1.94, 98.93)
 
 PASS: BioTool captured moving target embolus
 
@@ -444,7 +404,7 @@ Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True
 
 PASS: BioTool captured moving target embolus
 
-Transport result: bubble=(18.23, 2.62, 102.23) trap=(22.33, 1.92, 94.66) stability=1
+Transport result: bubble=(18.24, 2.62, 102.22) trap=(22.33, 1.92, 94.66) stability=1
 
 PASS: Only sustained in-trap placement completes geometric deposit
 
@@ -454,7 +414,7 @@ Tracked capture embolus: locked=embolus charge=1 blocker=none input enabled=True
 
 PASS: BioTool captured moving target embolus
 
-Transport result: bubble=(18.29, 1.11, 104.64) trap=(22.33, 1.92, 94.66) stability=1
+Transport result: bubble=(18.29, 1.11, 104.63) trap=(22.33, 1.92, 94.66) stability=1
 
 PASS: Only sustained in-trap placement completes geometric deposit
 
@@ -474,183 +434,163 @@ PASS: Real left Y continues completed Scene07
 
 PASS: Transition 07→08 arrives through normal travel
 
-PASS: Scanner objective expected for virus-study
+PASS: First viral encounter starts with one drifting virion and no combat wave
 
-Contact virus-study: Research target — virus-study / SphereCollider layerInspector=True
+First viral scan: step=1 distance=3,039524 progress=0 active=True blocked=False obstacle=none lock=none
 
-Scan virus-study: step=1 enabled=True lock=virus-study progress=1 blocker=none aim=(41.64, 13.87, 124.17) target=(43.45, 14.36, 124.96) contact=(43.45, 14.36, 124.96)
+PASS: Real Scanner investigates the first viral particle before immune action
 
-PASS: Scanner completed virus-study
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
 
-PASS: Study virus has authored XRI grab support
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
 
-PASS: BioTool click cannot replace two-hand virus enlargement
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
 
-PASS: Both real grips select the same study virus
+PASS: Physical XR hand pull charges the same held field and previews advection
 
-PASS: Two-hand separation enlarges the persistent intact/cutaway model
+PASS: Releasing the existing right Trigger launches the real cell
 
-PASS: Virus visual follows its held XRI target
+PASS: A missed XR cell launch preserves the first virus and allows reuse
 
-PASS: One released virus grip keeps the other grip selected
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
 
-PASS: Educational virus scale persists after releasing both hands
+PASS: Physical XR hand pull charges the same held field and previews advection
 
-PASS: Scanner objective expected for genome
+PASS: Releasing the existing right Trigger launches the real cell
 
-Contact genome: Research target — genome / SphereCollider layerInspector=True
-
-Scan genome: step=3 enabled=True lock=capsid progress=1 blocker=none aim=(42.32, 14.29, 124.28) target=(43.42, 14.30, 124.94) contact=(43.42, 14.30, 124.94)
-
-PASS: Scanner completed genome
-
-PASS: Scanner objective expected for capsid
-
-Contact capsid: Research target — capsid / SphereCollider layerInspector=True
-
-Scan capsid: step=4 enabled=True lock=none progress=1 blocker=none aim=(42.32, 14.29, 124.28) target=(43.45, 14.36, 124.96) contact=(43.45, 14.36, 124.96)
-
-PASS: Scanner completed capsid
-
-PASS: Scanner objective expected for epitope
-
-Contact epitope: Research target — epitope / SphereCollider layerInspector=True
-
-Scan epitope: step=5 enabled=True lock=none progress=1 blocker=none aim=(42.32, 14.29, 124.28) target=(43.64, 14.19, 125.05) contact=(43.64, 14.19, 125.05)
-
-PASS: Scanner completed epitope
-
-PASS: All Scene08 parts scanned without tool enlargement/debug completion
+PASS: Actual XR capture/pull/aim/release completes single-virus tutorial
 
 PASS: Real left Y continues completed Scene08
 
 PASS: Same-site transition 08→09 arrives through normal travel
 
-PASS: BioTool objective expected for immune-mode
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
 
-PASS: BioTool target exists: immune-mode
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
 
-PASS: BioTool target contact enabled: immune-mode
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
 
-Tool immune-mode: locked=immune-mode charge=0 radius=1 pressure=120 aim=(42.33, 13.79, 124.32) contact=(42.86, 14.86, 124.98)
+PASS: Physical XR hand pull charges the same held field and previews advection
 
-PASS: BioTool completed immune-mode
+PASS: Releasing the existing right Trigger launches the real cell
 
-PASS: Charging BioTool at the phagocyte cannot mark an unrelated incoming virion
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
 
-PASS: Rapid immune assault starts with a six-target burst
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
 
-PASS: Incoming virion has active target contact: 0
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 0
+PASS: Physical XR hand pull charges the same held field and previews advection
 
-PASS: Incoming virion has active target contact: 1
+PASS: Releasing the existing right Trigger launches the real cell
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 1
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
 
-PASS: Incoming virion has active target contact: 2
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 2
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
 
-PASS: Incoming virion has active target contact: 3
+PASS: Physical XR hand pull charges the same held field and previews advection
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 3
+PASS: Releasing the existing right Trigger launches the real cell
 
-PASS: Incoming virion has active target contact: 4
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 4
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
 
-PASS: Incoming virion has active target contact: 5
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 5
+PASS: Physical XR hand pull charges the same held field and previews advection
 
-PASS: Incoming virion has active target contact: 6
+PASS: Releasing the existing right Trigger launches the real cell
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 6
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
 
-PASS: Incoming virion has active target contact: 7
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 7
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
 
-PASS: Incoming virion has active target contact: 8
+PASS: Physical XR hand pull charges the same held field and previews advection
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 8
+PASS: Releasing the existing right Trigger launches the real cell
 
-PASS: Incoming virion has active target contact: 9
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 9
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
 
-PASS: Incoming virion has active target contact: 10
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 10
+PASS: Physical XR hand pull charges the same held field and previews advection
 
-PASS: Incoming virion has active target contact: 11
+PASS: Releasing the existing right Trigger launches the real cell
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 11
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
 
-PASS: Incoming virion has active target contact: 12
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 12
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
 
-PASS: Incoming virion has active target contact: 13
+PASS: Physical XR hand pull charges the same held field and previews advection
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 13
+PASS: Releasing the existing right Trigger launches the real cell
 
-PASS: Incoming virion has active target contact: 14
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 14
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
 
-PASS: Incoming virion has active target contact: 15
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 15
+PASS: Physical XR hand pull charges the same held field and previews advection
 
-PASS: Incoming virion has active target contact: 16
+PASS: Releasing the existing right Trigger launches the real cell
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 16
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
 
-PASS: Incoming virion has active target contact: 17
+PASS: Physical XR hand pull charges the same held field and previews advection
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 17
+PASS: Releasing the existing right Trigger launches the real cell
 
-PASS: Incoming virion has active target contact: 18
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 18
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
 
-PASS: Incoming virion has active target contact: 19
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 19
+PASS: Physical XR hand pull charges the same held field and previews advection
 
-PASS: Incoming virion has active target contact: 20
+PASS: Releasing the existing right Trigger launches the real cell
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 20
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
 
-PASS: Incoming virion has active target contact: 21
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 21
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
 
-PASS: Incoming virion has active target contact: 22
+PASS: Physical XR hand pull charges the same held field and previews advection
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 22
+PASS: Releasing the existing right Trigger launches the real cell
 
-PASS: Incoming virion has active target contact: 23
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
 
-PASS: Rapid BioTool hit marks the aimed moving virion: 23
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
 
-PASS: Twenty-four individual incoming virions hit through actual rapid-fire trigger input
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
 
-PASS: BioTool objective expected for phagocyte
+PASS: Physical XR hand pull charges the same held field and previews advection
 
-PASS: BioTool target exists: phagocyte
+PASS: Releasing the existing right Trigger launches the real cell
 
-PASS: BioTool target contact enabled: phagocyte
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
 
-Tool phagocyte: locked=phagocyte charge=0 radius=1 pressure=120 aim=(42.33, 13.79, 124.32) contact=(42.96, 14.49, 125.08)
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
 
-PASS: BioTool completed phagocyte
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
 
-PASS: Scene09 handoff completes only after all twenty-four actual phagocyte ingestions
+PASS: Physical XR hand pull charges the same held field and previews advection
 
-PASS: Scene09 phagocyte stays in its current episode instead of moving to the future wound
+PASS: Releasing the existing right Trigger launches the real cell
+
+PASS: Actual XR capture/pull/aim/release completes later viral population
 
 PASS: Real left Y continues completed Scene09
 
@@ -764,7 +704,7 @@ PASS: Eleven flow platelets and three balance reserves authored at existing woun
 
 PASS: Real right grip selects Flow-caught platelet 0
 
-Released Flow-caught platelet 0 position=(91.50, 2.52, 179.00) intended=(91.68, 2.77, 181.87) accepted=False
+Released Flow-caught platelet 0 position=(91.50, 2.52, 178.99) intended=(91.68, 2.77, 181.87) accepted=False
 
 PASS: Wrong physical platelet placement stays unaccepted and can be re-grabbed
 
@@ -1088,7 +1028,7 @@ PASS: Scanner objective expected for infected-cell
 
 Contact infected-cell: Research target — infected-cell / SphereCollider layerInspector=True
 
-Scan infected-cell: step=1 enabled=True lock=infected-cell progress=1 blocker=none aim=(119.32, 15.96, 233.41) target=(121.29, 17.71, 235.89) contact=(121.29, 17.71, 235.89)
+Scan infected-cell: step=1 enabled=True lock=infected-cell progress=0 blocker=none aim=(119.32, 15.96, 233.41) target=(121.29, 17.71, 235.89) contact=(121.29, 17.71, 235.89)
 
 PASS: Scanner completed infected-cell
 
@@ -1096,21 +1036,55 @@ PASS: Final exam starts by finding/scanning an actual infected cell before wave 
 
 PASS: Wrong final biological target cannot substitute an incoming virion
 
-PASS: Real pulse/mark in timing window handles final virion 0
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
 
-PASS: Real pulse/mark in timing window handles final virion 1
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
 
-PASS: Real pulse/mark in timing window handles final virion 2
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
 
-PASS: Real pulse/mark in timing window handles final virion 3
+PASS: Physical XR hand pull charges the same held field and previews advection
 
-PASS: Final timed wave includes real shield pulses followed by four charged marks
+PASS: Releasing the existing right Trigger launches the real cell
+
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
+
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
+
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
+
+PASS: Physical XR hand pull charges the same held field and previews advection
+
+PASS: Releasing the existing right Trigger launches the real cell
+
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
+
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
+
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
+
+PASS: Physical XR hand pull charges the same held field and previews advection
+
+PASS: Releasing the existing right Trigger launches the real cell
+
+PASS: Requested species exists in the ordinary moving blood population: phagocyte
+
+PASS: Actual left Trigger identifies or activates a concrete flowing phagocyte
+
+PASS: Actual XR Capture holds a phagocyte without swallowing it into the tool
+
+PASS: Physical XR hand pull charges the same held field and previews advection
+
+PASS: Releasing the existing right Trigger launches the real cell
+
+PASS: Actual XR capture/pull/aim/release completes later viral population
+
+PASS: Final immune population uses the same phagocyte mechanism before specific antibody recognition
 
 PASS: Scanner objective expected for epitope
 
 Contact epitope: Research target — epitope / SphereCollider layerInspector=True
 
-Scan epitope: step=3 enabled=True lock=epitope progress=1 blocker=none aim=(119.32, 15.96, 233.41) target=(121.05, 17.54, 235.62) contact=(121.05, 17.54, 235.62)
+Scan epitope: step=3 enabled=True lock=epitope progress=1 blocker=none aim=(118.93, 15.59, 233.41) target=(121.05, 17.54, 235.62) contact=(121.05, 17.54, 235.62)
 
 PASS: Scanner completed epitope
 
@@ -1128,7 +1102,7 @@ PASS: BioTool target exists: neutralized
 
 PASS: BioTool target contact enabled: neutralized
 
-Tool neutralized: locked=infected-cell charge=0 radius=1 pressure=120 aim=(119.27, 16.40, 233.19) contact=(121.05, 17.54, 235.62)
+Tool neutralized: locked=infected-cell charge=0 radius=1 pressure=120 aim=(119.15, 16.02, 233.56) contact=(121.05, 17.54, 235.62)
 
 PASS: BioTool completed neutralized
 
@@ -1138,7 +1112,7 @@ PASS: BioTool target exists: t-cell
 
 PASS: BioTool target contact enabled: t-cell
 
-Tool t-cell: locked=none charge=0 radius=1 pressure=120 aim=(119.27, 16.40, 233.19) contact=(121.20, 16.98, 235.38)
+Tool t-cell: locked=none charge=0 radius=1 pressure=120 aim=(119.15, 16.02, 233.56) contact=(121.20, 16.98, 235.38)
 
 PASS: BioTool completed t-cell
 
@@ -1158,7 +1132,7 @@ PASS: BioTool target exists: check-pressure
 
 PASS: BioTool target contact enabled: check-pressure
 
-Tool check-pressure: locked=check-pressure charge=0 radius=1 pressure=120 aim=(119.27, 16.40, 233.19) contact=(119.59, 15.61, 234.81)
+Tool check-pressure: locked=check-pressure charge=0 radius=1 pressure=120 aim=(119.15, 16.02, 233.56) contact=(119.59, 15.61, 234.81)
 
 PASS: BioTool completed check-pressure
 
@@ -1168,7 +1142,7 @@ PASS: BioTool target exists: check-temperature
 
 PASS: BioTool target contact enabled: check-temperature
 
-Tool check-temperature: locked=check-temperature charge=0 radius=1 pressure=120 aim=(119.27, 16.40, 233.19) contact=(119.66, 16.25, 234.70)
+Tool check-temperature: locked=check-temperature charge=0 radius=1 pressure=120 aim=(119.15, 16.02, 233.56) contact=(119.66, 16.25, 234.70)
 
 PASS: BioTool completed check-temperature
 
@@ -1178,7 +1152,7 @@ PASS: BioTool target exists: check-flow
 
 PASS: BioTool target contact enabled: check-flow
 
-Tool check-flow: locked=check-flow charge=0 radius=1 pressure=120 aim=(119.27, 16.40, 233.19) contact=(119.73, 16.88, 234.58)
+Tool check-flow: locked=check-flow charge=0 radius=1 pressure=120 aim=(119.15, 16.02, 233.56) contact=(119.73, 16.88, 234.58)
 
 PASS: BioTool completed check-flow
 
@@ -1186,7 +1160,7 @@ PASS: Scanner objective expected for check-wall
 
 Contact check-wall: Homeostasis sensor — check-wall / SphereCollider layerInspector=True
 
-Scan check-wall: step=4 enabled=True lock=check-wall progress=1 blocker=none aim=(119.32, 15.96, 233.41) target=(120.17, 15.48, 234.45) contact=(120.17, 15.48, 234.45)
+Scan check-wall: step=4 enabled=True lock=check-wall progress=1 blocker=none aim=(118.93, 15.59, 233.41) target=(120.17, 15.48, 234.45) contact=(120.17, 15.48, 234.45)
 
 PASS: Scanner completed check-wall
 
@@ -1194,7 +1168,7 @@ PASS: Scanner objective expected for check-virus
 
 Contact check-virus: Homeostasis sensor — check-virus / SphereCollider layerInspector=True
 
-Scan check-virus: step=5 enabled=True lock=check-virus progress=1 blocker=none aim=(119.32, 15.96, 233.41) target=(120.24, 16.12, 234.33) contact=(120.24, 16.12, 234.33)
+Scan check-virus: step=5 enabled=True lock=check-virus progress=1 blocker=none aim=(118.93, 15.59, 233.41) target=(120.24, 16.12, 234.33) contact=(120.24, 16.12, 234.33)
 
 PASS: Scanner completed check-virus
 
@@ -1204,7 +1178,7 @@ PASS: BioTool target exists: check-hemostasis
 
 PASS: BioTool target contact enabled: check-hemostasis
 
-Tool check-hemostasis: locked=check-hemostasis charge=0 radius=1 pressure=120 aim=(119.27, 16.40, 233.19) contact=(120.32, 16.75, 234.22)
+Tool check-hemostasis: locked=check-hemostasis charge=0 radius=1 pressure=120 aim=(119.15, 16.02, 233.56) contact=(120.32, 16.75, 234.22)
 
 PASS: BioTool completed check-hemostasis
 

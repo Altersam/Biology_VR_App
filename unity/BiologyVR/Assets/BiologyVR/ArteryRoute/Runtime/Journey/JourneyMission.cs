@@ -102,9 +102,11 @@ namespace BiologyVR.ArteryRoute.Journey
                     for(int bubble=0;bubble<(world.embolusWave?JourneyEmbolusWave.Count:1);bubble++)
                     {Goal(world.embolusWave?$"Захвати газовый эмбол: {bubble+1} / 6":"Захвати пузырёк полем BioTool",StudyAction.Capture,"embolus");Goal(world.embolusWave?$"Удерживай поле: помести эмбол {bubble+1} / 6 в ловушку":"Удерживай Trigger: перенеси пузырёк и стабилизируй в ловушке",StudyAction.Deposit,"embolus");}break;
                 case 8:
+                    if(world.immunity){Goal("Найди и исследуй одну чужеродную частицу в потоке",StudyAction.Scan,"virus-study");Goal("Найди фагоцит: Scanner инициирует иммунную реакцию в модели",StudyAction.Activate,"phagocyte");Goal("Удерживай CAPTURE: притяни активную клетку",StudyAction.Capture,"phagocyte");Goal("Отведи руку, направь клетку и отпусти Trigger",StudyAction.Direct,"immune-engulf");break;}
                     Goal("Просканируй неизвестный вирион",StudyAction.Scan,"virus-study");Goal("Увеличь вирус в учебном режиме",StudyAction.Enlarge,"virus-study");
                     Goal("Изучи генетический материал",StudyAction.Scan,"genome");Goal("Изучи капсид",StudyAction.Scan,"capsid");Goal("Найди антиген и эпитоп",StudyAction.Scan,"epitope");break;
                 case 9:
+                    if(world.immunity){Temperature=36.6f;ViralLoad=25;Goal("Используй фагоциты общего потока для врождённой защиты",StudyAction.Direct,"immune-engulf",12);break;}
                     Temperature=36.6f;ViralLoad=25;Goal("Открой иммунное управление",StudyAction.Activate,"immune-mode");Goal("Отрази волну: 24 вириона — наведи BioTool и стреляй",StudyAction.Mark,"incoming-virus",AssaultVirusCount);Goal("Передай помеченные частицы фагоциту",StudyAction.Direct,"phagocyte");break;
                 case 10:
                     if(world.hemodynamics)
@@ -131,7 +133,7 @@ namespace BiologyVR.ArteryRoute.Journey
                     Goal("Распознай три разных фрагмента debris сканером",StudyAction.Scan,"debris",3);Goal("Включи помощь фагоцита",StudyAction.Activate,"cleanup-mode");Goal("Наведи BioTool на каждый распознанный debris",StudyAction.Direct,"debris",3);
                     Goal("Найди плазмин: фактор удаления фибрина",StudyAction.Scan,"plasmin");Goal("Активируй фибринолиз",StudyAction.Activate,"plasmin");Goal("После удаления фибрина запусти repair",StudyAction.Activate,"repair");Goal("Просканируй восстановленный эндотелий",StudyAction.Scan,"healed-wall");break;
                 case 15:
-                    Temperature=38.3f;ViralLoad=100;Goal("Самостоятельно найди и просканируй клетку-источник",StudyAction.Scan,"infected-cell");Goal("Окна подсветки: pulse для защищённых целей, затем mark четырёх вирионов",StudyAction.Mark,"incoming-virus",4);
+                    Temperature=38.3f;ViralLoad=100;Goal("Самостоятельно найди и просканируй клетку-источник",StudyAction.Scan,"infected-cell");if(world.immunity)Goal("Самостоятельно направь фагоциты к чужеродным частицам",StudyAction.Direct,"immune-engulf",4);else Goal("Окна подсветки: pulse для защищённых целей, затем mark четырёх вирионов",StudyAction.Mark,"incoming-virus",4);
                     Goal("Найди эпитоп сканером",StudyAction.Scan,"epitope");Goal("Выбери комплементарное антитело",StudyAction.Bind,"antibody-A");
                     Goal("Направь фагоцит к связанному antigen-antibody комплексу",StudyAction.Direct,"neutralized");
                     Goal("Направь T-лимфоцит к инфицированной клетке",StudyAction.Direct,"t-cell");Goal("Очисти три оставшихся комплекса",StudyAction.Direct,"remaining",3);break;
@@ -141,6 +143,7 @@ namespace BiologyVR.ArteryRoute.Journey
             }
             if(travel)mover.TravelTo(SceneNumber);else mover.TravelTo(SceneNumber,true);
             world.ShowScene(SceneNumber);
+            if(SceneNumber==8&&world.immunity&&world.immunity.TutorialCompleted){StepIndex=Goals.Count;Progress=0;world.RememberEpisode();}
             if(FreeBloodResearch)world.research.EnterStage();
             Changed?.Invoke();
         }
@@ -154,8 +157,8 @@ namespace BiologyVR.ArteryRoute.Journey
                 case 5:LearningTerm="Гемодинамический эксперимент";LearningNote="Поток возникает из-за разности давлений. Измерь A и B, сравни скорость и диаметр, затем проверь свою гипотезу экспериментом. В первых двух опытах расход фиксирован; в третьем изменён приток.";Formula="";ProfessorLine="Прежде чем лечить сосуд, выясним, от чего зависит поток.";break;
                 case 6:LearningTerm="Атеросклеротическая бляшка";LearningNote="LDL и воспаление формируют липидное ядро; фиброзная покрышка удерживает его внутри стенки.";Formula="Повреждение покрышки → тромбоциты → фибрин → окклюзия";ProfessorLine="Точность важнее силы: работай только по липидным мишеням.";break;
                 case 7:LearningTerm="Газовый эмбол";LearningNote="Пузырёк может перемещаться с кровотоком и застрять там, где просвет становится уже.";ProfessorLine="Опасность определяется не размером объекта, а тем, где он окажется.";break;
-                case 8:LearningTerm="Строение вирусной частицы";LearningNote="Сначала различи генетический материал, капсид и поверхностный антиген — атака без распознавания неточна.";Formula="Антиген ⊃ эпитоп";ProfessorLine="Не атакуй неизвестное. Получи данные.";break;
-                case 9:LearningTerm="Иммунный ответ";LearningNote="Распознавание и маркировка позволяют иммунной клетке забрать частицу; пропуски повышают температуру.";Formula="39,5 °C — критический игровой предел";ProfessorLine="Сохрани контроль над волной: правильное действие снижает нагрузку.";break;
+                case 8:LearningTerm="Первая чужеродная частица";LearningNote="Вирус не является клеткой. Он содержит генетический материал и использует клетку хозяина для размножения. Исследуй одну частицу, затем найди фагоцит в обычном потоке.";Formula="ИССЛЕДОВАТЬ → НАЙТИ КЛЕТКУ → НАБЛЮДАТЬ";ProfessorLine="Перед нами вирусная частица. Сначала выясни, с чем имеешь дело.";break;
+                case 9:LearningTerm="Врождённая иммунная защита";LearningNote="Используй ранее изученный цикл: распознай частицу, найди фагоцит, инициируй реакцию в модели и направь клетку к материалу. Настоящий противовирусный иммунитет значительно сложнее.";Formula="ВИРУСНАЯ НАГРУЗКА";ProfessorLine="Используй элементы той же живой среды, которую ты исследовал.";break;
                 case 10:LearningTerm="Диагностика низкого давления";LearningNote="Измерь локальный диаметр, скорость, давление по обе стороны участка и целостность стенки. Выбери действие на основании полученных данных.";Formula="";ProfessorLine="Обоснуй действие измерениями.";break;
                 case 11:LearningTerm="Повреждение эндотелия";LearningNote="Разрыв стенки объясняет одновременно кровопотерю и падение давления.";Formula="Дефект стенки + утечка → снижение объёма кровотока";ProfessorLine="Три независимых наблюдения должны привести к одному выводу.";break;
                 case 12:LearningTerm="Гемостаз";LearningNote="Адгезия и активация тромбоцитов создают первичную пробку; тромбин запускает сеть фибрина.";Formula="Фибриноген —(тромбин)→ фибрин";ProfessorLine="Пробка должна расти поэтапно, а не возникать мгновенно.";break;
@@ -281,6 +284,9 @@ namespace BiologyVR.ArteryRoute.Journey
             if(SceneNumber!=5&&SceneNumber!=10)return;
             ModelRadius=radius;PressureSystolic=pressure;
         }
+        public void UpdateInnateViralLoad(float value){ViralLoad=Mathf.Clamp(value,0,100);Changed?.Invoke();}
+        public void ObserveImmunePhenomenon(string title,string text,string professor)
+        {if(!world.immunity||!world.immunity.Active)return;LearningTerm=title;LearningNote=text;ProfessorLine=professor;Changed?.Invoke();}
         public void WarnExcessiveTone()
         {WrongTargetActions++;Feedback="Чрезмерное сужение ограничивает поток. Подними BioTool и верни умеренный тонус.";Changed?.Invoke();}
         public void RecordPhysicalError(string text){WrongTargetActions++;Feedback=text;Changed?.Invoke();}

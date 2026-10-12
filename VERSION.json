@@ -1,10 +1,10 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "unity": "6000.1.9f1",
-  "art": "Coral V6 + free blood research and molecular journal + in-vessel hemodynamics + staged hemostasis + persistent bloodstream + XR lifecycle + futuristic holographic UI",
-  "updated_utc": "2026-10-12T04:57:16.615299+00:00",
-  "webgl_version": "0.5.0",
-  "android_release_version": "0.5.0",
+  "art": "Coral V6 + five-population living blood pool + nested RBC gas analysis + phagocyte capture/pull/launch/engulf + innate viral waves + hemodynamics + staged hemostasis + XR lifecycle",
+  "updated_utc": "2026-10-12T18:52:25.998285+00:00",
+  "webgl_version": "0.6.0",
+  "android_release_version": "0.6.0",
   "releases": [
     {
       "file": "BiologyVR_MetaQuest.apk",
@@ -39,9 +39,25 @@
       "version": "0.5.0",
       "device": "Meta Quest 2 / Pro / 3 / 3S",
       "tag": "v0.5.0"
+    },
+    {
+      "file": "BiologyVR_Pico4_v0.6.0.apk",
+      "bytes": 77356895,
+      "sha256": "9b5841cca0ee6815584145f20191eb8bf3c609502795399c43534057e3a854f4",
+      "version": "0.6.0",
+      "device": "PICO 4 / PICO 4 Enterprise",
+      "tag": "v0.6.0"
+    },
+    {
+      "file": "BiologyVR_MetaQuest_v0.6.0.apk",
+      "bytes": 76472676,
+      "sha256": "d50c611d94973a89274606ef3489d75668752bd4c1101c66bf1e47a8d91dcafa",
+      "version": "0.6.0",
+      "device": "Meta Quest 2 / Pro / 3 / 3S",
+      "tag": "v0.6.0"
     }
   ],
-  "pico_release_version": "0.5.0",
-  "quest_release_version": "0.5.0",
-  "android_version_code": 6
+  "pico_release_version": "0.6.0",
+  "quest_release_version": "0.6.0",
+  "android_version_code": 7
 }

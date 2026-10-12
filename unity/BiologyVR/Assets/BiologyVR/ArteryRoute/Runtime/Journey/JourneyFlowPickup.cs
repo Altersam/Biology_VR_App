@@ -11,7 +11,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public int poolIndex;
         public float startDistance=1.5f;
         public Vector2 startLane;
-        public bool InStudyFlow=>flow&&target&&target.mission&&target.mission.SceneNumber==3&&gameObject.activeInHierarchy;
+        public bool InStudyFlow=>flow&&target&&target.mission&&!target.mission.world.bloodEntities&&target.mission.SceneNumber==3&&gameObject.activeInHierarchy;
         public bool Held=>target&&(target.grabbed||target.DesktopHeld)||(grab&&grab.isSelected);
         public bool Rejoining{get;private set;}
         public int HiddenReentries{get;private set;}

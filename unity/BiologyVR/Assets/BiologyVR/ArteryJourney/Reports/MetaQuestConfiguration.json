@@ -1,5 +1,5 @@
 {
-  "utc": "2026-10-12T04:46:49.3323906Z",
+  "utc": "2026-10-12T18:46:33.9316937Z",
   "device": "Meta Quest 2 / Pro / 3 / 3S",
   "supportedDevices": [
     "quest2",
@@ -25,11 +25,11 @@
       "error": false
     },
     {
-      "message": "[Optional] Switch to use InputSystem.XR.PoseControl instead of OpenXR.Input.PoseControl, which will be deprecated in a future release.",
+      "message": "Optimize Buffer Discards is only supported on Vulkan graphics API",
       "error": false
     },
     {
-      "message": "[Optional] Switch to use StickControl thumbsticks instead of Vector2Control, but may break existing projects that have code dependencies to the Vector2Control type. StickControl allows more input options for thumbstick-based control, such as acting as both a combined 2D vector, two independent axes or a four-way Dpad with 4 independent buttons.",
+      "message": "Application Entry Point is required to set to Game Activity for Unity 6.0+.",
       "error": false
     },
     {

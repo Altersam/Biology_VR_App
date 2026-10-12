@@ -12,14 +12,15 @@ apk = json.loads((reports / 'PicoApkVerification.json').read_text(encoding='utf-
 quest = json.loads((reports / 'MetaQuestBuildReport.json').read_text(encoding='utf-8-sig'))
 quest_apk = json.loads((reports / 'MetaQuestApkVerification.json').read_text(encoding='utf-8-sig'))
 pc = json.loads((reports / 'Polish/FlowPickup/Hemodynamics_PC_Input.json').read_text(encoding='utf-8-sig'))
-research = json.loads((reports / 'Polish/FlowPickup/Free_Blood_Research_PC_Input.json').read_text(encoding='utf-8-sig'))
+research = json.loads((reports / 'Polish/FlowPickup/Connected_Research_Orders_PC.json').read_text(encoding='utf-8-sig'))
+organism = json.loads((reports / 'Polish/FlowPickup/Connected_Organism_PC.json').read_text(encoding='utf-8-sig'))
 mobile = json.loads((reports / 'Polish/FlowPickup/Mobile_All_Scenes_Persistent_Blood.json').read_text(encoding='utf-8-sig'))
 xr = (reports / 'Polish/VR_INPUT_PLAYTHROUGH_V7.md').read_text(encoding='utf-8-sig')
-if web.get('version') != version or web['result'] != 'Succeeded' or not browser['passed'] or browser['utc'] < web['utc'] or pico['result'] != 'Succeeded' or apk.get('version') != version or not apk['passed'] or quest['result'] != 'Succeeded' or quest_apk.get('version') != version or not quest_apk['passed'] or not pc['passed'] or not research['passed'] or not any('twenty-four permutations passed' in line for line in research['checks']) or not mobile['passed'] or 'Status: FULL SIMULATOR PASS' not in xr or 'Free first-stage research completes' not in xr:
+if web.get('version') != version or web['result'] != 'Succeeded' or not browser['passed'] or browser['utc'] < web['utc'] or pico['result'] != 'Succeeded' or apk.get('version') != version or not apk['passed'] or quest['result'] != 'Succeeded' or quest_apk.get('version') != version or not quest_apk['passed'] or not pc['passed'] or not research['passed'] or not organism['passed'] or not any('All 120 five-population orders' in line for line in research['checks']) or not mobile['passed'] or 'Status: FULL SIMULATOR PASS' not in xr or 'First XR grip promotes a real background instance' not in xr or 'Final immune population uses the same phagocyte mechanism' not in xr:
     raise SystemExit('Current build and gameplay proofs required')
 name = f'BiologyVR_Pico4_v{version}.apk'
 quest_name = f'BiologyVR_MetaQuest_v{version}.apk'
-body = f'''# Biology VR {version} — свободное исследование состава крови
+body = f'''# Biology VR {version} — живой кровоток и врождённая защита
 
 [Играть в браузере](https://altersam.github.io/Biology_VR_App/play/) ·
 [Скачать PICO APK](https://github.com/Altersam/Biology_VR_App/releases/download/v{version}/{name}) ·
@@ -28,15 +29,24 @@ body = f'''# Biology VR {version} — свободное исследовани�
 
 ## Изменения
 
-- Первый артериальный этап — свободная лаборатория, без порядка RBC → WBC → platelet → plasma.
-- Восемь существующих объектов доступны одновременно: эритроцит, лейкоцит, тромбоцит,
-  плазма, гемоглобин, гем/Fe²⁺, O₂ и CO₂. У каждого независимые статусы исследования.
+- Первый артериальный этап — пять независимых популяций: эритроцит, лейкоцит,
+  фагоцит, тромбоцит и плазма. Фагоцит — функциональный архетип лейкоцита.
+- Игрок выбирает конкретный экземпляр общего кровотока. Фоновые 360 слотов
+  остаются без массовой физики, интерактивных представителей максимум семь.
 - Захват/BioTool открывают контекстную карточку; Scanner завершает исследование.
   Предварительный grab не обязателен. Теория — короткие страницы, отдельные для каждого объекта.
 - Профессор реагирует на первое действие; повторное чтение не даёт новый зачёт.
-  Журнал и страницы сохраняются при переключениях и возврате. Continue доступен после 4/4,
+  Журнал и страницы сохраняются при переключениях и возврате. Continue доступен после 5/5,
   автоматического перехода нет. Кровь и пульсация продолжаются во время чтения.
-- Молекулярные темы доступны до эритроцита; сохранены XRI grab, O₂↔гем и двуручное увеличение.
+- Hb → гем/Fe²⁺ → O₂ раскрываются в локальном анализе выбранного RBC;
+  CO₂ изучается в контексте RBC/плазмы и преимущественного переноса HCO₃⁻.
+  Крупные самостоятельные Hb/O₂/CO₂ отсутствуют в обычном потоке.
+- Первый вирус: одна частица и один цикл обучения. Scanner инициирует реакцию
+  в модели; CAPTURE удерживает фагоцит, отвод руки заряжает поле, отпускание
+  запускает саму клетку. Preview учитывает дрейф крови; промах допускает повтор.
+- Контакт приводит к постепенному окружению и поглощению ~1.8 с. Ёмкость клетки
+  ограничена тремя успешными поглощениями. Поздние Scenes09/15 используют тот же
+  цикл внутри обычной крови; в Scene09 завершение требует снятой Viral Load.
 - Scene05: измерения A/B, скорости и диаметра прямо в артерии; Scanner FLOW,
   тонкие AR-кольца/линии и семь диагностических трассеров.
 - Три головоломки: узкий участок, широкий участок, низкое давление при нормальном
@@ -56,8 +66,10 @@ body = f'''# Biology VR {version} — свободное исследовани�
 ## Проверки
 
 - Полный маршрут Scenes03–16 + VERY FAR: **FULL SIMULATOR PASS**, XR InputActions/XRI.
-- Свободное исследование: **все 24 порядка PASS**, UTC `{research['utc']}`;
-  optional-темы до RBC, повторы, partial re-entry, кнопки страниц и нормальный Continue.
+- Свободное исследование: **все 120 порядков пяти типов PASS**, UTC `{research['utc']}`;
+  точный независимый прогресс, повторы, partial re-entry и нормальный Continue.
+- Связанный ПК fixture: **PASS**, UTC `{organism['utc']}`: вложенные темы,
+  первый вирус, промах/повтор, поглощение, поздняя волна и сохранение tutorial.
 - ПК-гемодинамика: **PASS**, UTC `{pc['utc']}`.
 - Циркуляция с мобильным пулом 180: **PASS**, UTC `{mobile['utc']}`.
 - WebGL: **Succeeded**, {web['errors']} errors / {web['warnings']} warnings,
@@ -94,6 +106,8 @@ body = f'''# Biology VR {version} — свободное исследовани�
 Левый Trigger — Scanner; правый — BioTool; правая A/B — режимы;
 Grip — предметы/карточки; левая Y — Continue. В TONUS движение вверх расширяет,
 вниз сужает участок. В CAPTURE тромбоцит прикрепляется автоматически у раны.
+Для фагоцита: удерживать CAPTURE → отвести руку → навести → отпустить Trigger.
+На ПК натяжение задаётся колесом при удерживаемом E.
 
 Unity-проект: `unity/BiologyVR`, Unity **6000.1.9f1**.
 Стартовая сцена: `Assets/BiologyVR/ArteryJourney/Scenes/ArteryNarrativeVR_VisualRework.unity`.

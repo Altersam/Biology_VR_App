@@ -26,6 +26,8 @@ namespace BiologyVR.ArteryRoute.Journey
         public static BioToolMode For(StudyGoal goal)
         {
             if(goal==null)return BioToolMode.Impulse;
+            if(goal.target=="immune-engulf")return BioToolMode.Capture;
+            if(goal.target=="phagocyte"&&goal.action==StudyAction.Activate)return BioToolMode.Capture;
             if(goal.action==StudyAction.Capture||goal.action==StudyAction.Deposit)return BioToolMode.Capture;
             if(goal.action==StudyAction.Direct&&goal.target=="platelet")return BioToolMode.Capture;
             if(goal.action==StudyAction.Radius||goal.action==StudyAction.Pressure)return BioToolMode.Tonus;
@@ -57,6 +59,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(CurrentMode==mode&&ModeChanges>0)return;
             if(CurrentMode==BioToolMode.Capture&&mode!=CurrentMode&&input&&input.world.EmbolusCaptured){input.world.ReleaseEmbolus();lastGoal=input.mission.Current;lastScene=input.mission.SceneNumber;RequiredMode=For(lastGoal);}
             if(CurrentMode==BioToolMode.Capture&&mode!=CurrentMode&&input&&input.plateletCapture)input.plateletCapture.Release();
+            if(CurrentMode==BioToolMode.Capture&&mode!=CurrentMode&&input&&input.world.immunity)input.world.immunity.CancelHold();
             CurrentMode=mode;ModeChanges++;ModePopupUntil=Time.time+1.1f;HeldSeconds=0;
             if(input){var rig=input.GetComponent<JourneyInstrumentRig>();if(rig)rig.ModeChanged();}
             if(userSelected&&input)input.mission.FeedbackMessage(Caption);

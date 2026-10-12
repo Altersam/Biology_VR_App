@@ -17,6 +17,9 @@ namespace BiologyVR.ArteryRoute.Journey
         public GameObject[] debris,platelets;
         public JourneyHemodynamicsExperiment hemodynamics;
         public JourneyResearchManager research;
+        public JourneyBloodInteractionPool bloodEntities;
+        public JourneyErythrocyteAnalysis analysis;
+        public JourneyInnateImmunity immunity;
         public GameObject[] remainingComplexes;
         public GameObject virusPrefab;
         public Renderer[] toneWall;
@@ -64,6 +67,7 @@ namespace BiologyVR.ArteryRoute.Journey
             public bool embolusCaptured,embolusStabilized,virusSourceRemoved;
             public float radius,pressure,clotBalance,fibrin,repair;
             public JourneyResearchSnapshot[] researchObjects;
+            public bool phagocyteLaunchTutorialCompleted;
         }
         [SerializeField] EpisodeMemory[] episodeMemory=new EpisodeMemory[14];
         public bool IsEpisodeCompleted(int scene)=>scene>=3&&scene<=16&&episodeMemory!=null&&episodeMemory.Length>scene-3&&episodeMemory[scene-3]!=null&&episodeMemory[scene-3].completed;
@@ -78,9 +82,10 @@ namespace BiologyVR.ArteryRoute.Journey
             state.embolusCaptured=captured;state.embolusStabilized=mission.SceneNumber==7&&mission.Complete;state.virusSourceRemoved=sourceRemoved;
             state.radius=mission.ModelRadius;state.pressure=mission.PressureSystolic;state.clotBalance=mission.ClotBalance;state.fibrin=fibrinGrowth;state.repair=repairGrowth;
             if(mission.SceneNumber==3&&research)state.researchObjects=research.Capture();
+            if(immunity)state.phagocyteLaunchTutorialCompleted=immunity.TutorialCompleted;
         }
-        public void ForgetEpisode(int scene){if(scene>=3&&scene<=16&&episodeMemory!=null)episodeMemory[scene-3]=new EpisodeMemory{scene=scene,visited=true};if(scene==3&&research)research.ResetRun();}
-        public void ResetJourneyMemory(){episodeMemory=new EpisodeMemory[14];if(research)research.ResetRun();}
+        public void ForgetEpisode(int scene){if(scene>=3&&scene<=16&&episodeMemory!=null)episodeMemory[scene-3]=new EpisodeMemory{scene=scene,visited=true};if(scene==3&&research){if(analysis)analysis.Close();if(bloodEntities)foreach(var slot in bloodEntities.slots)bloodEntities.Release(slot.target);research.ResetRun();}}
+        public void ResetJourneyMemory(){episodeMemory=new EpisodeMemory[14];if(research)research.ResetRun();if(immunity)immunity.ResetRun();}
         Vector3[] residualPositions;
         Vector3 repairStartScale=Vector3.one,clotBaseScale=Vector3.one,fibrinBaseScale=Vector3.one;
         public bool Returning{get;private set;}
@@ -119,6 +124,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public JourneyTarget Find(string id)
         {
             if(string.IsNullOrEmpty(id))return null;
+            if(id=="virus-study"&&immunity&&mission.SceneNumber==8)return immunity.TutorialVirus.target;
             if(id=="embolus"&&mission.SceneNumber==7&&embolusWave&&embolusWave.ActiveTarget)return embolusWave.ActiveTarget;
             if(map.TryGetValue(id,out var cached)&&cached)return cached;
             if(targets!=null)foreach(var target in targets)if(target&&target.targetId==id)
@@ -330,6 +336,7 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         public bool CanApply(StudyAction action,string target)
         {
+            if(immunity&&immunity.Active&&(target=="immune-engulf"||target=="phagocyte"||target=="virus-study"))return immunity.CanApply(action,target);
             if(hemodynamics&&target.StartsWith("hdx-"))return hemodynamics.CanApply(action,target);
             if(mission.FreeBloodResearch)return research.CanInvestigate(Find(target));
             if(mission.SceneNumber==16&&target.StartsWith("check-"))
@@ -418,6 +425,7 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         public void Apply(StudyAction action,string target,int progress)
         {
+            if(immunity&&immunity.Active&&(target=="immune-engulf"||target=="phagocyte"||target=="virus-study"))return;
             if(hemodynamics&&target.StartsWith("hdx-")){hemodynamics.Accepted(action,target);return;}
             if(mission.SceneNumber==16&&target.StartsWith("check-"))HomeostasisChecks++;
             switch(target)
@@ -497,7 +505,7 @@ namespace BiologyVR.ArteryRoute.Journey
              if(fibrinGrowth>0&&fibrin){float rate=mission.SceneNumber==12&&hemostasisPuzzle&&hemostasisPuzzle.flowLayering?.16f:.45f;fibrinGrowth=Mathf.Min(1,fibrinGrowth+Time.deltaTime*rate);fibrin.transform.localScale=fibrinBaseScale*fibrinGrowth;}
             if(mission.SceneNumber==14&&fibrinolysis){FibrinRemoval=Mathf.Min(1,FibrinRemoval+Time.deltaTime*.32f);fibrinGrowth=1-FibrinRemoval;if(FibrinRemoval>=1&&fibrin)fibrin.SetActive(false);}
             if(repairGrowth>0&&repairPatch){repairGrowth=Mathf.Min(1,repairGrowth+Time.deltaTime*.30f);var r=repairPatch.GetComponent<Renderer>();if(r){var block=new MaterialPropertyBlock();r.GetPropertyBlock(block);block.SetFloat("_Reveal",repairGrowth);r.SetPropertyBlock(block);}}
-            bool wave=(mission.SceneNumber==9||mission.SceneNumber==15)&&mission.Current?.action==StudyAction.Mark&&!sourceRemoved;
+            bool wave=!immunity&&(mission.SceneNumber==9||mission.SceneNumber==15)&&mission.Current?.action==StudyAction.Mark&&!sourceRemoved;
             if(wave&&virusPrefab)
             {
                 waveTimer+=Time.deltaTime;

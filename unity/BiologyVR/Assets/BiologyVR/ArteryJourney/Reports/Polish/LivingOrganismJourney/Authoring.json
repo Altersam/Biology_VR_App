@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-12T08:11:38.3931165Z",
+  "bloodPool": 360,
+  "interactiveProxyLimit": 7,
+  "phagocyteProxyLimit": 3,
+  "virusPool": 8,
+  "firstStageRequired": 5,
+  "nestedMolecules": true,
+  "ambientLargeGasObjects": false,
+  "tutorial": "Scene08 / one virus / one successful cell launch and engulf",
+  "waves": "Scene09 and Scene15 / same cell manipulation / existing ViralLoad",
+  "aimOriginsPreserved": true,
+  "InputActionsPreserved": true,
+  "hardwareVerified": false
+}

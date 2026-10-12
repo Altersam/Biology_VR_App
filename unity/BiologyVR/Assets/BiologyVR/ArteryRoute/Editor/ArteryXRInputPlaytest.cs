@@ -23,7 +23,7 @@ namespace BiologyVR.ArteryRoute.Editor
         static bool[] simulatorEnabled;
         static XRSimulatedHMDState hs;
         static float runtimeGrip;static bool runtimeGripButton;
-        static readonly List<string> notes=new List<string>();static bool running,previewOnly,plaqueFixture,controllerFixture;
+        static readonly List<string> notes=new List<string>();static bool running,previewOnly,plaqueFixture,controllerFixture,immuneFixture;
         [MenuItem("Biology VR/Playtest Scene03 Through XR Input")]
         public static void Run()
         {Start(false);}
@@ -33,13 +33,15 @@ namespace BiologyVR.ArteryRoute.Editor
         public static void PlaqueOnly()=>Start(false,true);
         [MenuItem("Biology VR/Test XR Controller Animation Guides And UI Lifecycle")]
         public static void ControllersOnly()=>Start(false,false,true);
-        static void Start(bool preview,bool plaque=false,bool controllers=false)
+        [MenuItem("Biology VR/Test Connected Innate Immunity Through XR Input")]
+        public static void ImmunityOnly()=>Start(false,false,false,true);
+        static void Start(bool preview,bool plaque=false,bool controllers=false,bool immune=false)
         {
             if(!EditorApplication.isPlaying)throw new InvalidOperationException("Start a fresh Play Mode session first");
             if(running)throw new InvalidOperationException("XR playtest already running");
             mission=UnityEngine.Object.FindFirstObjectByType<JourneyMission>();
             if(mission.SceneNumber!=3||mission.StepIndex!=0)throw new InvalidOperationException("Fresh Scene03 required; this test does not reset/complete mission state. Actual scene="+mission.SceneNumber+" step="+mission.StepIndex);
-            previewOnly=preview;plaqueFixture=plaque;controllerFixture=controllers;running=true;EditorCoroutineUtility.StartCoroutineOwnerless(GuardedPlay());
+            previewOnly=preview;plaqueFixture=plaque;controllerFixture=controllers;immuneFixture=immune;running=true;EditorCoroutineUtility.StartCoroutineOwnerless(GuardedPlay());
         }
         static IEnumerator GuardedPlay()
         {
@@ -64,6 +66,7 @@ namespace BiologyVR.ArteryRoute.Editor
         }
         static void WriteReport()
         {
+            if(immuneFixture){Directory.CreateDirectory(LivingOrganismJourneyBuilder.Reports);File.WriteAllText(LivingOrganismJourneyBuilder.Reports+"/Connected_Immune_XR.md","# Connected innate immunity / actual XR input\n\nUTC: "+DateTime.UtcNow.ToString("O")+"\n\nStatus: "+(running?"RUNNING":notes.Contains("PASS: Connected immune input regression complete")&&!notes.Any(n=>n.StartsWith("BLOCKED"))?"PASS":"BLOCKED")+"\n\nScope: isolated Enter(8,true) travel fixture followed by normal Continue to Scene09. Real controller states, no success APIs; not a full route or physical-headset test.\n\n"+string.Join("\n\n",notes));return;}
             if(controllerFixture){Directory.CreateDirectory(ArteryPolishReview.Reports+"/XRControllers");File.WriteAllText(ArteryPolishReview.Reports+"/XRControllers/Input_Lifecycle.md","# XR controller lifecycle\n\nUTC: "+DateTime.UtcNow.ToString("O")+"\n\nStatus: "+(running?"RUNNING":notes.Contains("PASS: Controller lifecycle input regression complete")&&!notes.Any(n=>n.StartsWith("BLOCKED"))?"PASS":"BLOCKED")+"\n\n"+string.Join("\n\n",notes));return;}
             if(plaqueFixture){Directory.CreateDirectory(PlaqueChallengeBuilder.Reports);File.WriteAllText(PlaqueChallengeBuilder.Reports+"/XR_Plaque_Input.md","# Actual XR plaque fixture\n\nUTC: "+DateTime.UtcNow.ToString("O")+"\n\n"+string.Join("\n\n",notes));return;}
             if(previewOnly){Directory.CreateDirectory(BiomedicalLivingPass.Reports+"/Stage1");File.WriteAllText(BiomedicalLivingPass.Reports+"/Stage1/XR_Input_Preview.md","# Controller-mounted device preview\n\nUTC: "+DateTime.UtcNow.ToString("O")+"\n\n"+string.Join("\n\n",notes));return;}
@@ -93,6 +96,7 @@ namespace BiologyVR.ArteryRoute.Editor
                 input.useExplicitAimSources=true;
                 yield return new EditorWaitForSeconds(.45f);
                 if(controllerFixture){yield return ControllerLifecycle();yield break;}
+                if(immuneFixture){mission.Enter(8,true);while(!mission.Ready)yield return GameSeconds(.1f);yield return GameSeconds(.3f);yield return ImmuneEncounter(true);ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(4f);Require(mission.SceneNumber==9&&mission.Ready,"Normal left Y continues the completed tutorial to Scene09");yield return ImmuneEncounter(false);Require(mission.Complete&&mission.ViralLoad==0,"Connected immune input regression complete");yield break;}
                 if(plaqueFixture)
                 {
                     mission.Enter(6,false);yield return GameSeconds(.25f);
@@ -136,7 +140,8 @@ namespace BiologyVR.ArteryRoute.Editor
                     Require(tools.scannerVR.GetComponentsInChildren<Collider>(true).Length==0&&tools.bioVR.GetComponentsInChildren<Collider>(true).Length==0,"Biomedical tool views add no physical contacts");
                     notes.Add("Installed device mesh triangles: Scanner="+tools.scannerVR.GetComponentsInChildren<MeshFilter>(true).Sum(f=>f.sharedMesh.triangles.Length/3)+"; BioTool="+tools.bioVR.GetComponentsInChildren<MeshFilter>(true).Sum(f=>f.sharedMesh.triangles.Length/3));
                 }
-                if(mission.FreeBloodResearch)yield return FreeResearchEpisode();
+                if(w.bloodEntities)yield return ConnectedResearchEpisode();
+                else if(mission.FreeBloodResearch)yield return FreeResearchEpisode();
                 else
                 {
                 var rbc=w.Find("rbc");Vector3 centre=rbc.GetComponent<SphereCollider>().bounds.center;
@@ -287,6 +292,9 @@ namespace BiologyVR.ArteryRoute.Editor
                 ArteryPolishReview.Capture(mission.mover.viewCamera,"V7Input/Scene07_Player_WithHUD.png");
                 ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
                 Require(mission.SceneNumber==8&&mission.mover.Moving,"Real left Y continues completed Scene07");yield return GameSeconds(10f);Require(mission.SceneNumber==8&&mission.Ready,"Transition 07→08 arrives through normal travel");
+                if(w.immunity)yield return ImmuneEncounter(true);
+                else
+                {
                 yield return Scan("virus-study");
                 var virus=w.Find("virus-study");var virusGrab=virus.GetComponent<XRGrabInteractable>();Require(virusGrab,"Study virus has authored XRI grab support");
                 Aim(false,virus.transform.position);yield return GameSeconds(.12f);Trigger(false,true);yield return GameSeconds(.2f);Trigger(false,false);yield return GameSeconds(.18f);
@@ -303,9 +311,13 @@ namespace BiologyVR.ArteryRoute.Editor
                 Require(w.virusInspection.Enlarged,"Educational virus scale persists after releasing both hands");
                 foreach(string id in new[]{"genome","capsid","epitope"})yield return Scan(id);
                 Require(mission.Complete&&w.IsEpisodeCompleted(8),"All Scene08 parts scanned without tool enlargement/debug completion");
+                }
                 ArteryPolishReview.Capture(mission.mover.viewCamera,"V7Input/Scene08_Player_WithHUD.png");
                 ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
                 Require(mission.SceneNumber==9&&mission.mover.Moving,"Real left Y continues completed Scene08");yield return GameSeconds(4f);Require(mission.SceneNumber==9&&mission.Ready,"Same-site transition 08→09 arrives through normal travel");
+                if(w.immunity)yield return ImmuneEncounter(false);
+                else
+                {
                 yield return ToolAction("immune-mode");
                 var wrongWaveTarget=w.Find("phagocyte");Aim(false,wrongWaveTarget.GetComponent<Collider>().bounds.center);yield return GameSeconds(.12f);Trigger(false,true);yield return GameSeconds(.3f);Trigger(false,false);yield return GameSeconds(.18f);
                 Require(w.MarkedViruses==0&&mission.StepIndex==1,"Charging BioTool at the phagocyte cannot mark an unrelated incoming virion");
@@ -316,6 +328,7 @@ namespace BiologyVR.ArteryRoute.Editor
                 var phagocytePosition=w.phagocyte.position;
                 yield return ToolAction("phagocyte");Require(mission.Complete&&w.IsEpisodeCompleted(9)&&mission.ViralLoad==0&&w.EngulfedViruses==JourneyMission.AssaultVirusCount,"Scene09 handoff completes only after all twenty-four actual phagocyte ingestions");
                 Require(Vector3.Distance(phagocytePosition,w.phagocyte.position)<.01f,"Scene09 phagocyte stays in its current episode instead of moving to the future wound");
+                }
                 ArteryPolishReview.Capture(mission.mover.viewCamera,"V7Input/Scene09_Player_WithHUD.png");
                 ls=ls.WithButton(ControllerButton.SecondaryButton,true);yield return GameSeconds(.12f);ls=ls.WithButton(ControllerButton.SecondaryButton,false);yield return GameSeconds(.2f);
                 Require(mission.SceneNumber==10&&mission.mover.Moving,"Real left Y continues completed Scene09");yield return GameSeconds(10f);Require(mission.SceneNumber==10&&mission.Ready,"Transition 09→10 arrives through normal travel");
@@ -405,8 +418,8 @@ namespace BiologyVR.ArteryRoute.Editor
                 Require(Quaternion.Angle(recoveryHead,mission.mover.viewCamera.transform.localRotation)<.01f&&Quaternion.Angle(recoveryOrigin,origin.rotation)<.01f&&input.scanner==scanner&&input.bioTool==tool,"14→15 preserves origin/gaze and original tools");
                 LookWithHead(w.infected.position);yield return GameSeconds(.12f);yield return Scan("infected-cell");Require(mission.StepIndex==1,"Final exam starts by finding/scanning an actual infected cell before wave actions");
                 var wrongFinal=w.Find("t-cell");Aim(false,wrongFinal.GetComponent<Collider>().bounds.center);yield return GameSeconds(.12f);Trigger(false,true);yield return GameSeconds(.3f);Trigger(false,false);yield return GameSeconds(.18f);Require(mission.Progress==0,"Wrong final biological target cannot substitute an incoming virion");
-                for(int i=0;i<4;i++)yield return MarkFinalVirus(i);
-                Require(mission.StepIndex==2&&w.FinalPulseHits>=2,"Final timed wave includes real shield pulses followed by four charged marks");yield return Scan("epitope");
+                if(w.immunity){yield return ImmuneEncounter(false);Require(mission.StepIndex==2,"Final immune population uses the same phagocyte mechanism before specific antibody recognition");}
+                else{for(int i=0;i<4;i++)yield return MarkFinalVirus(i);Require(mission.StepIndex==2&&w.FinalPulseHits>=2,"Final timed wave includes real shield pulses followed by four charged marks");}yield return Scan("epitope");
                 yield return PlaceAntibodyWithGrip(w.Find("antibody-B"),w.Find("epitope").transform.position);
                 Require(mission.StepIndex==3&&!w.AntibodyBound,"Physically placed wrong antibody is rejected without advancing final exam");
                 yield return PlaceAntibodyWithGrip(w.Find("antibody-A"),w.Find("epitope").transform.position);
@@ -476,7 +489,7 @@ namespace BiologyVR.ArteryRoute.Editor
             while(Time.time-began<1.1f||!repeat&&research.Find(id).State!=JourneyResearchState.Investigated&&Time.time-began<3)
             {Aim(true,contact.bounds.center);yield return null;}
             Trigger(true,false);yield return GameSeconds(.15f);
-            var input=mission.GetComponent<JourneyInput>();notes.Add("Free research scan "+id+": focused="+(research.Focused?research.Focused.theory.id:"none")+" status="+research.Find(id).State+" count="+research.RequiredInvestigated+" blocker="+(input.AimObstruction?input.AimObstruction.name:"none")+" uiBlocked="+input.ScannerBlockedByUi);
+            var input=mission.GetComponent<JourneyInput>();notes.Add("Free research scan "+id+": focused="+(research.Focused?research.Focused.theory.id:"none")+" status="+research.Find(id).State+" count="+research.RequiredInvestigated+" blocker="+(input.AimObstruction?input.AimObstruction.name:"none")+" uiBlocked="+input.ScannerBlockedByUi+" analysis="+mission.world.analysis.Opened+" targetActive="+target.gameObject.activeSelf+" collider="+contact.enabled+" position="+contact.bounds.center+" scanner="+input.scanner.position+" lock="+(input.LockedTarget?input.LockedTarget.name:"none"));
             Require(research.Find(id).State==JourneyResearchState.Investigated&&research.Focused==research.Find(id)&&research.UniqueScans==count+(repeat?0:1),"Actual XR Scanner independently investigates or reopens "+id);
             Require(mission.LearningTerm==research.Find(id).theory.displayName,"Object-specific theory is shown for XR selection "+id);
         }
@@ -528,6 +541,83 @@ namespace BiologyVR.ArteryRoute.Editor
             before=research.UniqueScans;yield return TrackResearchScan("plasma");Require(research.UniqueScans==before&&mission.Complete,"Theory can still be reopened after all mandatory research without extra credit");
             Require(true,"Free first-stage research completes through actual XR actions in player-selected order with molecular details preserved");
             ArteryPolishReview.Capture(mission.mover.viewCamera,"FreeBloodResearch/06_XR_Research_Complete.png");
+        }
+        static Transform FindLiveBlood(string type)
+        {
+            var world=mission.world;var stream=world.bloodEntities.stream;Transform result=null;float best=10;
+            for(int i=0;i<stream.flow.VisibleCellLimit;i++){var cell=stream.flow.cells[i];if(stream.Leased(i)||!cell.GetComponent<Renderer>().enabled||JourneyBloodInteractionPool.ResearchType(stream.flow.species[i])!=type||type=="phagocyte"&&!world.bloodEntities.HasPhagocyteCapacity(i))continue;float distance=Vector3.Distance(cell.position,mission.mover.viewCamera.transform.position);if(distance>1.4f&&distance<best){best=distance;result=cell;}}
+            return result;
+        }
+        static IEnumerator ScanLiveBlood(string type)
+        {
+            Transform cell=null;var world=mission.world;world.bloodEntities.stream.RequestInflux(type=="rbc"?"erythrocyte":type=="plasma"?"albumin":type);float began=Time.time;
+            LookWithHead(mission.mover.viewCamera.transform.position+mission.mover.path.Forward(mission.mover.Distance)*5);yield return GameSeconds(.15f);
+            while(!(cell=FindLiveBlood(type))&&Time.time-began<50)yield return GameSeconds(.15f);
+            Require(cell,"Requested species exists in the ordinary moving blood population: "+type);
+            LookWithHead(cell.position);yield return GameSeconds(.15f);Trigger(true,true);began=Time.time;
+            while(Time.time-began<5)
+            {
+                var proxy=world.bloodEntities.slots.Where(s=>s.type==type&&s.index>=0&&(type!="phagocyte"||s.target.GetComponent<JourneyPhagocyteEntity>().RemainingCapacity>0&&!s.target.GetComponent<JourneyPhagocyteEntity>().Busy)).OrderBy(s=>Vector3.Distance(s.target.transform.position,mission.mover.viewCamera.transform.position)).FirstOrDefault();Aim(true,proxy!=null?proxy.target.GetComponent<Collider>().bounds.center:cell.position);yield return GameSeconds(.03f);
+                if(mission.SceneNumber==3&&world.research.Find(type).State==JourneyResearchState.Investigated)break;
+                if(mission.SceneNumber!=3&&world.immunity.phagocytes.Any(p=>p.gameObject.activeInHierarchy&&p.State==JourneyPhagocyteState.Activated&&p.RemainingCapacity>0))break;
+            }
+            Trigger(true,false);yield return GameSeconds(.15f);
+            if(mission.SceneNumber!=3&&!world.immunity.phagocytes.Any(p=>p.gameObject.activeInHierarchy&&p.State==JourneyPhagocyteState.Activated&&p.RemainingCapacity>0)){var input=mission.GetComponent<JourneyInput>();notes.Add("Live activation: lock="+(input.LockedTarget?input.LockedTarget.name:"none")+" blocked="+input.ScannerBlockedByUi+" obstacle="+(input.AimObstruction?input.AimObstruction.name:"none")+" cells="+string.Join(",",world.immunity.phagocytes.Select(p=>p.name+":"+p.State+":"+p.RemainingCapacity+":"+p.gameObject.activeSelf)));}
+            Require(mission.SceneNumber==3?world.research.Find(type).State==JourneyResearchState.Investigated:world.immunity.phagocytes.Any(p=>p.gameObject.activeInHierarchy&&p.State==JourneyPhagocyteState.Activated&&p.RemainingCapacity>0),"Actual left Trigger identifies or activates a concrete flowing "+type);
+        }
+        static IEnumerator ConnectedResearchEpisode()
+        {
+            var world=mission.world;var research=world.research;Directory.CreateDirectory(LivingOrganismJourneyBuilder.Reports);
+            Require(research.RequiredCount==5&&world.analysis.molecules.All(t=>!t.gameObject.activeInHierarchy),"Five blood populations are independent; large molecular models remain absent until analysis");
+            world.bloodEntities.stream.RequestInflux("phagocyte");float catchStart=Time.time;Transform drifting=null;while(!(drifting=FindLiveBlood("phagocyte"))&&Time.time-catchStart<50)yield return GameSeconds(.15f);Require(drifting,"An ordinary phagocyte is available for a first grip without prior Scanner promotion");
+            Pose(false,drifting.position,Quaternion.identity);yield return GameSeconds(.1f);Grip(false,true);catchStart=Time.time;
+            while(Time.time-catchStart<2&&!world.immunity.phagocytes.Any(p=>p.target.grabbed)){Pose(false,drifting.position,Quaternion.identity);yield return GameSeconds(.03f);}
+            notes.Add("Near grip: acquisitions="+world.bloodEntities.Acquisitions+" right="+rc.position+" source="+drifting.position+" states="+string.Join(",",world.bloodEntities.slots.Select(s=>s.type+":"+s.index+":"+s.target.grabbed+":"+s.grab.isSelected))+" journal="+research.Find("phagocyte").State);
+            Require(world.immunity.phagocytes.Any(p=>p.target.grabbed&&p.target.GetComponent<XRGrabInteractable>().isSelected)&&research.Find("phagocyte").State==JourneyResearchState.Investigating&&research.RequiredInvestigated==0,"First XR grip promotes a real background instance and begins research without scan credit");Grip(false,false);yield return GameSeconds(.2f);
+            foreach(var type in new[]{"phagocyte","platelet","leukocyte","plasma","rbc"})yield return ScanLiveBlood(type);
+            Require(mission.Complete&&research.RequiredInvestigated==5,"Player-selected pool instances complete free research with phagocyte first");
+            var subject=world.Find("rbc");Pose(false,subject.GetComponent<Collider>().bounds.center,Quaternion.identity);yield return GameSeconds(.2f);Grip(false,true);yield return GameSeconds(.25f);Require(subject.grabbed,"Existing XR grip selects the promoted blood instance");
+            Aim(true,subject.GetComponent<Collider>().bounds.center);Trigger(true,true);yield return GameSeconds(1.7f);Trigger(true,false);yield return GameSeconds(.15f);Require(world.analysis.Opened&&world.analysis.Subject==subject,"Deep Scan reveals local hemoglobin content inside the selected erythrocyte");
+            ArteryPolishReview.Capture(mission.mover.viewCamera,"LivingOrganismJourney/10_XR_Nested_RBC_Analysis.png");
+            foreach(var id in new[]{"hemoglobin","heme","oxygen","co2"})yield return TrackResearchScan(id);Require(research.OptionalInvestigated==4,"XR molecular investigation follows RBC → Hb → heme/Fe2+ and gas transport, not ambient molecules");
+            Grip(false,false);yield return GameSeconds(.2f);
+            var heme=world.Find("heme");Pose(true,heme.GetComponent<Collider>().bounds.center,Quaternion.identity);yield return GameSeconds(.15f);Grip(true,true);yield return GameSeconds(.25f);
+            var oxygen=world.Find("oxygen");Pose(false,oxygen.GetComponent<Collider>().bounds.center,Quaternion.identity);yield return GameSeconds(.15f);Grip(false,true);yield return GameSeconds(.25f);Require(oxygen.grabbed,"Nested educational O2 can be extracted by the existing grip");Grip(false,false);Grip(true,false);yield return GameSeconds(.3f);world.analysis.Close();
+            Require(world.analysis.molecules.All(t=>!t.gameObject.activeInHierarchy)&&research.RequiredInvestigated==5,"Closing analysis removes standalone molecular objects while preserving type journal");
+            ArteryPolishReview.Capture(mission.mover.viewCamera,"LivingOrganismJourney/11_XR_Living_Blood_Research.png");
+        }
+        static IEnumerator ImmuneEncounter(bool tutorial)
+        {
+            var world=mission.world;var immunity=world.immunity;
+            if(tutorial)
+            {
+                Require(immunity.LiveCount==1&&!immunity.TutorialCompleted,"First viral encounter starts with one drifting virion and no combat wave");
+                var virus=immunity.TutorialVirus;LookWithHead(virus.transform.position);yield return GameSeconds(.15f);Trigger(true,true);float began=Time.time;
+                while(mission.StepIndex==0&&Time.time-began<3){Aim(true,virus.contact.bounds.center);yield return GameSeconds(.03f);}Trigger(true,false);yield return GameSeconds(.15f);
+                var scannerInput=mission.GetComponent<JourneyInput>();notes.Add("First viral scan: step="+mission.StepIndex+" distance="+Vector3.Distance(virus.transform.position,mission.mover.viewCamera.transform.position)+" progress="+immunity.ScanProgress+" active="+virus.gameObject.activeInHierarchy+" blocked="+scannerInput.ScannerBlockedByUi+" obstacle="+(scannerInput.AimObstruction?scannerInput.AimObstruction.name:"none")+" lock="+(scannerInput.LockedTarget?scannerInput.LockedTarget.name:"none"));Require(mission.StepIndex==1,"Real Scanner investigates the first viral particle before immune action");
+                yield return ScanLiveBlood("phagocyte");yield return LaunchImmuneCell(true);yield return GameSeconds(4.2f);Require(!mission.Complete&&immunity.LiveCount==1,"A missed XR cell launch preserves the first virus and allows reuse");
+            }
+            float start=Time.time;int initialStep=mission.StepIndex;
+            while((tutorial?!mission.Complete:mission.StepIndex==initialStep)&&Time.time-start<220)
+            {
+                if(!immunity.phagocytes.Any(p=>p.gameObject.activeInHierarchy&&p.State==JourneyPhagocyteState.Activated&&p.RemainingCapacity>0))yield return ScanLiveBlood("phagocyte");
+                while(immunity.LiveCount==0)yield return GameSeconds(.1f);
+                int before=immunity.Neutralized;yield return LaunchImmuneCell(false);float began=Time.time;while(immunity.Neutralized==before&&Time.time-began<4.5f)yield return GameSeconds(.1f);
+            }
+            Require(tutorial?mission.Complete&&immunity.TutorialCompleted&&immunity.Neutralized==1:mission.StepIndex>initialStep,"Actual XR capture/pull/aim/release completes "+(tutorial?"single-virus tutorial":"later viral population"));
+            ArteryPolishReview.Capture(mission.mover.viewCamera,tutorial?"LivingOrganismJourney/12_XR_First_Phagocytosis.png":"LivingOrganismJourney/13_XR_Wave_Within_Blood.png");
+        }
+        static IEnumerator LaunchImmuneCell(bool miss)
+        {
+            var immunity=mission.world.immunity;float waited=Time.time;while(!immunity.phagocytes.Any(p=>p.gameObject.activeInHierarchy&&p.State==JourneyPhagocyteState.Activated&&p.RemainingCapacity>0)&&Time.time-waited<5)yield return GameSeconds(.08f);
+            var cell=immunity.phagocytes.First(p=>p.gameObject.activeInHierarchy&&p.State==JourneyPhagocyteState.Activated&&p.RemainingCapacity>0);Aim(false,cell.target.GetComponent<Collider>().bounds.center);yield return GameSeconds(.15f);Trigger(false,true);float began=Time.time;
+            while(!immunity.Held&&Time.time-began<3){Aim(false,cell.target.GetComponent<Collider>().bounds.center);yield return GameSeconds(.03f);}Require(immunity.Held,"Actual XR Capture holds a phagocyte without swallowing it into the tool");yield return GameSeconds(.9f);
+            var input=mission.GetComponent<JourneyInput>();Vector3 origin=rc.position;Quaternion rotation=rc.rotation;var backward=-input.bioTool.forward;began=Time.time;
+            while(Time.time-began<.6f){Pose(false,origin+backward*.24f*Mathf.Clamp01((Time.time-began)/.6f),rotation);yield return null;}yield return GameSeconds(.15f);Require(immunity.PullDistance>.18f&&immunity.trajectory.enabled,"Physical XR hand pull charges the same held field and previews advection");
+            var target=immunity.Tutorial?immunity.TutorialVirus:immunity.viruses.Where(v=>v.Live&&v.State!=JourneyImmuneVirusState.BeingPhagocytosed).OrderBy(v=>Vector3.Distance(cell.transform.position,v.transform.position)).First();
+            Vector3 aimOrigin=input.bioTool.position;Quaternion mount=Quaternion.Inverse(rc.rotation)*input.bioTool.rotation;Vector3 offset=Quaternion.Inverse(rc.rotation)*(input.bioTool.position-rc.position);began=Time.time;
+            while(Time.time-began<1.1f){Vector3 point=miss?aimOrigin+mission.mover.path.Up(mission.mover.Distance)*5:ArteryFlowPickupPlaytest.ImmuneInterceptPoint(immunity,target,aimOrigin,JourneyInnateImmunity.HoldDistance+immunity.PullDistance);Quaternion aimRotation=Quaternion.LookRotation(point-aimOrigin,mission.mover.viewCamera.transform.up);Quaternion controllerRotation=aimRotation*Quaternion.Inverse(mount);Pose(false,aimOrigin-controllerRotation*offset,controllerRotation);yield return null;}
+            ArteryPolishReview.Capture(mission.mover.viewCamera,"LivingOrganismJourney/14_XR_Captured_Pulled_Cell.png");Trigger(false,false);yield return GameSeconds(.15f);Require(cell.State==JourneyPhagocyteState.Launched||cell.State==JourneyPhagocyteState.Phagocytosis,"Releasing the existing right Trigger launches the real cell");
         }
         static IEnumerator ObserveBloodTravel(float seconds)
         {
