@@ -248,3 +248,11 @@ Pages deployment **success**, run **38206216380**; опубликованный 
 Версия новых сборок: **0.6.0 / Android versionCode 7**. Фактический статус
 сборки и публикации — актуальные build reports и `RELEASE_0_6_0_RU.md`.
 Предыдущие разделы описывают историю развития проекта.
+
+Публикация 0.6.0 проверена UTC `2026-10-12T18:59:12.179267+00:00`:
+- Source/WebGL commit `f80a9dbe34f76b27e5912fe9614815d4da78a225` отправлен в приложение.
+- GitHub Release `v0.6.0` содержит PICO APK, Meta Quest APK и SHA256SUMS.
+- GitHub digest обоих APK совпадает с проверенными локальными файлами.
+- Pages deployment `38294283709` — success; публичный WebGL сообщает версию 0.6.0,
+  loader/framework совпадают с локальной сборкой.
+- `RELEASE_PUBLICATION_0_6_0.json` содержит ссылки и результаты проверки.
