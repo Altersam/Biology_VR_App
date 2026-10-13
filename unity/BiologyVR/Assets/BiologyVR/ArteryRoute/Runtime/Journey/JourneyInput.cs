@@ -109,7 +109,7 @@ namespace BiologyVR.ArteryRoute.Journey
             var keyboard = Keyboard.current;
             if (keyboard != null)
             {
-                if (keyboard.gKey.wasPressedThisFrame)
+                if (keyboard.gKey.wasPressedThisFrame&&!world.freeTools)
                 {
                     if(desktopControls&&desktopControls.ReleaseMouseGrab())return;
                     if(world!=null)
@@ -160,7 +160,7 @@ namespace BiologyVR.ArteryRoute.Journey
             // OnDisable clears the queue; public HUD methods remain callable while disabled.
             pendingScan = pendingTool = false;
             if (!isActiveAndEnabled) return;
-            if(world.bloodEntities&&world.bloodEntities.Active&&(useExplicitAimSources||mover.UsingTrackedInput||XRSettings.isDeviceActive))
+            if(!world.freeTools&&world.bloodEntities&&world.bloodEntities.Active&&(useExplicitAimSources||mover.UsingTrackedInput||XRSettings.isDeviceActive))
             {
                 if(!leftHand||!rightHand)foreach(var hand in mover.origin.GetComponentsInChildren<Transform>(true)){if(hand.name=="Left Controller")leftHand=hand;else if(hand.name=="Right Controller")rightHand=hand;}
                 int before=world.bloodEntities.Acquisitions;
@@ -188,7 +188,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public void SetUiBlocking(bool scannerBlocked,bool toolBlocked)
         {
             if(scannerBlocked&&!ScannerBlockedByUi){ScanProgress=0;scanTarget=null;scanConsumed=false;ScannerHeld=false;}
-            if(toolBlocked&&!ToolBlockedByUi){ChargeProgress=0;chargeTarget=null;toolConsumed=false;ToolHeld=false;AdjustingTone=false;ToneStability=0;if(world&&world.EmbolusCaptured)world.ReleaseEmbolus();if(world&&world.immunity)world.immunity.CancelHold();if(plateletCapture)plateletCapture.Release();}
+            if(toolBlocked&&!ToolBlockedByUi){ChargeProgress=0;chargeTarget=null;toolConsumed=false;ToolHeld=false;AdjustingTone=false;ToneStability=0;if(world&&world.EmbolusCaptured)world.ReleaseEmbolus();if(world&&world.freeTools)world.freeTools.Release();if(world&&world.immunity)world.immunity.CancelHold();if(plateletCapture)plateletCapture.Release();}
             ScannerBlockedByUi=scannerBlocked;ToolBlockedByUi=toolBlocked;
         }
         public Vector3 GuideEndpoint(Transform source,out bool targetContact)
@@ -205,7 +205,7 @@ namespace BiologyVR.ArteryRoute.Journey
             return ray.GetPoint(distance);
         }
         public void CancelInstrumentProgress()
-        {ScannerHeld=ToolHeld=false;ScanProgress=ChargeProgress=0;scanTarget=chargeTarget=LockedTarget=null;LockedContact=null;scanConsumed=toolConsumed=previousPhysicalTool=desktopFieldActive=false;AdjustingTone=false;ToneStability=0;if(world)world.ReleaseEmbolus();if(world&&world.immunity)world.immunity.CancelHold();if(plateletCapture)plateletCapture.Release();}
+        {ScannerHeld=ToolHeld=false;ScanProgress=ChargeProgress=0;scanTarget=chargeTarget=LockedTarget=null;LockedContact=null;scanConsumed=toolConsumed=previousPhysicalTool=desktopFieldActive=false;AdjustingTone=false;ToneStability=0;if(world)world.ReleaseEmbolus();if(world&&world.freeTools)world.freeTools.Release();if(world&&world.immunity)world.immunity.CancelHold();if(plateletCapture)plateletCapture.Release();}
 
         /// <summary>Shared controller/keyboard hold path. Uses real scene raycasts; no focused-target fallback.</summary>
         public void UpdateHeldInstruments(float deltaTime,bool scanning,bool firing)
@@ -220,6 +220,8 @@ namespace BiologyVR.ArteryRoute.Journey
             var source=AimSource(scanning?scanner:bioTool);
             var hit=Aim(source);LockedTarget=hit;
             if(world.bloodEntities&&hit)world.bloodEntities.Touch(hit);
+            if(world.freeTools&&world.freeTools.Handle(deltaTime,scanning,firing,hit,AimSource(bioTool),desktopControls&&desktopControls.Active,bioModes.CurrentMode)){ChargeProgress=world.freeTools.ReverseCharge;previousPhysicalTool=firing;return;}
+            if(world.freeTools&&world.freeTools.ScanFlow(deltaTime,scanning,hit)){previousPhysicalTool=firing;return;}
             if(world.immunity&&world.immunity.HandleInput(deltaTime,scanning,firing&&bioModes.CurrentMode==BioToolMode.Capture,hit,AimSource(bioTool),desktopControls&&desktopControls.Active))
             {ScanProgress=world.immunity.ScanProgress;ChargeProgress=world.immunity.ChargeProgress;if(instrumentFeedback)instrumentFeedback.PresentLock(hit,ScanProgress,hit,scanning,source);previousPhysicalTool=firing;return;}
             if(mission.FreeBloodResearch)
@@ -227,7 +229,7 @@ namespace BiologyVR.ArteryRoute.Journey
                 bool correct=world.research.CanInvestigate(hit);
                 if(correct)world.research.SelectInstance(hit);
                 if(!scanning)deepScanAge=0;
-                if(scanning&&scanConsumed&&correct&&hit.targetId=="rbc"&&world.analysis&&!world.analysis.Opened){deepScanAge+=deltaTime;if(deepScanAge>.65f)world.analysis.Open(hit);}
+                if(!world.freeTools&&scanning&&scanConsumed&&correct&&hit.targetId=="rbc"&&world.analysis&&!world.analysis.Opened){deepScanAge+=deltaTime;if(deepScanAge>.65f)world.analysis.Open(hit);}
                 if(scanning&&scanConsumed&&correct&&hit!=scanTarget){scanConsumed=false;ScanProgress=0;scanTarget=null;}
                 if(scanning&&!scanConsumed)
                 {
@@ -236,10 +238,10 @@ namespace BiologyVR.ArteryRoute.Journey
                     {
                         if(scanTarget!=hit){scanTarget=hit;ScanProgress=0;mission.Accept(StudyAction.Measure,hit.targetId);}
                         ScanProgress=Mathf.Clamp01(ScanProgress+Mathf.Max(0,deltaTime)/scanDuration);
-                        if(ScanProgress>=1){scanConsumed=true;mission.Accept(StudyAction.Scan,hit.targetId);}
+                        if(ScanProgress>=1){scanConsumed=true;mission.Accept(StudyAction.Scan,hit.targetId);var phag=hit.GetComponent<JourneyPhagocyteEntity>();if(phag)phag.Studied=true;}
                     }
                 }
-                else if(firing&&!toolConsumed&&!previousPhysicalTool&&correct){toolConsumed=true;world.Primary(hit);}
+                else if(!world.freeTools&&firing&&!toolConsumed&&!previousPhysicalTool&&correct){toolConsumed=true;world.Primary(hit);}
                 if(instrumentFeedback)instrumentFeedback.PresentLock(correct?hit:null,scanning?ScanProgress:0,correct,scanning,source);
                 previousPhysicalTool=firing;return;
             }
@@ -263,12 +265,13 @@ namespace BiologyVR.ArteryRoute.Journey
                     if(firing)DesktopFieldDistance=Mathf.Clamp(DesktopFieldDistance+JourneyDesktopControls.WheelSteps*JourneyDesktopControls.DepthPerWheelStep,.45f,6.5f);
                 }
                 else desktopFieldActive=false;
-                world.UpdateEmbolusField(deltaTime,fieldSource,firing,desktop?DesktopFieldDistance:JourneyWorld.EmbolusHoldDistance);
+                if(world.freeTools&&firing&&hit!=world.Find("embolus"))world.PauseEmbolusAttraction(deltaTime);
+                else world.UpdateEmbolusField(deltaTime,fieldSource,firing,desktop?DesktopFieldDistance:JourneyWorld.EmbolusHoldDistance);
                 if(instrumentFeedback)instrumentFeedback.PresentLock(firing?world.Find("embolus"):null,world.EmbolusStability,firing,false,AimSource(bioTool));
                 previousPhysicalTool=firing;return;
             }
             desktopFieldActive=false;
-            if(world.hemodynamics&&world.hemodynamics.Control(deltaTime,firing&&!scanning,AimSource(bioTool),hit,desktopControls&&desktopControls.Active))
+            if(world.hemodynamics&&(!world.freeTools||bioModes.CurrentMode==BioToolMode.Tonus)&&world.hemodynamics.Control(deltaTime,firing&&!scanning,AimSource(bioTool),hit,desktopControls&&desktopControls.Active))
             {AdjustingTone=world.hemodynamics.Adjusting;ToneStability=world.hemodynamics.Stability;ChargeProgress=ToneStability;previousPhysicalTool=firing;return;}
             if(mission.SceneNumber==10&&goal!=null&&goal.action==StudyAction.Radius&&goal.target=="tone")
             {
@@ -474,11 +477,18 @@ namespace BiologyVR.ArteryRoute.Journey
 
             var ray = new Ray(source.position, source.forward);
             float distance = Mathf.Max(.01f, maxAimDistance);
+            if(world.freeTools&&RawScannerPressed&&world.freeTools.Held)
+            {
+                var held=world.freeTools.Held;var heldCollider=held.GetComponent<Collider>();float bodyAcross=Vector3.Cross(heldCollider.bounds.center-ray.origin,ray.direction).sqrMagnitude;JourneyTarget nearest=heldCollider.Raycast(ray,out var bodyHit,12)?held:null;float best=nearest?bodyAcross:float.MaxValue;
+                foreach(var topic in new[]{world.freeTools.payload.oxygen,world.freeTools.payload.co2,world.freeTools.payload.heme})
+                {var c=topic.GetComponent<Collider>();if(world.freeTools.payload.Available(topic)&&c.Raycast(ray,out var bondHit,12)){float across=Vector3.Cross(c.bounds.center-ray.origin,ray.direction).sqrMagnitude;if(across<best){best=across;nearest=topic;}}}
+                if(nearest){LockedContact=nearest.GetComponent<Collider>();return nearest;}
+            }
             // Local analysis owns its interaction space. A momentary miss between
             // small content models must not promote a distant cell and close it.
             float contentsDistance=0;bool contents=world.analysis&&world.analysis.RayThroughContents(ray,out contentsDistance);
             if(contents)distance=Mathf.Min(distance,contentsDistance);
-            else if(world.bloodEntities&&(RawScannerPressed||RawToolPressed||GripPressed()||Mouse.current!=null&&Mouse.current.leftButton.isPressed)){world.bloodEntities.Promote(ray,Mathf.Min(maxAimDistance,12));Physics.SyncTransforms();}
+            else if(world.bloodEntities&&(RawScannerPressed||RawToolPressed||!world.freeTools&&(GripPressed()||Mouse.current!=null&&Mouse.current.leftButton.isPressed))){world.bloodEntities.Promote(ray,Mathf.Min(maxAimDistance,12));Physics.SyncTransforms();}
             int count = Physics.RaycastNonAlloc(ray, targetHits, distance, targetMask.value, QueryTriggerInteraction.Collide);
             // NonAlloc does not promise the nearest hits if its buffer is full.
             // Fail closed instead of aiming through an omitted nearer target.
@@ -487,6 +497,7 @@ namespace BiologyVR.ArteryRoute.Journey
             for (int i = 0; i < count; i++)
             {
                 var target = TargetFrom(targetHits[i].collider);
+                if(world.freeTools&&targetHits[i].collider.GetComponentInParent<JourneyHemostasisPiece>()&&target){LockedContact=targetHits[i].collider;return target;}
                 if (!IsUsableTarget(target)) continue;
                 if (!Obstructed(ray, targetHits[i].distance, target, 0f, source)){LockedContact=targetHits[i].collider;return target;}
             }

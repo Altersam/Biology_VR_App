@@ -20,6 +20,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public JourneyBloodInteractionPool bloodEntities;
         public JourneyErythrocyteAnalysis analysis;
         public JourneyInnateImmunity immunity;
+        public JourneyFreeBioTool freeTools;
         public GameObject[] remainingComplexes;
         public GameObject virusPrefab;
         public Renderer[] toneWall;
@@ -569,6 +570,7 @@ namespace BiologyVR.ArteryRoute.Journey
             EmbolusStability=EmbolusInsideTrap()?Mathf.Clamp01(EmbolusStability+dt/EmbolusSettleDuration):0;
             if(EmbolusStability>=1)TryStabilizeEmbolus();
         }
+        public void PauseEmbolusAttraction(float dt){if(captured&&embolusWave){EmbolusStability=0;embolusWave.DriftCaptured(dt);}}
         public void ReleaseEmbolus()
         {
             if(!captured)return;captured=false;EmbolusStability=0;embolusDrifting=true;

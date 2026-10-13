@@ -272,6 +272,8 @@ namespace BiologyVR.ArteryRoute.Journey
         bool CanBeginGrab()
         {
             if (mission == null || mission.Goals == null) return false;
+            if(mission.world.freeTools&&mission.world.bloodEntities.Owns(this)&&mission.world.freeTools.Held!=this)return false;
+            if(mission.world.freeTools&&mission.world.bloodEntities.Owns(this)&&!mission.FreeBloodResearch)return mission.Ready;
             if(mission.FreeBloodResearch){mission.world.research.SelectInstance(this);return mission.Accept(StudyAction.Grab,targetId);}
             var current = mission.Current;
             if(mission.SceneNumber==15&&current?.action==StudyAction.Bind&&targetId.StartsWith("antibody"))return mission.Ready;
@@ -342,6 +344,7 @@ namespace BiologyVR.ArteryRoute.Journey
         {
             if (!homeInitialized) return;
             StopRestore();
+            if(mission&&mission.world.freeTools&&mission.world.freeTools.ReturnSuppressed)return;
             if(mission&&mission.world.bloodEntities&&mission.world.bloodEntities.Owns(this))
             {enlargedForHome=false;transform.SetParent(mission.world.transform,true);transform.localScale=NonZeroScale(originalScale);ClearVelocity();mission.world.bloodEntities.Release(this);return;}
             if(!flowPickup)flowPickup=GetComponent<JourneyFlowPickup>();

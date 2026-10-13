@@ -1,0 +1,14 @@
+{
+  "version": "0.7.0",
+  "method": "Only actual Unity PC/XR captures, resized into a contact sheet",
+  "sources": [
+    "01_Bound_Oxygen_RBC.png",
+    "02_Hb_With_Bound_Iron.png",
+    "03_Critical_Vascular_Field.png",
+    "05_Context_Help_And_Readable_Screens.png",
+    "07_XR_Bound_Cargo_And_Panels.png",
+    "08_XR_Reverse_Hand_Pull.png",
+    "09_Plaque_Released_Flow.png",
+    "10_All_Evasive_Emboli_Deposited.png"
+  ]
+}

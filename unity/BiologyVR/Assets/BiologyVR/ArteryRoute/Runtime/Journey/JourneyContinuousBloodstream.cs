@@ -56,6 +56,7 @@ namespace BiologyVR.ArteryRoute.Journey
         bool[] leased;
         int[] generations;
         float[] reuseAfter;
+        float[] brokenUntil;
         string requestedInflux;
         bool injectingInflux;
         public int PoolReturns{get;private set;}
@@ -72,7 +73,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(!flow)flow=GetComponent<JourneyBloodFlow>();if(!flow||palette==null||palette.Length==0)return;
             int count=flow.cells.Length;reserved=new bool[count];local=new bool[count];arc=new float[count];progress=new float[count];speed=new float[count];spin=new float[count];phase=new float[count];laneX=new float[count];laneY=new float[count];route=new int[count];forcedBranch=new int[count];visualType=new int[count];pose=new Quaternion[count];turnStart=new Vector3[count];filters=new MeshFilter[count];renderers=new Renderer[count];
             if(!flow.mission.world.bloodEntities)foreach(var pickup in flow.interactiveCells)if(pickup)reserved[pickup.poolIndex]=true;
-            leased=new bool[count];generations=new int[count];reuseAfter=new float[count];
+            leased=new bool[count];generations=new int[count];reuseAfter=new float[count];brokenUntil=new float[count];
             leaking=new bool[count];leakTime=new float[count];leakStart=new Vector3[count];leakHole=new Vector3[count];
             for(int i=0;i<count;i++)if(!reserved[i])active.Add(i);
             BackgroundCount=active.Count;BranchPassages=new int[flow.branchPaths.Length];CurrentSpeciesCounts=new int[palette.Length];RunSeed=varySeedEachRun?Environment.TickCount^GetInstanceID():randomSeed;rng=new System.Random(RunSeed);
@@ -110,6 +111,7 @@ namespace BiologyVR.ArteryRoute.Journey
             float angle=Range(0,Mathf.PI*2),radius=Mathf.Sqrt(Range(.08f,.85f))*3.25f;laneX[i]=Mathf.Cos(angle)*radius;laneY[i]=Mathf.Sin(angle)*radius;
             speed[i]=Range(1.15f,2.05f);spin[i]=Range(-18,18);phase[i]=Range(0,Mathf.PI*2);pose[i]=Quaternion.Euler(Range(25,155),Range(0,360),Range(0,360));
             generations[i]++;
+            if(flow.mission.world.freeTools)flow.mission.world.freeTools.payload.UpdateSource(i,source.id);
         }
         void Update()
         {
@@ -124,6 +126,7 @@ namespace BiologyVR.ArteryRoute.Journey
             foreach(int i in active)
             {
                 if(i>=limit){renderers[i].enabled=false;continue;}
+                if(brokenUntil[i]>0){arc[i]+=dt*speed[i];Place(i,dt);renderers[i].enabled=false;if(flow.mission.world.freeTools&&flow.mission.world.freeTools.payload.backgroundCargo[i])flow.mission.world.freeTools.payload.backgroundCargo[i].gameObject.SetActive(false);if(brokenUntil[i]>Time.time||!Invisible(i,camera,Vector3.Distance(flow.cells[i].position,camera.transform.position)))continue;brokenUntil[i]=0;Randomize(i);}
                 if(leaking[i])
                 {
                     leakTime[i]+=dt;PlaceLeak(i);
@@ -137,8 +140,8 @@ namespace BiologyVR.ArteryRoute.Journey
                 // persistent visual circulation, including failures and late stages.
                 float advance=dt*speed[i];
                 if(route[i]<0&&flow.mission.world.hemodynamics)advance*=flow.mission.world.hemodynamics.LocalSpeed(arc[i]);
-                if(route[i]<0&&flow.mission.SceneNumber==6&&flow.mission.world.plaqueChallenge&&Mathf.Abs(arc[i]-flow.path.Anchor(6)-5)<14)
-                    advance*=Mathf.Lerp(.82f,1,flow.mission.world.plaqueChallenge.FlowFraction);
+                if(route[i]<0&&flow.mission.SceneNumber==6&&flow.mission.world.plaqueChallenge&&arc[i]>flow.path.Anchor(6)-8&&arc[i]<flow.path.Anchor(6)+5)
+                    advance*=flow.mission.world.freeTools?Mathf.Pow(flow.mission.world.plaqueChallenge.FlowFraction,2):Mathf.Lerp(.82f,1,flow.mission.world.plaqueChallenge.FlowFraction);
                 if(route[i]<0)
                 {
                     float previous=arc[i];arc[i]+=advance;
@@ -170,7 +173,7 @@ namespace BiologyVR.ArteryRoute.Journey
                 distance=(flow.cells[i].position-camera.transform.position).magnitude;
                 renderers[i].enabled=!leased[i]&&distance>1.3f&&distance<visibleDistance;
             }
-            RefillCoverage(camera,limit);
+            if(!flow.mission.world.freeTools||flow.mission.SceneNumber!=6||!flow.mission.world.plaqueChallenge||flow.mission.world.plaqueChallenge.Cleared)RefillCoverage(camera,limit);
             NearbyMainCells=VisibleMovingCells=0;
             foreach(int i in active)if(i<limit&&renderers[i].enabled)
             {
@@ -228,7 +231,7 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         bool TryLocalEntry(int i,Camera camera,out float entry)
         {
-            if(flow.mission.SceneNumber==3&&flow.mission.world.bloodEntities&&!flow.mover.Moving)
+            if((flow.mission.SceneNumber==3&&flow.mission.world.bloodEntities||flow.mission.SceneNumber==6&&flow.mission.world.freeTools)&&!flow.mover.Moving)
             {entry=coverageArc-14.5f+Range(-2,0);var inlet=MainPoint(entry,0,0);return !GeometryUtility.TestPlanesAABB(planes,new Bounds(inlet,Vector3.one*7.5f));}
             entry=0;int selected=-1,best=int.MaxValue;
             for(int bin=0;bin<DensityBins;bin++)
@@ -257,7 +260,8 @@ namespace BiologyVR.ArteryRoute.Journey
                 route[i]=-1;progress[i]=0;arc[i]=entry;injectingInflux=true;Randomize(i);injectingInflux=false;laneX[i]=.55f+Range(-.3f,.3f);laneY[i]=-.35f+Range(-.25f,.25f);Place(i,0);RecycledCells++;PoolReturns++;return;
             }
         }
-        public void SetLease(int index,bool value){leased[index]=value;renderers[index].enabled=!value;if(value)PromotionCount++;}
+        public void SetLease(int index,bool value){leased[index]=value;renderers[index].enabled=!value&&brokenUntil[index]<=Time.time;if(value)PromotionCount++;}
+        public void BreakCell(int index){brokenUntil[index]=Time.time+2.5f;renderers[index].enabled=false;}
         public void ResumeLease(int index,Vector3 position)
         {
             float value=NearestArc(position);route[index]=-1;progress[index]=0;arc[index]=value;var radial=position-flow.path.Centre(value);laneX[index]=Mathf.Clamp(Vector3.Dot(radial,flow.path.Right(value)),-2.8f,2.8f);laneY[index]=Mathf.Clamp(Vector3.Dot(radial,flow.path.Up(value)),-2.8f,2.8f);Place(index,0);

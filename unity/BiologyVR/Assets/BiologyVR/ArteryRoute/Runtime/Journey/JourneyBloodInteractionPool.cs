@@ -35,20 +35,20 @@ namespace BiologyVR.ArteryRoute.Journey
         public int Returns{get;private set;}
         public bool HasPhagocyteCapacity(int index)=>capacityGeneration[index]!=stream.Generation(index)||capacityRemaining[index]>0;
         bool wasActive;
-        public bool Active=>world.mission.SceneNumber==3||world.mission.SceneNumber==8||world.mission.SceneNumber==9||world.mission.SceneNumber==15&&world.mission.Current?.target=="immune-engulf";
+        public bool Active=>world.freeTools?world.mission.SceneNumber>=3&&world.mission.SceneNumber<=16:world.mission.SceneNumber==3||world.mission.SceneNumber==8||world.mission.SceneNumber==9||world.mission.SceneNumber==15&&world.mission.Current?.target=="immune-engulf";
         public static string ResearchType(string species)
-        {if(species.StartsWith("erythrocyte"))return "rbc";if(species=="leukocyte"||species=="phagocyte"||species=="platelet")return species;return "plasma";}
+        {if(species.StartsWith("erythrocyte"))return "rbc";if(species=="leukocyte"||species=="phagocyte"||species=="platelet"||species=="hemoglobin")return species;return "plasma";}
         public bool Owns(JourneyTarget target){foreach(var slot in slots)if(slot.target==target)return slot.index>=0;return false;}
         public JourneyBloodInteractiveSlot Slot(JourneyTarget target){foreach(var slot in slots)if(slot.target==target)return slot;return null;}
         public bool Preview(Ray ray,float maxDistance,out string type,out Vector3 point)
         {
             type=null;point=Vector3.zero;if(!Active||!stream.Pick(ray,maxDistance,out int index,out _))return false;
-            type=ResearchType(stream.flow.species[index]);point=stream.flow.cells[index].position;return world.mission.SceneNumber==3||type=="phagocyte";
+            type=ResearchType(stream.flow.species[index]);point=stream.flow.cells[index].position;return world.freeTools||world.mission.SceneNumber==3||type=="phagocyte";
         }
         public JourneyTarget Promote(Ray ray,float maxDistance)
         {
             if(!Active||!world.mission.Ready||!stream.Pick(ray,maxDistance,out int index,out float distance))return null;
-            string type=ResearchType(stream.flow.species[index]);if(world.mission.SceneNumber!=3&&type!="phagocyte")return null;
+            string type=ResearchType(stream.flow.species[index]);if(!world.freeTools&&world.mission.SceneNumber!=3&&type!="phagocyte")return null;
             foreach(var existing in slots)if(existing.index>=0&&existing.contact.enabled&&existing.contact.Raycast(ray,out var already,distance)){existing.touched=Time.time;return existing.target;}
             int obstaclesCount=Physics.RaycastNonAlloc(ray,obstacles,distance,~0,QueryTriggerInteraction.Ignore);if(obstaclesCount==obstacles.Length)return null;for(int i=0;i<obstaclesCount;i++){var hit=obstacles[i];if(!hit.collider.transform.IsChildOf(world.mover.origin.transform)&&!hit.collider.GetComponentInParent<JourneyTarget>())return null;}
             JourneyBloodInteractiveSlot preferred=null;
@@ -64,7 +64,7 @@ namespace BiologyVR.ArteryRoute.Journey
                 slot.body.sharedMesh=source.GetComponent<MeshFilter>().sharedMesh;slot.body.GetComponent<Renderer>().sharedMaterials=source.GetComponent<Renderer>().sharedMaterials;slot.body.transform.localScale=source.localScale;
                 foreach(var surface in slot.legacyRenderers)if(surface)surface.enabled=false;slot.body.gameObject.SetActive(true);slot.body.GetComponent<Renderer>().enabled=true;slot.target.gameObject.SetActive(true);slot.contact.enabled=true;slot.grab.enabled=true;
                 slot.contact.center=slot.body.sharedMesh.bounds.center*source.localScale.x;slot.contact.radius=Mathf.Max(.07f,slot.body.sharedMesh.bounds.extents.magnitude*source.localScale.x*.8f);
-                slot.target.SetHomePose();if(phag){phag.ResetForCell(index,stream.Generation(index));if(capacityGeneration[index]==phag.Generation)phag.RestoreCapacity(capacityRemaining[index]);}
+                 slot.target.SetHomePose();if(phag){phag.ResetForCell(index,stream.Generation(index));if(capacityGeneration[index]==phag.Generation)phag.RestoreCapacity(capacityRemaining[index]);}
                 var platelet=slot.target.GetComponent<JourneyPlateletEntity>();if(platelet)platelet.SetState(JourneyPlateletState.Flowing);
                 return slot.target;
             }

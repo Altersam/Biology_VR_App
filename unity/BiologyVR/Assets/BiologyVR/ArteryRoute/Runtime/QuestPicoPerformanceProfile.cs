@@ -25,7 +25,7 @@ namespace BiologyVR.ArteryRoute
                 if(disablePostProcessing)data.renderPostProcessing=false;
             }
             QualitySettings.vSyncCount=0;
-            QualitySettings.antiAliasing=2;
+            QualitySettings.antiAliasing=FindFirstObjectByType<JourneyFreeBioTool>()?4:2;
             var flow=FindFirstObjectByType<JourneyBloodFlow>();
             if(flow)flow.SetVisibleCellLimit(mobileBloodCells);
             foreach(var light in FindObjectsByType<Light>(FindObjectsSortMode.None))

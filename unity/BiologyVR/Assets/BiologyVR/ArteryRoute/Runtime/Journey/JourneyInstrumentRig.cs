@@ -59,7 +59,8 @@ namespace BiologyVR.ArteryRoute.Journey
                 if(scannerPC.gameObject.activeSelf)scannerPC.transform.rotation=Quaternion.Slerp(scannerPC.transform.rotation,Quaternion.LookRotation(direction,camera.up),1-Mathf.Exp(-Time.deltaTime*12));
                 if(bioPC.gameObject.activeSelf)bioPC.transform.rotation=Quaternion.Slerp(bioPC.transform.rotation,Quaternion.LookRotation(direction,camera.up),1-Mathf.Exp(-Time.deltaTime*12));
             }
-            var mode=modes?modes.CurrentMode:BioToolMode.Impulse;bool plateletHeld=input.plateletCapture&&input.plateletCapture.Holding;bool phagHeld=input.world.immunity&&input.world.immunity.Held;bool captured=input.world.EmbolusCaptured||plateletHeld||phagHeld;
+            var fieldHeld=input.world.freeTools?input.world.freeTools.Held:null;
+            var mode=modes?modes.CurrentMode:BioToolMode.Impulse;bool plateletHeld=input.plateletCapture&&input.plateletCapture.Holding;bool phagHeld=input.world.immunity&&input.world.immunity.Held;bool captured=input.world.EmbolusCaptured||plateletHeld||phagHeld||fieldHeld;
             string caption=modes?modes.Caption:"IMPULSE";bool popup=modes&&Time.time<modes.ModePopupUntil;
             ActiveScanner.Present(scan,false,input.ScanProgress,mode,input.world.hemodynamics&&input.world.hemodynamics.Active?"SCANNER · FLOW":"SCANNER · диагностика",scan);
             ActiveBioTool.Present(fire,captured,input.ChargeProgress,mode,caption,popup);
@@ -70,9 +71,9 @@ namespace BiologyVR.ArteryRoute.Journey
             Vector3 scanEnd=target?target.transform.position:start+ActiveScanner.muzzle.forward*.40f;
             scanEnd=start+(scanEnd-start).normalized*Mathf.Min(.45f,Vector3.Distance(start,scanEnd));
             Draw(scannerBeam,start,scanEnd,scan&&ActiveScanner.gameObject.activeInHierarchy,.0015f);
-            bool capture=fire&&mode==BioToolMode.Capture;
+            bool capture=fire&&mode==BioToolMode.Capture||fieldHeld&&(mode==BioToolMode.Bio||mode==BioToolMode.Reverse);
             Vector3 origin=ActiveBioTool.muzzle.position;
-            Vector3 end=phagHeld?input.world.immunity.Held.transform.position:plateletHeld?input.plateletCapture.HeldPiece.transform.position:input.world.EmbolusCaptured?input.world.bubble.position:target?target.transform.position:origin+ActiveBioTool.muzzle.forward*.45f;
+            Vector3 end=fieldHeld?fieldHeld.transform.position:phagHeld?input.world.immunity.Held.transform.position:plateletHeld?input.plateletCapture.HeldPiece.transform.position:input.world.EmbolusCaptured?input.world.bubble.position:target?target.transform.position:origin+ActiveBioTool.muzzle.forward*.45f;
             captureTether.enabled=capture&&captured;
             if(captureTether.enabled)
             {
@@ -98,9 +99,10 @@ namespace BiologyVR.ArteryRoute.Journey
             cellReleaseAge+=Time.deltaTime;float cellRecoil=cellReleaseAge<.24f?Mathf.Sin(cellReleaseAge/.24f*Mathf.PI):0;
             ActiveBioTool.AnimateHousing(Mathf.Max(shot?Mathf.Sin(phase*Mathf.PI):0,cellRecoil),fire);ActiveScanner.AnimateHousing(0,scan);
             if(!tracked)bioPC.transform.localPosition=bioPCMount-Vector3.forward*(shot?.016f*Mathf.Sin(phase*Mathf.PI):0);
-            Draw(impulseBeam,origin,Vector3.Lerp(origin,shotEnd,phase),shot&&phase<.45f,.0048f*(1-phase));
+            var pulseEnd=Vector3.Lerp(origin,shotEnd,Mathf.SmoothStep(0,1,phase));
+            Draw(impulseBeam,Vector3.Lerp(origin,pulseEnd,Mathf.Clamp01(phase*1.6f)),pulseEnd,shot&&phase<.82f,.009f*Mathf.Sin(Mathf.PI*phase));
             pulseRing.enabled=shot;
-            if(shot){pulseRing.transform.SetPositionAndRotation(Vector3.Lerp(origin,shotEnd,phase),cameraRef.transform.rotation);pulseRing.transform.localScale=Vector3.one*Mathf.Lerp(.055f,.18f,phase);pulseRing.widthMultiplier=.006f*(1-phase);}
+            if(shot){pulseRing.transform.SetPositionAndRotation(pulseEnd,cameraRef.transform.rotation);pulseRing.transform.localScale=Vector3.one*Mathf.Lerp(.055f,.27f,phase);pulseRing.widthMultiplier=.01f*(1-phase);}
         }
         void Draw(LineRenderer line,Vector3 start,Vector3 end,bool visible,float width)
         {

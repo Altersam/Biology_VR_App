@@ -4,7 +4,7 @@ using UnityEngine.XR;
 
 namespace BiologyVR.ArteryRoute.Journey
 {
-    public enum BioToolMode{Impulse,Capture,Tonus,Bio}
+    public enum BioToolMode{Impulse,Capture,Tonus,Bio,Reverse}
     /// <summary>One mode state shared by existing actions and all model/VFX views.</summary>
     public sealed class BioToolModeController:MonoBehaviour
     {
@@ -14,7 +14,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public int ModeChanges{get;private set;}
         public float ModePopupUntil{get;private set;}
         public float HeldSeconds{get;private set;}
-        public string Caption=>CurrentMode==BioToolMode.Impulse?"IMPULSE · точечный импульс":CurrentMode==BioToolMode.Capture?"CAPTURE · удерживаемый захват":CurrentMode==BioToolMode.Tonus?"TONUS · сосудистое поле":"BIO · локальная активация";
+        public string Caption=>CurrentMode==BioToolMode.Impulse?"ИМПУЛЬС":CurrentMode==BioToolMode.Capture?"ПРИТЯЖЕНИЕ":CurrentMode==BioToolMode.Tonus?"СОСУДИСТОЕ ПОЛЕ":CurrentMode==BioToolMode.Reverse?"РЕВЕРС · ЗАПУСК КЛЕТКИ":"АКТИВАЦИЯ";
         InputAction nextMode,previousMode;
         StudyGoal lastGoal;
         int lastScene=-1;
@@ -26,11 +26,12 @@ namespace BiologyVR.ArteryRoute.Journey
         public static BioToolMode For(StudyGoal goal)
         {
             if(goal==null)return BioToolMode.Impulse;
-            if(goal.target=="immune-engulf")return BioToolMode.Capture;
-            if(goal.target=="phagocyte"&&goal.action==StudyAction.Activate)return BioToolMode.Capture;
+            if(goal.target=="immune-engulf")return BioToolMode.Reverse;
+            if(goal.target=="phagocyte"&&goal.action==StudyAction.Activate)return BioToolMode.Bio;
             if(goal.action==StudyAction.Capture||goal.action==StudyAction.Deposit)return BioToolMode.Capture;
             if(goal.action==StudyAction.Direct&&goal.target=="platelet")return BioToolMode.Capture;
             if(goal.action==StudyAction.Radius||goal.action==StudyAction.Pressure)return BioToolMode.Tonus;
+            if(goal.action==StudyAction.Measure)return BioToolMode.Bio;
             if(goal.action==StudyAction.Direct||goal.action==StudyAction.Balance||goal.action==StudyAction.Activate)return BioToolMode.Bio;
             return BioToolMode.Impulse;
         }
@@ -41,7 +42,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(lastGoal==goal&&lastScene==input.mission.SceneNumber)return;
             lastGoal=goal;lastScene=input.mission.SceneNumber;RequiredMode=For(goal);
             // Existing mission mode selection remains authoritative at each new step.
-            Select(RequiredMode,false);
+            if(!input.world.freeTools)Select(RequiredMode,false);
         }
         void Update()
         {
@@ -49,8 +50,8 @@ namespace BiologyVR.ArteryRoute.Journey
             bool button=nextMode!=null&&nextMode.IsPressed();
             bool back=previousMode!=null&&previousMode.IsPressed();
             bool keyboard=Keyboard.current!=null&&Keyboard.current.cKey.wasPressedThisFrame;
-            if(keyboard||(button&&!previousButton))Select((BioToolMode)(((int)CurrentMode+1)%4),true);
-            else if(back&&!previousBack)Select((BioToolMode)(((int)CurrentMode+3)%4),true);
+            if(keyboard||(button&&!previousButton))Select((BioToolMode)(((int)CurrentMode+1)%5),true);
+            else if(back&&!previousBack)Select((BioToolMode)(((int)CurrentMode+4)%5),true);
             previousButton=button;previousBack=back;
             HeldSeconds=input.ToolHeld?HeldSeconds+Time.deltaTime:0;
         }
@@ -59,8 +60,9 @@ namespace BiologyVR.ArteryRoute.Journey
             if(CurrentMode==mode&&ModeChanges>0)return;
             if(CurrentMode==BioToolMode.Capture&&mode!=CurrentMode&&input&&input.world.EmbolusCaptured){input.world.ReleaseEmbolus();lastGoal=input.mission.Current;lastScene=input.mission.SceneNumber;RequiredMode=For(lastGoal);}
             if(CurrentMode==BioToolMode.Capture&&mode!=CurrentMode&&input&&input.plateletCapture)input.plateletCapture.Release();
-            if(CurrentMode==BioToolMode.Capture&&mode!=CurrentMode&&input&&input.world.immunity)input.world.immunity.CancelHold();
+            if(CurrentMode==BioToolMode.Capture&&mode!=CurrentMode&&input&&input.world.immunity&&!input.world.freeTools)input.world.immunity.CancelHold();
             CurrentMode=mode;ModeChanges++;ModePopupUntil=Time.time+1.1f;HeldSeconds=0;
+            if(input&&input.world.freeTools)input.world.freeTools.ModeChanged(mode);
             if(input){var rig=input.GetComponent<JourneyInstrumentRig>();if(rig)rig.ModeChanged();}
             if(userSelected&&input)input.mission.FeedbackMessage(Caption);
             if(userSelected&&input){var feedback=input.GetComponent<JourneyToolFeedback>();if(feedback&&feedback.audioSource&&feedback.modeSound)feedback.audioSource.PlayOneShot(feedback.modeSound,.22f);}

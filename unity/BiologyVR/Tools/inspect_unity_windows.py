@@ -53,3 +53,17 @@ if '--dismiss-invalid-path' in sys.argv:
                 if child['class'] == 'Button' and child['caption'] == '&OK':
                     user.SendMessageW(child['handle'], 0x00F5, 0, 0)
                     print('Dismissed the specific Invalid project path / OK dialog')
+if '--cancel-sdk-detection' in sys.argv:
+    for row in rows:
+        if row['class'] == '#32770' and row['caption'].startswith('Detecting Android SDK'):
+            for child in row['children']:
+                if child['class'] == 'Button' and child['caption'] == 'Cancel':
+                    user.SendMessageW(child['handle'], 0x00F5, 0, 0)
+                    print('Cancelled the specific stalled Android SDK detection')
+if '--dismiss-build-failure' in sys.argv:
+    for row in rows:
+        if row['class'] == '#32770' and row['caption'] == 'Build failure':
+            for child in row['children']:
+                if child['class'] == 'Button' and child['caption'] == '&OK':
+                    user.SendMessageW(child['handle'], 0x00F5, 0, 0)
+                    print('Acknowledged the build-failure result')

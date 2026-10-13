@@ -104,10 +104,10 @@ namespace BiologyVR.ArteryRoute.Journey
             if(mission.SceneNumber>=17){site.gameObject.SetActive(false);if(impactRing)impactRing.enabled=false;return;}
             foreach(var contact in legacyContacts)if(contact)contact.enabled=false;
             foreach(var visual in legacyVisuals)if(visual)visual.enabled=false;
-            foreach(var contact in measurementContacts)if(contact)contact.enabled=here&&mission.StepIndex==0;
-            foreach(var contact in modeContacts)if(contact)contact.enabled=here&&mission.StepIndex==2;
-            foreach(var visual in measurementVisuals)if(visual)visual.enabled=here&&mission.StepIndex==0;
-            foreach(var visual in modeVisuals)if(visual)visual.enabled=here&&mission.StepIndex==2;
+            foreach(var contact in measurementContacts)if(contact)contact.enabled=!world.freeTools&&here&&mission.StepIndex==0;
+            foreach(var contact in modeContacts)if(contact)contact.enabled=!world.freeTools&&here&&mission.StepIndex==2;
+            foreach(var visual in measurementVisuals)if(visual)visual.enabled=!world.freeTools&&here&&mission.StepIndex==0;
+            foreach(var visual in modeVisuals)if(visual)visual.enabled=!world.freeTools&&here&&mission.StepIndex==2;
             if(here&&scene!=6&&!world.IsEpisodeCompleted(6)){BeginAttempt();formation=0;wasCombat=false;}
             scene=mission.SceneNumber;site.gameObject.SetActive(here||world.IsEpisodeCompleted(6));if(!here&&!Cleared)return;
             float dt=Time.deltaTime;bool combat=Combat;
@@ -144,11 +144,11 @@ namespace BiologyVR.ArteryRoute.Journey
                     piece.surface.GetPropertyBlock(block);block.SetColor("_BaseColor",Color.Lerp(cream,danger,Mathf.Max(0,Obstruction-.75f)*2.4f));piece.surface.SetPropertyBlock(block);
                 }
             }
-            diagnosisContact.enabled=here&&mission.StepIndex==1;
+            diagnosisContact.enabled=here&&(world.freeTools?mission.Current?.target=="plaque"&&mission.Current.action==StudyAction.Scan:mission.StepIndex==1);
             for(int i=0;i<shards.Length;i++)if(shards[i].gameObject.activeSelf)
             {shardAge[i]+=dt;shards[i].position+=shardVelocity[i]*dt;shards[i].Rotate(120*dt,70*dt,90*dt);shards[i].localScale*=Mathf.Max(0,1-dt*3);if(shardAge[i]>.45f)shards[i].gameObject.SetActive(false);}
             impactAge+=dt;if(impactRing){impactRing.enabled=impactAge<.22f;impactRing.transform.localScale=Vector3.one*Mathf.Lerp(.22f,.85f,impactAge/.22f);impactRing.widthMultiplier=.016f*Mathf.Clamp01(1-impactAge/.22f);}
-            if(here&&Time.time>=refreshAt){refreshAt=Time.time+.20f;mission.SetPlaquePressure(Cleared?120:Mathf.Lerp(120,92,Obstruction));}
+            if(here&&Time.time>=refreshAt){refreshAt=Time.time+.20f;mission.SetPlaquePressure(Cleared?120:world.freeTools?120+65*Obstruction:Mathf.Lerp(120,92,Obstruction));}
             RetargetLogical();
         }
         void RetargetLogical()

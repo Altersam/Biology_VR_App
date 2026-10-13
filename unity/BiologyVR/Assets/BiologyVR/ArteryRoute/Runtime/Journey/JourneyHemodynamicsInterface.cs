@@ -15,6 +15,7 @@ namespace BiologyVR.ArteryRoute.Journey
         bool activeBefore;
         void LateUpdate()
         {
+            if(experiment.world.freeTools){compactTheory.SetActive(false);compactVitals.SetActive(false);screens.theoryRoot.gameObject.SetActive(true);screens.vitalsRoot.gameObject.SetActive(true);return;}
             bool active=experiment.Active;compactTheory.SetActive(active);compactVitals.SetActive(active);
             if(active||activeBefore){screens.theoryRoot.gameObject.SetActive(!active);screens.vitalsRoot.gameObject.SetActive(!active);}activeBefore=active;
             if(!active)return;var mission=experiment.world.mission;

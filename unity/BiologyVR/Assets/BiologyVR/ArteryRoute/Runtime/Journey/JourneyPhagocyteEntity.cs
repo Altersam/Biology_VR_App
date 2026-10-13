@@ -12,10 +12,11 @@ namespace BiologyVR.ArteryRoute.Journey
         public int CellIndex{get;private set;}=-1;
         public int Generation{get;private set;}
         public int RemainingCapacity{get;private set;}=3;
+        public bool Studied{get;set;}
         public Vector3 launchVelocity;
         public float stateAge;
         public bool Busy=>State==JourneyPhagocyteState.Captured||State==JourneyPhagocyteState.Charged||State==JourneyPhagocyteState.Launched||State==JourneyPhagocyteState.Phagocytosis||State==JourneyPhagocyteState.Recovering;
-        public void ResetForCell(int index,int generation){CellIndex=index;Generation=generation;RemainingCapacity=3;SetState(JourneyPhagocyteState.Flowing);}
+        public void ResetForCell(int index,int generation){CellIndex=index;Generation=generation;RemainingCapacity=3;Studied=false;SetState(JourneyPhagocyteState.Flowing);}
         public void SetState(JourneyPhagocyteState state){State=state;stateAge=0;}
         public void Used(){RemainingCapacity=Mathf.Max(0,RemainingCapacity-1);}
         public void RestoreCapacity(int value){RemainingCapacity=Mathf.Clamp(value,0,3);}

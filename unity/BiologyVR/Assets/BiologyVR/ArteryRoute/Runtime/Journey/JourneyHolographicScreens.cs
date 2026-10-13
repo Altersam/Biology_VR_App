@@ -60,7 +60,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(referenceButton)referenceButton.GetComponentInChildren<Text>().text="Подробнее";
             if(practiceButton)practiceButton.GetComponentInChildren<Text>().text="К практике";
             theoryTitle.text=m.LearningTerm;
-            if(shortTheory)shortTheory.text=ShortExplanation(m.SceneNumber);
+            if(shortTheory)shortTheory.text=m.world.freeTools&&(m.SceneNumber==8||m.SceneNumber==9)?"1. Притяжение: захвати фагоцит.\n2. Scanner: изучи клетку.\n3. Активация: удержи курок.\n4. Реверс: наведи и отпусти.":ShortExplanation(m.SceneNumber);
             if(illustrationText)illustrationText.text=MiniDiagram(m.SceneNumber);
             var text=new StringBuilder();text.Append("<b>").Append(m.LearningTerm).Append("</b>\n\n").Append(m.LearningNote);
             if(!string.IsNullOrEmpty(m.Formula))text.Append("\n\n<b>Формула / связь</b>\n").Append(m.Formula);
@@ -90,15 +90,15 @@ namespace BiologyVR.ArteryRoute.Journey
         {
             var m=hud.mission;var focused=research.Focused;var data=focused?focused.theory:null;
             theoryTitle.text=data?data.displayName:"Состав крови";
-            shortTheory.resizeTextForBestFit=true;shortTheory.resizeTextMinSize=24;shortTheory.resizeTextMaxSize=30;
-            shortTheory.text=data?data.pages[focused.Page].text:"Осмотрись: клетки движутся рядом.\nВыбери элемент потока — порядок свободный.\nМолекулярные детали откроются в анализе.";
+            shortTheory.resizeTextForBestFit=!m.world.freeTools;shortTheory.resizeTextMinSize=24;shortTheory.resizeTextMaxSize=30;
+            shortTheory.text=data?(m.world.freeTools?FlowSynopsis(data.id):data.pages[focused.Page].text):m.world.freeTools?"O₂: голубой груз на RBC.\nCO₂: тёмный груз на RBC.\nHb + железо: жёлтая метка.\nЗахват — BioTool ПРИТЯЖЕНИЕ.":"Осмотрись: клетки движутся рядом.\nВыбери элемент потока — порядок свободный.\nМолекулярные детали откроются в анализе.";
             illustrationText.text=data?data.pages[focused.Page].visualConnection:"КЛЕТКИ · ПЛАЗМА · ГАЗООБМЕН";
             var text=new StringBuilder();
             if(data){text.Append("<b>").Append(data.displayName).Append("</b>\n\n");foreach(var page in data.pages)text.Append("<b>").Append(page.heading).Append("</b>\n").Append(page.text).Append("\n\n");text.Append("Учебный масштаб условный; молекулярные модели связаны с их переносчиком.");}
-            else text.Append("Выбери конкретный элемент общего потока. Эритроцит, лейкоцит, фагоцит, тромбоцит и плазма доступны в любом порядке. Гемоглобин, гем/Fe²⁺, O₂ и CO₂ открываются в режиме анализа эритроцита и транспорта газов.");
+            else text.Append(m.world.freeTools?"Все образцы находятся в общем потоке. O₂ и часть CO₂ показаны связанным грузом эритроцита; основной перенос CO₂ в организме — бикарбонат. Hb и его гем/железо показаны связанным учебным образцом. BioTool ПРИТЯЖЕНИЕ захватывает носитель; после отпускания он возвращается в кровь.":"Выбери конкретный элемент общего потока. Эритроцит, лейкоцит, фагоцит, тромбоцит и плазма доступны в любом порядке. Гемоглобин, гем/Fe²⁺, O₂ и CO₂ открываются в режиме анализа эритроцита и транспорта газов.");
             theoryText.text=text.ToString();
             taskText.text=!string.IsNullOrEmpty(m.ProfessorLine)?m.ProfessorLine:m.CurrentGoalLabel;
-            taskHint.text=data&&focused.State==JourneyResearchState.Investigated?"Изучено • можно открыть снова или выбрать другой объект":"Scanner: F / левый Trigger • Grip / ЛКМ — рассмотреть";
+            taskHint.text=data&&focused.State==JourneyResearchState.Investigated?"Изучено • можно открыть снова или выбрать другой объект":m.world.freeTools?"Захват: BioTool / ПРИТЯЖЕНИЕ / правый курок":"Scanner: F / левый Trigger • Grip / ЛКМ — рассмотреть";
             taskProgress.text=$"Состав крови {research.RequiredInvestigated}/{research.RequiredCount}";
             pageLabel.text=data?$"{(focused.State==JourneyResearchState.Investigated?"ИЗУЧЕНО":"ИССЛЕДУЕМ")} • {focused.Page+1:00} / {data.pages.Length:00}":"СВОБОДНАЯ ЛАБОРАТОРИЯ / ВЫБЕРИ КЛЕТКУ";
             if(referenceButton)referenceButton.GetComponentInChildren<Text>().text=data?"Ещё →":"Подробнее";
@@ -127,7 +127,7 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         public void TogglePractice(){ShowPractice=!ShowPractice;Refresh();}
         public void ShowOverview(){if(hud.mission.FreeBloodResearch&&!ShowPractice){hud.mission.world.research.TurnPage(-1);return;}ShowPractice=false;Refresh();}
-        public void NextTheoryPage(){if(hud.mission.FreeBloodResearch&&hud.mission.world.research.Focused){var world=hud.mission.world;if(world.analysis&&(world.research.Focused.theory.id=="rbc"||world.research.Focused.theory.id=="plasma")&&!world.analysis.Opened){world.analysis.Open(world.research.FocusedTarget);return;}ShowPractice=false;world.research.TurnPage(1);}else TogglePractice();}
+        public void NextTheoryPage(){if(hud.mission.FreeBloodResearch&&hud.mission.world.research.Focused){var world=hud.mission.world;if(!world.freeTools&&world.analysis&&(world.research.Focused.theory.id=="rbc"||world.research.Focused.theory.id=="plasma")&&!world.analysis.Opened){world.analysis.Open(world.research.FocusedTarget);return;}ShowPractice=false;world.research.TurnPage(1);}else TogglePractice();}
         public void ShowResearchOverview(){if(hud.mission.FreeBloodResearch){ShowPractice=false;hud.mission.world.research.ShowOverview();}else ShowOverview();}
         public void ScrollDown(){ScrollBy(-.20f);}
         public void ScrollUp(){ScrollBy(.20f);}
@@ -153,6 +153,7 @@ namespace BiologyVR.ArteryRoute.Journey
         static string ShortControls(JourneyMission m)
         {
             if(m.Complete)return "Продолжить → / левая Y";
+            if(m.world.freeTools&&m.SceneNumber==5)return "Поле: курок + рука / колесо";
             var goal=m.Current;if(goal==null)return "";
             if(goal.target=="hemostasis-stable")return "Наблюдай фибрин и постепенное уменьшение утечки";
             if(goal.action==StudyAction.Scan)return "Scanner: левый Trigger / F · навести на цель";
@@ -162,11 +163,24 @@ namespace BiologyVR.ArteryRoute.Journey
             if(m.SceneNumber==12&&goal.action==StudyAction.Direct&&goal.target=="platelet")return "BioTool Capture: удерживать Trigger / E • подвести к ране";
             if(goal.action==StudyAction.Bind||((m.SceneNumber==12||m.SceneNumber==13)&&(goal.action==StudyAction.Direct||goal.action==StudyAction.Balance)))return "Grip / ЛКМ — взять · перенести · отпустить";
             if(goal.action==StudyAction.Capture||goal.action==StudyAction.Deposit)return "Удерживать Trigger / E — поле захвата";
-            if(goal.target=="phagocyte"&&goal.action==StudyAction.Activate)return "Scanner: удерживать левый Trigger / F • реакция в модели";
-            if(goal.target=="immune-engulf")return m.SceneNumber==8?"CAPTURE: удерживать → отвести руку → направить → отпустить":"Вирусная нагрузка • используй ранее изученный цикл";
+            if(goal.target=="phagocyte"&&goal.action==StudyAction.Activate)return m.world.freeTools?"АКТИВАЦИЯ: правый курок / E":"Scanner: удерживать левый Trigger / F • реакция в модели";
+            if(goal.target=="immune-engulf")return m.world.freeTools?"РЕВЕРС: удерживать → навести → отпустить":m.SceneNumber==8?"CAPTURE: удерживать → отвести руку → направить → отпустить":"Вирусная нагрузка • используй ранее изученный цикл";
             if(goal.target=="tone")return "Удерживать Trigger · движение руки / колесо";
             return "BioTool: Trigger / E · A/B — режимы · C — ПК";
         }
+        static string FlowSynopsis(string id)=>id switch
+        {
+            "rbc"=>"• Зрелый RBC не имеет ядра.\n• Гибкий двояковогнутый диск.\n• Переносит O₂ благодаря Hb.\n• Участвует в переносе части CO₂.",
+            "leukocyte"=>"• Иммунная клетка с ядром.\n• Существует несколько типов.\n• Часть активно фагоцитирует.",
+            "phagocyte"=>"• Функциональный тип лейкоцита.\n• Захвати и изучи Scanner.\n• Активируй и направь к вирусу.",
+            "platelet"=>"• Фрагмент мегакариоцита.\n• Участвует в гемостазе.\n• Активация меняет его форму.",
+            "plasma"=>"• Жидкая среда крови.\n• Вода, белки, электролиты.\n• Транспортирует вещества.",
+            "hemoglobin"=>"• Белок с четырьмя субъединицами.\n• Гем содержит железо Fe²⁺.\n• O₂ связывается обратимо.",
+            "heme"=>"• Гем связан с гемоглобином.\n• Его железо — Fe²⁺.\n• O₂ связывается с этим центром.",
+            "oxygen"=>"• O₂ переносится главным образом Hb.\n• Связь с гемом обратима.\n• В тканях O₂ освобождается.",
+            "co2"=>"• CO₂ образуется в тканях.\n• Основной перенос — HCO₃⁻.\n• Часть связана с белками крови.",
+            _=>"Изучи выбранный элемент потока."
+        };
         static string ShortExplanation(int scene)=>scene switch
         {
             3=>"Эритроциты переносят кислород.\nЛейкоциты защищают организм.\nТромбоциты закрывают повреждения.",

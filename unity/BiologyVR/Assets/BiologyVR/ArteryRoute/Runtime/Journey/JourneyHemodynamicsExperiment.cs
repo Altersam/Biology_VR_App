@@ -21,9 +21,9 @@ namespace BiologyVR.ArteryRoute.Journey
         public float RadiusRatio{get;private set;}=1;
         public float ResistanceRatio=>1/Mathf.Pow(RadiusRatio,4);
         public float P1=>Active&&Case==3?(Late?92:100):120;
-        public float DeltaP=>Case==3?5:8*ResistanceRatio;
+        public float DeltaP=>world.freeTools?8:Case==3?5:8*ResistanceRatio;
         public float P2=>P1-DeltaP;
-        public float FlowRatio=>Case==3?DeltaP/8:1;
+        public float FlowRatio=>world.freeTools?Mathf.Pow(RadiusRatio,4):Case==3?DeltaP/8:1;
         public float VelocityRatio=>FlowRatio/(RadiusRatio*RadiusRatio);
         public float DiameterMm=>4.8f*RadiusRatio;
         public bool Active=>world&&world.mission&&(world.mission.SceneNumber==5||world.mission.SceneNumber==10);
@@ -35,9 +35,10 @@ namespace BiologyVR.ArteryRoute.Journey
         public int Mistakes{get;private set;}
         public int AcceptedHypotheses{get;private set;}
         public int TracerBursts{get;private set;}
-        public float SectionArc=>world.mover.path.Anchor(Late?10:5)+3.2f;
+        public float SectionArc=>world.freeTools?world.mover.Distance+3.2f:world.mover.path.Anchor(Late?10:5)+3.2f;
         public bool FormulaDiscovered{get;private set;}
         public bool ProcessingHypothesis{get;private set;}
+        public bool Critical=>RadiusRatio<.65f||RadiusRatio>1.45f;
         public string Title=>Late?"ДИАГНОСТИКА НИЗКОГО АД":Case==0?"ГЕМОДИНАМИЧЕСКИЙ ЭКСПЕРИМЕНТ":Case==1?"ОПЫТ 1 / СОПРОТИВЛЕНИЕ":Case==2?"ОПЫТ 2 / ЛОКАЛЬНАЯ СКОРОСТЬ":"ОПЫТ 3 / ПРОВЕРКА ГИПОТЕЗЫ";
         public string Summary=>Late?"Собери данные участка. Выбери обоснованное действие.":Case==0?"Поток возникает из-за разности давления. Измерь участок A → B.":Case<3?"Расход в учебном участке фиксирован. Настрой геометрию и сравни измерения.":"АД снизилось. Сначала измерь диаметр, скорость и давление A/B.";
         readonly bool[] seen=new bool[5];
@@ -57,6 +58,7 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         void Update()
         {
+            if(world&&world.freeTools){UpdateFieldLesson();return;}
             if(!world||world.mission.Goals==null)return;
             var m=world.mission;
             if(lastScene!=m.SceneNumber)
@@ -103,6 +105,7 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         public bool Control(float dt,bool held,Transform aim,JourneyTarget hit,bool desktop)
         {
+            if(world.freeTools)return ControlFieldLesson(dt,held,aim,desktop);
             var m=world.mission;if(!Active||m.Current?.action!=StudyAction.Radius){previousTool=held;Adjusting=false;return false;}
             if(!held||!aim){Adjusting=false;Stability=stable=0;previousTool=false;return true;}
             if(!Adjusting)
@@ -126,6 +129,7 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         public bool CanApply(StudyAction action,string id)
         {
+            if(world.freeTools)return Active&&(action==StudyAction.Scan||action==StudyAction.Radius&&Adjusting);
             if(!Active||!id.StartsWith("hdx-"))return false;
             if(action==StudyAction.Radius)return Adjusting&&Stability>=1;
             if(action==StudyAction.Bind)return ProcessingHypothesis&&Measurements>=(Late?5:4)&&Mathf.Abs(RadiusRatio-1)<.001f;
@@ -150,9 +154,42 @@ namespace BiologyVR.ArteryRoute.Journey
             return accepted;
         }
         public float LocalRadius(float arc)
-        {if(!Active)return 1;float weight=1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(.5f,1.1f,Mathf.Abs(arc-SectionArc)));return Mathf.Lerp(1,RadiusRatio,weight);}
+        {if(!Active&&!world.freeTools)return 1;float weight=1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(.5f,1.1f,Mathf.Abs(arc-SectionArc)));return Mathf.Lerp(1,RadiusRatio,weight);}
+        void UpdateFieldLesson()
+        {
+            var m=world.mission;if(m.Goals==null)return;
+            if(lastScene!=m.SceneNumber){lastScene=m.SceneNumber;RadiusRatio=1;Adjusting=false;stable=0;Case=0;}
+            arRoot.SetActive(false);cardBoard.SetActive(false);if(!Active){Shader.SetGlobalFloat("_HemoRadius",RadiusRatio);Shader.SetGlobalVector("_HemoCentreWS",world.mover.path.Centre(SectionArc));Shader.SetGlobalVector("_HemoAxisWS",world.mover.path.Forward(SectionArc));return;}
+            foreach(var reading in readings)reading.gameObject.SetActive(false);
+            foreach(var probe in probes)probe.gameObject.SetActive(false);
+            toneContact.gameObject.SetActive(true);toneContact.transform.position=world.mover.path.Offset(SectionArc,world.mover.path.Radius(SectionArc)*RadiusRatio,0);
+            foreach(var contact in toneContact.GetComponents<Collider>())contact.enabled=true;
+            // One invisible contact covers the actual wall; measurements stay on the screens.
+            var sphere=toneContact.GetComponent<SphereCollider>();if(sphere){sphere.center=Vector3.zero;sphere.radius=1.1f;}
+            var diameter=world.Find("hdx-diameter");diameter.gameObject.SetActive(m.Current?.target=="hdx-diameter");diameter.transform.position=toneContact.transform.position;
+            foreach(var contact in diameter.GetComponents<Collider>())contact.enabled=m.Current?.target=="hdx-diameter";
+            var scanSphere=diameter.GetComponent<SphereCollider>();if(scanSphere)scanSphere.radius=1.15f;
+            var final=world.Find("hdx-final");if(final){final.gameObject.SetActive(m.Current?.target=="hdx-final");final.transform.position=toneContact.transform.position;var c=final.GetComponent<SphereCollider>();if(c){c.radius=1.15f;c.enabled=m.Current?.target=="hdx-final";}}
+            foreach(var r in toneContact.GetComponentsInChildren<Renderer>(true))r.enabled=false;
+            foreach(var r in diameter.GetComponentsInChildren<Renderer>(true))r.enabled=false;
+            if(final)foreach(var r in final.GetComponentsInChildren<Renderer>(true))r.enabled=false;
+            float pressure=(Late?92:120)/Mathf.Pow(RadiusRatio,2);m.UpdateHemodynamicState(RadiusRatio,pressure);
+            Shader.SetGlobalVector("_HemoCentreWS",world.mover.path.Centre(SectionArc));Shader.SetGlobalVector("_HemoAxisWS",world.mover.path.Forward(SectionArc));Shader.SetGlobalFloat("_HemoRadius",RadiusRatio);
+        }
+        bool ControlFieldLesson(float dt,bool held,Transform aim,bool desktop)
+        {
+            if(!held||!aim){Adjusting=false;previousTool=false;stable=0;return false;}
+            if(!Adjusting){Adjusting=true;handStart=aim.position;handRadius=RadiusRatio;desktopOffset=0;}
+            if(desktop){desktopOffset+=JourneyDesktopControls.WheelSteps*.035f;RadiusRatio=Mathf.Clamp(handRadius+desktopOffset,.5f,1.8f);}
+            else RadiusRatio=Mathf.Clamp(handRadius+Vector3.Dot(aim.position-handStart,world.mover.path.Up(SectionArc))*1.2f,.5f,1.8f);
+            var current=world.mission.Current;
+            if(current?.target=="hdx-wide"&&RadiusRatio>1.20f)world.mission.Accept(StudyAction.Radius,current.target);
+            else if(current?.target=="hdx-critical"&&RadiusRatio>1.48f)world.mission.Accept(StudyAction.Radius,current.target);
+            else if(current?.target=="hdx-normal"){stable=RadiusRatio>.94f&&RadiusRatio<1.06f?stable+dt:0;Stability=Mathf.Clamp01(stable/.7f);if(Stability>=1)world.mission.Accept(StudyAction.Radius,current.target);}
+            return true;
+        }
         public float LocalSpeed(float arc)
-        {float weight=Active?1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(.5f,1.1f,Mathf.Abs(arc-SectionArc))):0;return Mathf.Clamp(Mathf.Lerp(1,FlowRatio,weight)/Mathf.Pow(LocalRadius(arc),2),.45f,2.5f);}
+        {float weight=Active||world.freeTools?1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(.5f,1.1f,Mathf.Abs(arc-SectionArc))):0;return Mathf.Clamp(Mathf.Lerp(1,FlowRatio,weight)/Mathf.Pow(LocalRadius(arc),2),world.freeTools?.12f:.45f,world.freeTools?3.5f:2.5f);}
         void UpdateGraphics()
         {
             CacheGraphics();

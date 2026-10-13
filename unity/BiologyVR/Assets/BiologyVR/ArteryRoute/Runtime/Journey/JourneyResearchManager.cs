@@ -42,7 +42,7 @@ namespace BiologyVR.ArteryRoute.Journey
         {if(string.IsNullOrEmpty(id))return null;if(registry.Count==0)RebuildRegistry();return registry.TryGetValue(id,out var item)?item:null;}
         public JourneyTarget FocusedTarget=>focusedInstance?focusedInstance:focused?focused.target:null;
         public void SelectInstance(JourneyTarget target){if(CanInvestigate(target))selectedInstance=target;}
-        public bool CanInvestigate(JourneyTarget target)=>Active&&world.mission.Ready&&target&&target.isActiveAndEnabled&&Find(target.targetId)!=null&&(!world.analysis||world.analysis.Available(target.targetId))&&(!world.bloodEntities||world.analysis&&world.analysis.IsMolecular(target.targetId)||world.bloodEntities.Owns(target));
+        public bool CanInvestigate(JourneyTarget target)=>Active&&world.mission.Ready&&target&&target.isActiveAndEnabled&&Find(target.targetId)!=null&&(world.freeTools?world.bloodEntities.Owns(target)||world.freeTools.payload.Available(target):(!world.analysis||world.analysis.Available(target.targetId))&&(!world.bloodEntities||world.analysis&&world.analysis.IsMolecular(target.targetId)||world.bloodEntities.Owns(target)));
         public void ResetRun()
         {RebuildRegistry();foreach(var item in objects)if(item)item.ResetRun();focused=hovered=null;selectedInstance=focusedInstance=null;introductions=uniqueScans=0;completionReported=false;}
         public void EnterStage()
@@ -50,6 +50,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public void RefreshAvailability()
         {
             if(!Active||objects==null)return;
+            if(world.freeTools)return;
             foreach(var item in objects)if(item&&item.target)
             {
                 bool available=world.analysis&&world.analysis.IsMolecular(item.theory.id)?world.analysis.Available(item.theory.id):!world.bloodEntities||world.bloodEntities.Owns(item.target);

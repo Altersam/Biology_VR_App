@@ -83,6 +83,7 @@ namespace BiologyVR.ArteryRoute.Journey
                     Goal("Сканируй эндотелий",StudyAction.Scan,"endothelium");Goal("Включи послойный режим",StudyAction.Activate,"layers");
                     Goal("Просканируй интиму",StudyAction.Scan,"intima");Goal("Просканируй мышечно-эластическую медиа",StudyAction.Scan,"media");Goal("Просканируй адвентицию",StudyAction.Scan,"adventitia");break;
                 case 5:
+                    if(world.freeTools){Goal("Scanner: просканируй участок артерии",StudyAction.Scan,"hdx-diameter");Goal("СОСУДИСТОЕ ПОЛЕ: расширь участок и наблюдай показатели",StudyAction.Radius,"hdx-wide");Goal("Продолжи расширение: наблюдай критическое изменение",StudyAction.Radius,"hdx-critical");Goal("Верни безопасный диаметр и удержи его",StudyAction.Radius,"hdx-normal");Goal("Scanner: проверь восстановленный участок",StudyAction.Scan,"hdx-final");break;}
                     if(world.hemodynamics)
                     {
                         Goal("Scanner: измерь давление A до участка",StudyAction.Scan,"hdx-p1");Goal("Измерь давление B после участка",StudyAction.Scan,"hdx-p2");Goal("Измерь локальную скорость",StudyAction.Scan,"hdx-speed");Goal("Измерь диаметр участка",StudyAction.Scan,"hdx-diameter");
@@ -95,20 +96,25 @@ namespace BiologyVR.ArteryRoute.Journey
                     Goal("Уменьши радиус модели",StudyAction.Radius,"small-radius");Goal("Увеличь радиус модели",StudyAction.Radius,"large-radius");
                     Goal("Измени модельное давление",StudyAction.Pressure,"pressure");Goal("Верни нормальные параметры",StudyAction.Activate,"normal-flow");break;
                 case 6:
+                    if(world.freeTools){WrongCapHits=0;Goal("Scanner: исследуй бляшку на стенке",StudyAction.Scan,"plaque");Goal("ИМПУЛЬС: разбей липиды и освободи поток",StudyAction.Pulse,"lipid",JourneyPlaqueChallenge.LipidCount);break;}
                     WrongCapHits=0;Goal("Обнаружь локальное нарушение потока",StudyAction.Measure,"plaque-flow");Goal("Просканируй бляшку и её состав",StudyAction.Scan,"plaque");
                     Goal("Открой режим BioTool «Импульс»",StudyAction.Activate,"pulse-mode");Goal(world.plaqueChallenge?"Раздроби всю растущую липидную массу до окклюзии":"Обработай три липидные мишени, сохрани покрышку",StudyAction.Pulse,"lipid",world.plaqueChallenge?JourneyPlaqueChallenge.LipidCount:3);break;
                 case 7:
+                    if(world.freeTools){for(int i=0;i<6;i++){Goal("ПРИТЯЖЕНИЕ: наведи на пузырёк и удержи курок",StudyAction.Capture,"embolus");Goal("Не теряй наведение: доведи пузырёк в кольцо",StudyAction.Deposit,"embolus");}break;}
                     Goal("Просканируй движущийся пузырёк",StudyAction.Scan,"embolus");Goal("Открой режим «Притяжение»",StudyAction.Activate,"attract-mode");
                     for(int bubble=0;bubble<(world.embolusWave?JourneyEmbolusWave.Count:1);bubble++)
                     {Goal(world.embolusWave?$"Захвати газовый эмбол: {bubble+1} / 6":"Захвати пузырёк полем BioTool",StudyAction.Capture,"embolus");Goal(world.embolusWave?$"Удерживай поле: помести эмбол {bubble+1} / 6 в ловушку":"Удерживай Trigger: перенеси пузырёк и стабилизируй в ловушке",StudyAction.Deposit,"embolus");}break;
                 case 8:
+                    if(world.freeTools){ViralLoad=25;Goal("ПРИТЯЖЕНИЕ: захвати фагоцит из потока",StudyAction.Capture,"phagocyte");Goal("Scanner: просканируй захваченный фагоцит",StudyAction.Scan,"phagocyte");Goal("АКТИВАЦИЯ: удержи курок BioTool",StudyAction.Activate,"phagocyte");Goal("РЕВЕРС: направь три фагоцита в вирус",StudyAction.Direct,"immune-engulf",3);break;}
                     if(world.immunity){Goal("Найди и исследуй одну чужеродную частицу в потоке",StudyAction.Scan,"virus-study");Goal("Найди фагоцит: Scanner инициирует иммунную реакцию в модели",StudyAction.Activate,"phagocyte");Goal("Удерживай CAPTURE: притяни активную клетку",StudyAction.Capture,"phagocyte");Goal("Отведи руку, направь клетку и отпусти Trigger",StudyAction.Direct,"immune-engulf");break;}
                     Goal("Просканируй неизвестный вирион",StudyAction.Scan,"virus-study");Goal("Увеличь вирус в учебном режиме",StudyAction.Enlarge,"virus-study");
                     Goal("Изучи генетический материал",StudyAction.Scan,"genome");Goal("Изучи капсид",StudyAction.Scan,"capsid");Goal("Найди антиген и эпитоп",StudyAction.Scan,"epitope");break;
                 case 9:
+                    if(world.freeTools){Temperature=36.6f;ViralLoad=25;Goal("Направляй фагоциты в вирусы: три контакта на частицу",StudyAction.Direct,"immune-engulf",4);break;}
                     if(world.immunity){Temperature=36.6f;ViralLoad=25;Goal("Используй фагоциты общего потока для врождённой защиты",StudyAction.Direct,"immune-engulf",12);break;}
                     Temperature=36.6f;ViralLoad=25;Goal("Открой иммунное управление",StudyAction.Activate,"immune-mode");Goal("Отрази волну: 24 вириона — наведи BioTool и стреляй",StudyAction.Mark,"incoming-virus",AssaultVirusCount);Goal("Передай помеченные частицы фагоциту",StudyAction.Direct,"phagocyte");break;
                 case 10:
+                    if(world.freeTools){PressureSystolic=92;Goal("Scanner: проверь участок при сниженном давлении",StudyAction.Scan,"hdx-diameter");Goal("СОСУДИСТОЕ ПОЛЕ: удержи безопасный диаметр",StudyAction.Radius,"hdx-normal");Goal("Повторно проверь участок перед поиском повреждения",StudyAction.Scan,"hdx-final");break;}
                     if(world.hemodynamics)
                     {
                         PressureSystolic=92;

@@ -1,0 +1,32 @@
+{
+  "utc": "2026-10-13T13:08:54.1266506Z",
+  "running": false,
+  "passed": true,
+  "method": "Real MouseState/KeyboardState and XRI field hand. Isolated episode-entry fixtures; no success API calls.",
+  "checks": [
+    "PASS: Actual C selects manual mode Impulse",
+    "PASS: A background blood cell is available as an ordinary impulse target",
+    "PASS: Impulse can actually destroy a blood-pool object outside a plaque combat goal",
+    "PASS: Scanner topic is present on its physical carrier: plaque",
+    "PASS: Actual Scanner hold studies plaque",
+    "PASS: Plaque raises measured upstream pressure and Scanner leads straight to impulse action",
+    "PASS: Primary-pool blood slows and queues upstream of the plaque instead of bypassing it with density teleportation",
+    "PASS: Actual C selects manual mode Impulse",
+    "PASS: Actual free-mode impulse destroys the original and arriving plaque lipids",
+    "PASS: Actual C selects manual mode Capture",
+    "PASS: Actual reticle tracking captures evasive embolus 1",
+    "PASS: Continuous aimed field transports and deposits embolus 1/6",
+    "PASS: Actual reticle tracking captures evasive embolus 2",
+    "PASS: Continuous aimed field transports and deposits embolus 2/6",
+    "PASS: Actual reticle tracking captures evasive embolus 3",
+    "PASS: Continuous aimed field transports and deposits embolus 3/6",
+    "PASS: Actual reticle tracking captures evasive embolus 4",
+    "PASS: Continuous aimed field transports and deposits embolus 4/6",
+    "PASS: Actual reticle tracking captures evasive embolus 5",
+    "PASS: Continuous aimed field transports and deposits embolus 5/6",
+    "PASS: Actual reticle tracking captures evasive embolus 6",
+    "PASS: Continuous aimed field transports and deposits embolus 6/6",
+    "PASS: All six evasive emboli finish through real attraction input",
+    "PASS: Feedback obstacles input sequence complete"
+  ]
+}

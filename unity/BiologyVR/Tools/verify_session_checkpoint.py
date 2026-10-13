@@ -32,7 +32,7 @@ expected = {
     runtime / 'JourneyHemodynamicsCard.cs': ['ResolveCard', 'Released'],
     runtime / 'JourneyHemodynamicsInterface.cs': ['compactTheory', 'ГОТОВО'],
     editor / 'HemodynamicsExperimentBuilder.cs': ['Install In Vessel Hemodynamics Experiment', 'ProjectionMaterial'],
-    editor / 'BiologyReleaseVersion.cs': ['"0.6.0"', 'AndroidCode=7'],
+    editor / 'BiologyReleaseVersion.cs': ['"0.7.0"', 'AndroidCode=8'],
     runtime / 'JourneyResearchTheory.cs': ['ScriptableObject', 'requiredForCompletion'],
     runtime / 'JourneyResearchableObject.cs': ['NotInvestigated,Investigating,Investigated'],
     runtime / 'JourneyResearchManager.cs': ['RequiredInvestigated', 'CompleteResearch', 'Capture()'],
@@ -44,6 +44,11 @@ expected = {
     runtime / 'JourneyInnateImmunity.cs': ['mission.Progress+LiveCount', 'world.mission.ViralLoad<=0', 'Predict(Vector3', 'TickEngulf'],
     runtime / 'JourneyPlateletEntity.cs': ['Flowing,Inactive,Activated,Adhered,Aggregated'],
     editor / 'LivingOrganismJourneyBuilder.cs': ['Install Connected Living Blood And Innate Immunity', 'controller.viruses=new JourneyImmuneVirus[8]'],
+    runtime / 'JourneyFreeBioTool.cs': ['JourneyBioFieldInteractor', 'LaunchFromField', 'ScanFlow'],
+    runtime / 'JourneyBloodPayload.cs': ['erythrocyte-O2', 'hemoglobin', 'Available'],
+    runtime / 'JourneyFlowBond.cs': ['JourneyTarget carrier'],
+    runtime / 'JourneyLiveTelemetry.cs': ['IdleSeconds>=60', 'Critical'],
+    editor / 'PlayerFeedbackReworkBuilder.cs': ['Install Player Feedback Gameplay Rework', 'dynamicPixelsPerUnit=5'],
     scene: ['flowLayering: 1', 'splitMainFlow: 1', 'Flow-caught platelet 10', 'Reserve balance platelet 13', 'plateletCapture: {fileID: 1035892481}', 'm_DynamicPixelsPerUnit: 2.5', 'Projection frame brackets'],
 }
 for path, markers in expected.items():
@@ -68,6 +73,8 @@ files.update((root / 'Tools').glob('*hemodynamics*'))
 files.update((root / 'Tools').glob('*free_blood_research*'))
 files.update((root / 'Tools').glob('*free_research*'))
 files.update((root / 'Tools').glob('*living_organism*'))
+files.update((root / 'Tools').glob('*player_feedback*'))
+files.update(editor.glob('PlayerFeedback*.cs'))
 files.add(root / 'Tools/saved_journey_verify_ws.json')
 files.add(Path(__file__).resolve())
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Generated/HolographicScreens').rglob('*'))
@@ -75,6 +82,8 @@ files.update((root / 'Assets/BiologyVR/ArteryJourney/Generated/HemodynamicsExper
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Generated/FreeBloodResearch').rglob('*'))
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Generated/LivingOrganismJourney').rglob('*'))
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Reports/Polish/LivingOrganismJourney').rglob('*'))
+files.update((root / 'Assets/BiologyVR/ArteryJourney/Generated/PlayerFeedbackRework').rglob('*'))
+files.update((root / 'Assets/BiologyVR/ArteryJourney/Reports/Polish/PlayerFeedbackRework').rglob('*'))
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Reports/Polish/FreeBloodResearch').rglob('*'))
 files.update((root / 'Assets/BiologyVR/ArteryJourney/Reports/Polish/HemodynamicsExperiment').rglob('*'))
 files.add(root / 'Assets/BiologyVR/ArteryRoute/Shaders/ArteryVisualV2.shader')

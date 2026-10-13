@@ -13,6 +13,13 @@ namespace BiologyVR.ArteryRoute.Editor
 {
     public static class WebGLPagesBuild
     {
+        public static void BuildVerifiedBatch()
+        {
+            EditorSceneManager.OpenScene(UniversalMobileBuild.ScenePath);
+            var routine=BuildRoutine();while(routine.MoveNext()){}
+            var proof=Newtonsoft.Json.Linq.JObject.Parse(File.ReadAllText(JourneyGeometry.Root+"/Reports/WebGLBuildReport.json"));
+            if((string)proof["result"]!="Succeeded"||(string)proof["version"]!=BiologyReleaseVersion.Version)throw new InvalidOperationException("WebGL build failed; see WebGLBuildReport.json");
+        }
         [MenuItem("Biology VR/Build WebGL For GitHub Pages")]
         public static void QueueBuild()=>EditorCoroutineUtility.StartCoroutineOwnerless(BuildRoutine());
         static IEnumerator BuildRoutine()

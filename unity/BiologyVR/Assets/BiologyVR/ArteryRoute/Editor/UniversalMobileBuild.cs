@@ -222,7 +222,8 @@ namespace BiologyVR.ArteryRoute.Editor
             if(!current)throw new InvalidOperationException("URP asset is missing");
             var mobile=AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>(QuestPicoUrp);
             if(!mobile){mobile=UnityEngine.Object.Instantiate(current);mobile.name="Artery Quest Pico Universal URP";AssetDatabase.CreateAsset(mobile,QuestPicoUrp);}
-            mobile.supportsHDR=false;mobile.msaaSampleCount=2;mobile.renderScale=.82f;mobile.maxAdditionalLightsCount=2;mobile.useSRPBatcher=true;mobile.supportsCameraDepthTexture=false;mobile.supportsCameraOpaqueTexture=false;
+            bool readable=UnityEngine.Object.FindFirstObjectByType<JourneyFreeBioTool>();
+            mobile.supportsHDR=false;mobile.msaaSampleCount=readable?4:2;mobile.renderScale=readable?1f:.82f;mobile.maxAdditionalLightsCount=2;mobile.useSRPBatcher=true;mobile.supportsCameraDepthTexture=false;mobile.supportsCameraOpaqueTexture=false;
             GraphicsSettings.defaultRenderPipeline=mobile;QualitySettings.renderPipeline=mobile;EditorUtility.SetDirty(mobile);
         }
         internal static void ApplyPerformanceComponent()

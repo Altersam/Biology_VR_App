@@ -1,0 +1,11 @@
+{
+  "utc": "2026-10-13T11:59:04.7832472Z",
+  "background": 360,
+  "proxies": 8,
+  "gasBoundToRbc": true,
+  "ironBoundToHb": true,
+  "gripForFlowDisabled": true,
+  "globalModes": 5,
+  "screenRaster": 5,
+  "helpAfterSeconds": 60
+}

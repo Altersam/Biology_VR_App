@@ -256,3 +256,25 @@ Pages deployment **success**, run **38206216380**; опубликованный 
 - Pages deployment `38294283709` — success; публичный WebGL сообщает версию 0.6.0,
   loader/framework совпадают с локальной сборкой.
 - `RELEASE_PUBLICATION_0_6_0.json` содержит ссылки и результаты проверки.
+
+## Переработка после прохождения — 0.7.0 / Android code 8
+
+Текущая версия механик: **PLAYER_FEEDBACK_REWORK_RU.md**. Клетки захватываются
+полем BioTool; газы и железо являются грузом носителя, автоматический анализ
+отключён. Сосудистая сцена использует два основных экрана; режимы выбираются
+вручную. Эмболы уходят с наведённого поля, вирус требует трёх контактов свежих
+фагоцитов через захват → Scanner → активацию → реверс. Помощь появляется после минуты.
+Актуальные PC/XR/obstacle проверки — `Reports/Polish/PlayerFeedbackRework/`.
+Пользователь запросил отдельную сборку APK для PICO 4 этой итерации.
+
+PICO APK **0.7.0 готов**, UTC `2026-10-13T14:37:00.0163091Z`:
+0 errors / 12 warnings; версия, manifest, ARM64/OpenXR и подпись PASS.
+Файл: `Builds/Pico4/BiologyVR_Pico4_v0.7.0.apk`, 77 591 775 байт.
+Инструкция/управление/SHA: **PICO4_BUILD_0_7_0_RU.md**.
+
+Meta Quest / Oculus APK **0.7.0 готов**, UTC `2026-10-13T17:08:29.9205505Z`:
+0 errors / 12 warnings; Meta devices/headtracking/подпись PASS, PICO runtime отсутствует.
+Файл: `Builds/MetaQuest/BiologyVR_MetaQuest_v0.7.0.apk`, 76 707 544 байта.
+WebGL **0.7.0 Succeeded**, UTC `2026-10-13T17:19:55.8699179Z`:
+0 errors / 8 warnings; Chromium loading smoke PASS.
+Общий релиз и контрольные суммы — **RELEASE_0_7_0_RU.md**.

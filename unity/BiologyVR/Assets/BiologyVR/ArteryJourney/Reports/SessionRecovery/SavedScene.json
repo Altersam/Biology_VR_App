@@ -1,10 +1,10 @@
 {
-  "utc": "2026-10-12T18:51:28.4157391Z",
+  "utc": "2026-10-13T17:24:54.4863051Z",
   "passed": true,
   "scene": "Assets/BiologyVR/ArteryJourney/Scenes/ArteryNarrativeVR_VisualRework.unity",
   "missingScripts": [],
   "missingDeps": [],
-  "sceneDependencyCount": 653,
+  "sceneDependencyCount": 663,
   "woundReferences": true,
   "bloodReferences": true,
   "holographicUiReferences": true,
@@ -12,6 +12,7 @@
   "hemodynamicsReferences": true,
   "freeBloodResearchReferences": true,
   "connectedOrganismReferences": true,
+  "playerFeedbackReferences": true,
   "targets": 77,
   "bloodPool": 360,
   "scope": "Saved master scene and serialized gameplay, screen, font and instrument references; runtime reports separate"

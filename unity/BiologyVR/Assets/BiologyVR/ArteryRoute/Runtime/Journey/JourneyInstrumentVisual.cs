@@ -70,6 +70,8 @@ namespace BiologyVR.ArteryRoute.Journey
                     {prongs[i].localPosition=restPositions[i]+radial*.022f*(1-HookAmount)+Vector3.forward*.012f*HookAmount;prongs[i].localRotation=Quaternion.AngleAxis(Mathf.Lerp(-20,12,HookAmount),tangent)*restRotations[i];}
                     else if(mode==BioToolMode.Bio)
                     {float breathe=(working?Mathf.Sin(Time.time*13)*8:0)+ModeTransitionAmount*12+ActivationAmount*10;prongs[i].localPosition=restPositions[i]+radial*ActivationAmount*.009f;prongs[i].localRotation=Quaternion.AngleAxis(breathe,tangent)*restRotations[i];}
+                    else if(mode==BioToolMode.Reverse)
+                    {prongs[i].localPosition=restPositions[i]+radial*(.018f+charge*.035f)+Vector3.back*charge*.028f;prongs[i].localRotation=Quaternion.AngleAxis(-18-charge*20,tangent)*restRotations[i];}
                     else
                      {
                          // Rotate the complete four-part crown about the device's
