@@ -278,3 +278,9 @@ Meta Quest / Oculus APK **0.7.0 готов**, UTC `2026-10-13T17:08:29.9205505Z`
 WebGL **0.7.0 Succeeded**, UTC `2026-10-13T17:19:55.8699179Z`:
 0 errors / 8 warnings; Chromium loading smoke PASS.
 Общий релиз и контрольные суммы — **RELEASE_0_7_0_RU.md**.
+
+Публикация **v0.7.0** подтверждена UTC `2026-10-13T17:32:52.824695+00:00`:
+source/WebGL commit `057ee4f6c833c5ae8c827f9e3e49329656a14433`, оба APK загружены,
+GitHub SHA-256 совпадают с локальными. Pages run `38439296701` — success;
+публичный WebGL сообщает 0.7.0, loader/framework совпадают со сборкой.
+Ссылки и результаты — `RELEASE_PUBLICATION_0_7_0.json`.
