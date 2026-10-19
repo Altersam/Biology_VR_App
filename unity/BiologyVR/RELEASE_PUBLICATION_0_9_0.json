@@ -1,0 +1,47 @@
+{
+  "utc": "2026-10-19T08:15:10.040464+00:00",
+  "version": "0.9.0",
+  "passed": true,
+  "repository": "Altersam/Biology_VR_App",
+  "source_commit": "55abf03993ae423a48a15bb02b45a9455da332ef",
+  "release_url": "https://github.com/Altersam/Biology_VR_App/releases/tag/v0.9.0",
+  "webgl_url": "https://altersam.github.io/Biology_VR_App/play/",
+  "checks": {
+    "release_published": true,
+    "pages_deployed_current_head": true,
+    "pico4_github_digest_matches": true,
+    "quest_github_digest_matches": true,
+    "checksums_uploaded": true,
+    "landing_version": true,
+    "served_webgl_version": true,
+    "served_play.loader.js_matches": true,
+    "served_play.framework.js.unityweb_matches": true
+  },
+  "pages": {
+    "conclusion": "success",
+    "databaseId": 39221247158,
+    "headSha": "55abf03993ae423a48a15bb02b45a9455da332ef",
+    "name": "pages build and deployment",
+    "status": "completed",
+    "url": "https://github.com/Altersam/Biology_VR_App/actions/runs/39221247158"
+  },
+  "artifacts": [
+    {
+      "file": "BiologyVR_Pico4_v0.9.0.apk",
+      "bytes": 83817801,
+      "sha256": "7c61ddb9e9b0b302044e4c57b0025321ac3f642458f7b880d9270e47634c349f",
+      "github_digest": "sha256:7c61ddb9e9b0b302044e4c57b0025321ac3f642458f7b880d9270e47634c349f",
+      "url": "https://github.com/Altersam/Biology_VR_App/releases/download/v0.9.0/BiologyVR_Pico4_v0.9.0.apk",
+      "matched": true
+    },
+    {
+      "file": "BiologyVR_MetaQuest_v0.9.0.apk",
+      "bytes": 82933582,
+      "sha256": "e57796e2f10cd2f10ab6f15107338ae13d85dff75b836e4f8a13e492a8e46b84",
+      "github_digest": "sha256:e57796e2f10cd2f10ab6f15107338ae13d85dff75b836e4f8a13e492a8e46b84",
+      "url": "https://github.com/Altersam/Biology_VR_App/releases/download/v0.9.0/BiologyVR_MetaQuest_v0.9.0.apk",
+      "matched": true
+    }
+  ],
+  "hardware_verified": false
+}
