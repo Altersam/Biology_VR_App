@@ -1,0 +1,21 @@
+{
+  "utc": "2026-10-14T11:27:52.4768732Z",
+  "episode": 10,
+  "focuses": 6,
+  "respondersPerFocus": [
+    3,
+    4,
+    3,
+    5,
+    4,
+    5
+  ],
+  "responderPool": 5,
+  "reuse": "Mission/Mover/BloodFlow/WBC mesh/LayerInspection/UI/Reverse/HemostasisPuzzle",
+  "scannerActivation": true,
+  "tutorialVirusHits": 1,
+  "lateVirusHits": 3,
+  "spikeGroups": 3,
+  "platelets": "actual blood-pool leases / launch to original wound",
+  "cameraForced": false
+}

@@ -8,7 +8,7 @@ import zipfile
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parent.parent
-REPO=ROOT.parent/'Biology_VR_App'
+REPO=ROOT.parent/'Github_VR'/'Biology_VR_App'
 TOOLS=ROOT/'Builds/Utilities/GitHubCLI'
 EXE=TOOLS/'bin/gh.exe'
 if not EXE.is_file():

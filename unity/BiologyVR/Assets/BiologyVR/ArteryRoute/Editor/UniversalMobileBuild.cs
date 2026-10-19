@@ -117,7 +117,7 @@ namespace BiologyVR.ArteryRoute.Editor
         public static void ReopenAtAsciiAlias()
         {
             if(EditorApplication.isPlaying)throw new InvalidOperationException("Exit Play Mode first");
-            string original=Path.GetFullPath("."),alias=Path.Combine(Path.GetPathRoot(original),"BiologyVR_bio_v02_build");
+            string original=Path.GetFullPath("."),alias=Path.Combine(Path.GetPathRoot(original),"BiologyVR_bio_03");
             if(!Directory.Exists(alias))throw new InvalidOperationException("Create the ASCII junction with Tools/create_ascii_build_alias.ps1 first");
             if(original.Any(c=>c>127))EditorPrefs.SetString("BiologyVR.Pico.OriginalProjectPath",original);
             AssetDatabase.SaveAssets();EditorSceneManager.SaveOpenScenes();EditorApplication.OpenProject(alias);

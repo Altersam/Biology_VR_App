@@ -48,6 +48,9 @@ namespace BiologyVR.ArteryRoute.Journey
         public void TravelTo(int scene,bool instant=false)
         {
             from=Distance;to=path.Anchor(scene);time=0;
+            // Use the existing station transition to stop near the same physical tear.
+            // Keep this position throughout diagnosis, plug, balance and repair.
+            if(scene>=11&&scene<=14&&mission&&mission.world.plateletLaunch)to=path.Anchor(11)+3.8f;
             float length=Mathf.Abs(to-from);duration=length<6?3.5f:length<20?6f:9f;
             Moving=!instant;
             TransitionProgress=Moving?0f:1f;

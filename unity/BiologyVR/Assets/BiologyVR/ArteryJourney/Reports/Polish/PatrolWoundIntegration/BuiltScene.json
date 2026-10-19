@@ -1,0 +1,34 @@
+{
+  "utc": "2026-10-19T03:38:32.8442711Z",
+  "version": "0.9.0",
+  "scene": "Assets/BiologyVR/ArteryJourney/Scenes/ArteryNarrativeVR_VisualRework.unity",
+  "sceneGuid": "c0ff2c23e2e226842a0d8592b18b1c45",
+  "focuses": [
+    {
+      "name": "ImmuneFocus_01",
+      "responders": 3
+    },
+    {
+      "name": "ImmuneFocus_02",
+      "responders": 4
+    },
+    {
+      "name": "ImmuneFocus_03",
+      "responders": 3
+    },
+    {
+      "name": "ImmuneFocus_04",
+      "responders": 5
+    },
+    {
+      "name": "ImmuneFocus_05",
+      "responders": 4
+    },
+    {
+      "name": "ImmuneFocus_06",
+      "responders": 5
+    }
+  ],
+  "platelets": 11,
+  "passed": true
+}

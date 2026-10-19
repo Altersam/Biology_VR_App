@@ -1,10 +1,10 @@
 {
-  "version": "0.7.0",
+  "version": "0.9.0",
   "unity": "6000.1.9f1",
-  "art": "Coral V6 + trigger-only BioTool field capture + carrier-bound gas/iron + five manual modes and reverse phagocyte launch + dynamic vascular telemetry + evasive emboli + readable VR screens and timed assistance",
-  "updated_utc": "2026-10-13T17:25:33.098008+00:00",
-  "webgl_version": "0.7.0",
-  "android_release_version": "0.7.0",
+  "art": "Immune patrol integrated into Scene10; six tissue focuses, pooled leukocytes, existing Reverse/cutaway; visible-wound platelet adhesion and remote plug balance; unified Scanner instructions",
+  "updated_utc": "2026-10-19T03:42:10.168187+00:00",
+  "webgl_version": "0.9.0",
+  "android_release_version": "0.9.0",
   "releases": [
     {
       "file": "BiologyVR_MetaQuest.apk",
@@ -71,9 +71,25 @@
       "version": "0.7.0",
       "device": "Meta Quest 2 / Pro / 3 / 3S",
       "tag": "v0.7.0"
+    },
+    {
+      "file": "BiologyVR_Pico4_v0.9.0.apk",
+      "bytes": 83817801,
+      "sha256": "7c61ddb9e9b0b302044e4c57b0025321ac3f642458f7b880d9270e47634c349f",
+      "version": "0.9.0",
+      "device": "PICO 4 / PICO 4 Enterprise",
+      "tag": "v0.9.0"
+    },
+    {
+      "file": "BiologyVR_MetaQuest_v0.9.0.apk",
+      "bytes": 82933582,
+      "sha256": "e57796e2f10cd2f10ab6f15107338ae13d85dff75b836e4f8a13e492a8e46b84",
+      "version": "0.9.0",
+      "device": "Meta Quest 2 / Pro / 3 / 3S",
+      "tag": "v0.9.0"
     }
   ],
-  "pico_release_version": "0.7.0",
-  "quest_release_version": "0.7.0",
-  "android_version_code": 8
+  "pico_release_version": "0.9.0",
+  "quest_release_version": "0.9.0",
+  "android_version_code": 10
 }

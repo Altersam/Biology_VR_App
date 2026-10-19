@@ -67,3 +67,10 @@ if '--dismiss-build-failure' in sys.argv:
                 if child['class'] == 'Button' and child['caption'] == '&OK':
                     user.SendMessageW(child['handle'], 0x00F5, 0, 0)
                     print('Acknowledged the build-failure result')
+if '--enter-safe-mode' in sys.argv:
+    for row in rows:
+        if row['class'] == '#32770' and row['caption'] == 'Enter Safe Mode?':
+            for child in row['children']:
+                if child['class'] == 'Button' and child['caption'] == '&Enter Safe Mode':
+                    user.SendMessageW(child['handle'], 0x00F5, 0, 0)
+                    print('Entered Unity Safe Mode to resolve compilation')

@@ -1,0 +1,18 @@
+{
+  "utc": "2026-10-17T15:15:16.7582295Z",
+  "version": "0.9.0",
+  "scene": "Assets/BiologyVR/ArteryJourney/Scenes/ArteryNarrativeVR_VisualRework.unity",
+  "focuses": 6,
+  "counts": [
+    3,
+    4,
+    3,
+    5,
+    4,
+    5
+  ],
+  "maximumResponders": 5,
+  "reused": "JourneyMission / JourneyMover / BloodFlow pool / Reverse / Scanner / LayerInspection / HolographicScreens / HemostasisPuzzle",
+  "woundContact": "actual visible tear plane; automatic free slot selection",
+  "cameraForced": false
+}

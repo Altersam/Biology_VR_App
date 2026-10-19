@@ -9,6 +9,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public Transform[] backgroundCargo;
         public JourneyTarget oxygen,co2,heme;
         public Mesh gasMesh,ironMesh;
+        public Mesh co2Mesh;
         public Material oxygenMaterial,co2Material,ironMaterial;
         Renderer[] sourceRenderers,cargoRenderers;
         void Awake(){sourceRenderers=new Renderer[backgroundCargo.Length];cargoRenderers=new Renderer[backgroundCargo.Length];for(int i=0;i<backgroundCargo.Length;i++){sourceRenderers[i]=backgroundCargo[i].parent.GetComponent<Renderer>();cargoRenderers[i]=backgroundCargo[i].GetComponent<Renderer>();}}
@@ -17,7 +18,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(backgroundCargo==null||index>=backgroundCargo.Length||!backgroundCargo[index])return;
             var cargo=backgroundCargo[index];bool o2=species=="erythrocyte-O2",carbon=species=="erythrocyte-CO2",iron=species=="hemoglobin";
             cargo.gameObject.SetActive(o2||carbon||iron);if(!cargo.gameObject.activeSelf)return;
-            cargo.GetComponent<MeshFilter>().sharedMesh=iron?ironMesh:gasMesh;
+            cargo.GetComponent<MeshFilter>().sharedMesh=iron?ironMesh:carbon&&co2Mesh?co2Mesh:gasMesh;
             cargo.GetComponent<Renderer>().sharedMaterial=iron?ironMaterial:o2?oxygenMaterial:co2Material;
             cargo.localPosition=iron?new Vector3(.12f,.20f,0):new Vector3(0,.24f,0);
             cargo.localScale=Vector3.one*(iron?.15f:.30f);

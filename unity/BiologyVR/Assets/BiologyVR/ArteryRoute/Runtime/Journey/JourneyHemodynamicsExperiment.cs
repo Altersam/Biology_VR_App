@@ -26,7 +26,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public float FlowRatio=>world.freeTools?Mathf.Pow(RadiusRatio,4):Case==3?DeltaP/8:1;
         public float VelocityRatio=>FlowRatio/(RadiusRatio*RadiusRatio);
         public float DiameterMm=>4.8f*RadiusRatio;
-        public bool Active=>world&&world.mission&&(world.mission.SceneNumber==5||world.mission.SceneNumber==10);
+        public bool Active=>world&&world.mission&&(world.mission.SceneNumber==5||world.mission.SceneNumber==10&&!world.immunePatrol);
         public bool Late=>world.mission.SceneNumber==10;
         public int Case{get;private set;}
         public bool Adjusting{get;private set;}
@@ -178,6 +178,10 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         bool ControlFieldLesson(float dt,bool held,Transform aim,bool desktop)
         {
+            // The immune/tissue and wound episodes own their wall. A residual TONUS
+            // selection must not deform their cutaway or reproduce the earlier lesson.
+            int scene=world.mission.SceneNumber;
+            if(scene==10&&world.immunePatrol||scene>=11&&scene<=14){Adjusting=false;Stability=stable=0;RadiusRatio=1;return false;}
             if(!held||!aim){Adjusting=false;previousTool=false;stable=0;return false;}
             if(!Adjusting){Adjusting=true;handStart=aim.position;handRadius=RadiusRatio;desktopOffset=0;}
             if(desktop){desktopOffset+=JourneyDesktopControls.WheelSteps*.035f;RadiusRatio=Mathf.Clamp(handRadius+desktopOffset,.5f,1.8f);}
@@ -189,7 +193,7 @@ namespace BiologyVR.ArteryRoute.Journey
             return true;
         }
         public float LocalSpeed(float arc)
-        {float weight=Active||world.freeTools?1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(.5f,1.1f,Mathf.Abs(arc-SectionArc))):0;return Mathf.Clamp(Mathf.Lerp(1,FlowRatio,weight)/Mathf.Pow(LocalRadius(arc),2),world.freeTools?.12f:.45f,world.freeTools?3.5f:2.5f);}
+        {if(world.immunePatrol&&world.immunePatrol.Active)return 1;float weight=Active||world.freeTools?1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(.5f,1.1f,Mathf.Abs(arc-SectionArc))):0;return Mathf.Clamp(Mathf.Lerp(1,FlowRatio,weight)/Mathf.Pow(LocalRadius(arc),2),world.freeTools?.12f:.45f,world.freeTools?3.5f:2.5f);}
         void UpdateGraphics()
         {
             CacheGraphics();

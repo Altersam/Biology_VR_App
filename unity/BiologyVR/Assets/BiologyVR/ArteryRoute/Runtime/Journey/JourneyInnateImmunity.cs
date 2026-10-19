@@ -12,6 +12,8 @@ namespace BiologyVR.ArteryRoute.Journey
         public LineRenderer trajectory;
         public Text status;
         public JourneyPhagocyteEntity[] phagocytes;
+        public JourneyVirusShatter shatter;
+        Vector3 damageScale;
         [SerializeField] bool tutorialCompleted;
         public bool TutorialCompleted=>tutorialCompleted;
         public bool Active=>world.mission.SceneNumber==8||world.mission.SceneNumber==9||world.mission.SceneNumber==15;
@@ -57,6 +59,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(lastScene!=mission.SceneNumber)
             {
                 Clear();lastScene=mission.SceneNumber;Neutralized=Missed=Launched=Spawned=MaximumLive=DamageContacts=serial=0;spawnClock=0;
+                if(mission.SceneNumber==9&&shatter)mission.FeedbackMessage("НОВАЯ ВОЛНА: первый вирус уничтожен. Следующие частицы двигаются активнее — используй тот же цикл.");
             }
             if(!Active){status.gameObject.SetActive(false);if(world.freeTools)MoveOutsideEncounter();return;}if(!mission.Ready)return;
             // Enter starts normal travel before the player reaches the new arc.
@@ -73,7 +76,8 @@ namespace BiologyVR.ArteryRoute.Journey
             foreach(var virus in viruses)
             {
                 if(!virus.Live||virus.State==JourneyImmuneVirusState.Engaged||virus.State==JourneyImmuneVirusState.BeingPhagocytosed)continue;
-                virus.arc+=Time.deltaTime*virus.speed;virus.transform.SetPositionAndRotation(world.mover.path.Offset(virus.arc,virus.laneX,virus.laneY),world.mover.path.Frame(virus.arc)*Quaternion.Euler(0,Time.time*11,0));
+                if(virus.evasive)virus.StepEvasive(world,Time.deltaTime);
+                else{virus.arc+=Time.deltaTime*virus.speed;virus.transform.SetPositionAndRotation(world.mover.path.Offset(virus.arc,virus.laneX,virus.laneY),world.mover.path.Frame(virus.arc)*Quaternion.Euler(0,Time.time*11,0));}
                 if(virus.arc>world.mover.Distance+15)
                 {
                     if(Tutorial){if(!Visible(virus.transform.position))virus.Begin(world.mover.Distance-6,1.1f,.15f,.28f);}
@@ -97,7 +101,7 @@ namespace BiologyVR.ArteryRoute.Journey
                 if(cell.State!=JourneyPhagocyteState.Phagocytosis)cell.Animate(cell.State==JourneyPhagocyteState.Flowing||cell.State==JourneyPhagocyteState.Scanned||world.freeTools&&cell.State==JourneyPhagocyteState.Captured?0:.25f,Vector3.zero);
             }
             if(engagingCell)TickEngulf();MaximumLive=Mathf.Max(MaximumLive,LiveCount);
-            status.gameObject.SetActive(engagingCell||Held);status.text=engagingCell?"ФАГОЦИТОЗ / окружение → поглощение → разрушение":$"ПОЛЕ / натяжение {PullDistance*100:0} см";
+            status.gameObject.SetActive(engagingCell||Held);status.text=engagingCell?(shatter?"ПОПАДАНИЕ / оболочка разрушается":"ФАГОЦИТОЗ / окружение → поглощение → разрушение"):$"ПОЛЕ / натяжение {PullDistance*100:0} см";
             if(status.gameObject.activeSelf){var point=engagingCell?engagingCell.transform.position:Held.transform.position;status.transform.SetPositionAndRotation(point+world.mover.viewCamera.transform.up*.4f,world.mover.viewCamera.transform.rotation);}
         }
         readonly Plane[] visibilityPlanes=new Plane[6];
@@ -116,6 +120,7 @@ namespace BiologyVR.ArteryRoute.Journey
             JourneyImmuneVirus virus=null;foreach(var candidate in viruses)if(!candidate.Live){virus=candidate;break;}if(!virus)return;
             float arc=world.mover.Distance+(world.freeTools?3.2f:-(tutorial?3.5f:6f));float a=serial++*2.399963f;virus.target.targetId=tutorial?"virus-study":"incoming-virus";
             virus.Begin(arc,tutorial?.4f:Mathf.Cos(a)*1.1f,tutorial?.15f:Mathf.Sin(a)*.8f,world.freeTools?(tutorial?.055f:.11f):tutorial?.28f:.40f+(serial%4)*.08f);Spawned++;
+            if(world.plateletLaunch&&tutorial)virus.UseSingleContactTutorial();
         }
         public bool HandleInput(float dt,bool scan,bool tool,JourneyTarget hit,Transform aim,bool desktop)
         {
@@ -171,7 +176,7 @@ namespace BiologyVR.ArteryRoute.Journey
         {if(id=="virus-study")return ProcessingScan;if(id=="phagocyte")return action==StudyAction.Capture?ProcessingCapture:ProcessingScan;if(id=="immune-engulf")return ProcessingSuccess;return true;}
         void BeginEngulf(JourneyPhagocyteEntity cell,JourneyImmuneVirus virus)
         {
-            if(engagingCell)return;engagingCell=cell;engagingVirus=virus;engulfAge=0;engulfStart=virus.transform.position;cell.SetState(JourneyPhagocyteState.Phagocytosis);virus.SetState(JourneyImmuneVirusState.Engaged);virus.contact.enabled=false;cell.launchVelocity=Vector3.zero;
+            if(engagingCell)return;engagingCell=cell;engagingVirus=virus;engulfAge=0;engulfStart=virus.transform.position;damageScale=virus.transform.localScale;cell.SetState(JourneyPhagocyteState.Phagocytosis);virus.SetState(JourneyImmuneVirusState.Engaged);virus.contact.enabled=false;cell.launchVelocity=Vector3.zero;if(shatter)shatter.Burst(virus.transform.position,virus.Integrity==1);
         }
         void TickEngulf()
         {
@@ -203,7 +208,7 @@ namespace BiologyVR.ArteryRoute.Journey
             var cell=hit?hit.GetComponent<JourneyPhagocyteEntity>():null;
             if(!cell||world.freeTools.Held!=hit){ScanProgress=0;scanAge=0;return false;}
             if(scanningTarget!=hit){scanningTarget=hit;scanAge=0;scanConsumed=false;}
-            if(!scanConsumed){scanAge+=dt;ScanProgress=Mathf.Clamp01(scanAge/.75f);if(ScanProgress>=1){cell.Studied=true;scanConsumed=true;ProcessingScan=true;if(Tutorial&&world.mission.Current?.action==StudyAction.Scan&&world.mission.Current.target=="phagocyte")world.mission.Accept(StudyAction.Scan,"phagocyte");ProcessingScan=false;world.mission.FeedbackMessage("Фагоцит распознан. Переключи BioTool в АКТИВАЦИЮ и удержи курок.");}}
+            if(!scanConsumed){scanAge+=dt;ScanProgress=Mathf.Clamp01(scanAge/.75f);if(ScanProgress>=1){cell.Studied=true;scanConsumed=true;ProcessingScan=true;if(Tutorial&&world.mission.Current?.action==StudyAction.Scan&&world.mission.Current.target=="phagocyte")world.mission.Accept(StudyAction.Scan,"phagocyte");ProcessingScan=false;if(world.plateletLaunch){cell.SetState(JourneyPhagocyteState.Activated);world.mission.GetComponent<JourneyInstrumentRig>().ScannerActivated(cell.transform.position);world.mission.FeedbackMessage("Клетка активирована Scanner. РЕВЕРС: наведи и отпусти курок.");}else world.mission.FeedbackMessage("Фагоцит распознан. Переключи BioTool в АКТИВАЦИЮ и удержи курок.");}}
             return true;
         }
         public void Activate(JourneyPhagocyteEntity cell,float dt)
@@ -218,23 +223,48 @@ namespace BiologyVR.ArteryRoute.Journey
         public void Preview(JourneyPhagocyteEntity cell,Transform aim,float charge)
         {
             trajectory.enabled=cell.Studied&&cell.State==JourneyPhagocyteState.Activated&&cell.RemainingCapacity>0;trajectory.positionCount=Tutorial?20:10;
-            var velocity=aim.forward*Mathf.Lerp(1.5f,5,charge);for(int i=0;i<trajectory.positionCount;i++)trajectory.SetPosition(i,Predict(cell.transform.position,velocity,i/(float)(trajectory.positionCount-1)*1.8f));
+            var velocity=FieldLaunchVelocity(cell,aim,charge);for(int i=0;i<trajectory.positionCount;i++)trajectory.SetPosition(i,Predict(cell.transform.position,velocity,i/(float)(trajectory.positionCount-1)*1.8f));
+        }
+        Vector3 FieldLaunchVelocity(JourneyPhagocyteEntity cell,Transform aim,float charge)
+        {
+            float speed=Mathf.Lerp(1.5f,5,charge);var fallback=aim.forward*speed;
+            if(!Active||charge<.5f)return fallback;
+            JourneyImmuneVirus target=null;float nearest=12;
+            foreach(var virus in viruses)
+            {
+                if(!virus.Live||virus.State==JourneyImmuneVirusState.Engaged||virus.State==JourneyImmuneVirusState.BeingPhagocytosed)continue;
+                var delta=virus.transform.position-aim.position;float along=Vector3.Dot(delta,aim.forward);
+                if(along<=.3f||along>=nearest||Vector3.Angle(aim.forward,delta)>10||Vector3.Cross(delta,aim.forward).magnitude>.55f)continue;
+                if(Physics.Linecast(aim.position,virus.transform.position,out var hit,~0,QueryTriggerInteraction.Ignore)&&!hit.collider.transform.IsChildOf(world.mover.origin.transform)&&hit.collider.GetComponentInParent<JourneyImmuneVirus>()!=virus&&hit.collider.GetComponentInParent<JourneyTarget>()!=cell.target)continue;
+                nearest=along;target=virus;
+            }
+            if(!target)return fallback;
+            // Match the existing damped flight and blood drift; never home after release.
+            float best=float.MaxValue;var result=fallback;var start=cell.transform.position;var drift=BloodVelocity(start);
+            for(float time=.12f;time<=1.6f;time+=.025f)
+            {
+                float distanceFactor=(1-Mathf.Exp(-.7f*time))/.7f;
+                var velocity=(target.PredictPosition(world,time)-start-drift*time)/distanceFactor;
+                float error=Mathf.Abs(velocity.magnitude-speed);
+                if(error<best){best=error;result=velocity.normalized*speed;}
+            }
+            return best<.3f?result:fallback;
         }
         public void LaunchFromField(JourneyPhagocyteEntity cell,Transform aim,float charge)
         {
             trajectory.enabled=false;if(!cell.Studied||cell.State!=JourneyPhagocyteState.Activated||cell.RemainingCapacity<=0){world.bloodEntities.Release(cell.target,true);world.mission.FeedbackMessage("Для запуска нужен свежий, просканированный и активированный фагоцит.");return;}
-            cell.launchVelocity=aim.forward*Mathf.Lerp(1.5f,5,charge);LastLaunchVelocity=cell.launchVelocity;LastBloodVelocity=BloodVelocity(cell.transform.position);cell.SetState(JourneyPhagocyteState.Launched);cell.target.GetComponent<SphereCollider>().enabled=false;cell.target.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>().enabled=false;Launched++;world.mission.GetComponent<JourneyInstrumentRig>().PhagocyteReleased();
+            cell.launchVelocity=FieldLaunchVelocity(cell,aim,charge);LastLaunchVelocity=cell.launchVelocity;LastBloodVelocity=BloodVelocity(cell.transform.position);cell.SetState(JourneyPhagocyteState.Launched);cell.target.GetComponent<SphereCollider>().enabled=false;cell.target.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>().enabled=false;Launched++;world.mission.GetComponent<JourneyInstrumentRig>().PhagocyteReleased();
         }
         void TickDamage()
         {
             engulfAge+=Time.deltaTime;var cell=engagingCell;var virus=engagingVirus;float t=Mathf.Clamp01(engulfAge/.9f);
-            cell.Animate(Mathf.Sin(t*Mathf.PI),(virus.transform.position-cell.transform.position).normalized);virus.transform.localScale=virus.initialScale*(1-.1f*Mathf.Sin(t*Mathf.PI));
+            cell.Animate(Mathf.Sin(t*Mathf.PI),(virus.transform.position-cell.transform.position).normalized);virus.transform.localScale=damageScale*(shatter&&virus.Integrity==1?Mathf.Lerp(1,0,t):1-.1f*Mathf.Sin(t*Mathf.PI));
             if(t<1)return;virus.Damage();DamageContacts++;cell.RestoreCapacity(0);cell.SetState(JourneyPhagocyteState.Recovering);world.bloodEntities.stream.ResumeLease(cell.CellIndex,cell.transform.position);
             if(virus.Integrity==0){virus.Return();Neutralized++;}else{virus.SetState(JourneyImmuneVirusState.Targetable);virus.contact.enabled=true;virus.transform.localScale=virus.initialScale*Mathf.Lerp(.7f,1,virus.Integrity/3f);}
             if(Tutorial){world.mission.UpdateInnateViralLoad(virus.Integrity/3f*25);if(virus.Integrity==0){tutorialCompleted=true;world.RememberEpisode();}}
             else world.mission.UpdateInnateViralLoad(Mathf.Max(world.mission.SceneNumber==15?72:0,world.mission.ViralLoad-25f/12));
             engagingCell=null;engagingVirus=null;ProcessingSuccess=true;var goal=world.mission.Current;
-            bool finalAllowed=world.mission.SceneNumber!=9||world.mission.Progress<goal.required-1||world.mission.ViralLoad<=0;
+            bool finalAllowed=world.mission.SceneNumber!=9||goal==null||world.mission.Progress<goal.required-1||world.mission.ViralLoad<=0;
             if(goal?.target=="immune-engulf"&&(Tutorial||virus.Integrity==0)&&finalAllowed)world.mission.Accept(StudyAction.Direct,"immune-engulf");ProcessingSuccess=false;
             if(Tutorial&&tutorialCompleted)world.RememberEpisode();
             world.bloodEntities.stream.RequestInflux("phagocyte");world.mission.FeedbackMessage(virus.Integrity==0?"Вирусная частица нейтрализована.":"Контакт ослабил частицу. Найди следующий фагоцит в потоке.");

@@ -1,0 +1,5 @@
+{
+  "utc": "2026-10-14T05:46:30.5289513Z",
+  "passed": false,
+  "reason": "System.InvalidOperationException: Saved-scene verification failed; inspect Z:/BiologyVR_bio_v02_build/Assets\\BiologyVR/ArteryJourney/Reports/SessionRecovery/SavedScene.json\r\n  at BiologyVR.ArteryRoute.Editor.SavedJourneyRecoveryValidation.VerifyCore (System.String folder) [0x00fac] in Z:\\YandexDisk\\ПетПроекты\\Biology_VR\\3д\\Unity\\bio_v0.2\\Assets\\BiologyVR\\ArteryRoute\\Editor\\SavedJourneyRecoveryValidation.cs:47 \r\n  at BiologyVR.ArteryRoute.Editor.SavedJourneyRecoveryValidation.Verify () [0x00029] in Z:\\YandexDisk\\ПетПроекты\\Biology_VR\\3д\\Unity\\bio_v0.2\\Assets\\BiologyVR\\ArteryRoute\\Editor\\SavedJourneyRecoveryValidation.cs:20 "
+}

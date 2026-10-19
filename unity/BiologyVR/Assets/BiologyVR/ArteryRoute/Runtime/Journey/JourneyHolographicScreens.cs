@@ -25,7 +25,9 @@ namespace BiologyVR.ArteryRoute.Journey
         JourneyMission subscribed;
         int chapter=-1;
         float refreshAt;
-        void Awake(){stick=new InputAction("Read holographic theory",InputActionType.Value,"<XRController>{RightHand}/thumbstick");}
+        Vector3 theoryHome,vitalsHome;
+        Quaternion theoryRotation,vitalsRotation;
+        void Awake(){stick=new InputAction("Read holographic theory",InputActionType.Value,"<XRController>{RightHand}/thumbstick");if(theoryRoot&&vitalsRoot){theoryHome=theoryRoot.localPosition;vitalsHome=vitalsRoot.localPosition;theoryRotation=theoryRoot.localRotation;vitalsRotation=vitalsRoot.localRotation;}}
         void OnEnable(){stick?.Enable();Subscribe();}
         void OnDisable(){stick?.Disable();if(subscribed)subscribed.Changed-=Refresh;subscribed=null;}
         void OnDestroy(){stick?.Dispose();}
@@ -55,13 +57,21 @@ namespace BiologyVR.ArteryRoute.Journey
         {
             if(!hud||!hud.mission||hud.mission.Goals==null)return;
             var m=hud.mission;
+            if(theoryRoot&&vitalsRoot)
+            {
+                bool tissue=m.SceneNumber>=10&&m.SceneNumber<=14&&m.world.immunePatrol;
+                theoryRoot.localPosition=tissue?new Vector3(-1.05f,-.12f,1.5f):theoryHome;
+                vitalsRoot.localPosition=tissue?new Vector3(1.05f,.40f,1.5f):vitalsHome;
+                theoryRoot.localRotation=tissue?Quaternion.LookRotation(theoryRoot.localPosition,Vector3.up):theoryRotation;
+                vitalsRoot.localRotation=tissue?Quaternion.LookRotation(vitalsRoot.localPosition,Vector3.up):vitalsRotation;
+            }
             if(m.FreeBloodResearch){RefreshResearch(m.world.research);RefreshVitals();return;}
             shortTheory.resizeTextForBestFit=false;
             if(referenceButton)referenceButton.GetComponentInChildren<Text>().text="Подробнее";
             if(practiceButton)practiceButton.GetComponentInChildren<Text>().text="К практике";
             theoryTitle.text=m.LearningTerm;
-            if(shortTheory)shortTheory.text=m.world.freeTools&&(m.SceneNumber==8||m.SceneNumber==9)?"1. Притяжение: захвати фагоцит.\n2. Scanner: изучи клетку.\n3. Активация: удержи курок.\n4. Реверс: наведи и отпусти.":ShortExplanation(m.SceneNumber);
-            if(illustrationText)illustrationText.text=MiniDiagram(m.SceneNumber);
+            if(shortTheory)shortTheory.text=m.SceneNumber==10&&m.world.immunePatrol?"Изменённая стенка → Scanner.\nГлубокий просмотр: повторный Scanner.\nРЕВЕРС направляет лейкоциты к очагам.":m.world.freeTools&&(m.SceneNumber==8||m.SceneNumber==9)?(m.world.plateletLaunch?"1. Притяжение: захвати фагоцит.\n2. Scanner: изучи и активируй.\n3. Реверс: наведи и отпусти.":"1. Притяжение: захвати фагоцит.\n2. Scanner: изучи клетку.\n3. Активация: удержи курок.\n4. Реверс: наведи и отпусти."):ShortExplanation(m.SceneNumber);
+            if(illustrationText)illustrationText.text=m.SceneNumber==10&&m.world.immunePatrol?"ОБНАРУЖИТЬ → НАПРАВИТЬ → УСТРАНИТЬ":MiniDiagram(m.SceneNumber);
             var text=new StringBuilder();text.Append("<b>").Append(m.LearningTerm).Append("</b>\n\n").Append(m.LearningNote);
             if(!string.IsNullOrEmpty(m.Formula))text.Append("\n\n<b>Формула / связь</b>\n").Append(m.Formula);
             text.Append("\n\n<b>Профессор</b>\n«").Append(m.ProfessorLine).Append("»");
@@ -75,7 +85,7 @@ namespace BiologyVR.ArteryRoute.Journey
             {var plaque=m.world.plaqueChallenge;taskProgress.text=$"Осталось {plaque.RemainingCount} • {plaque.RemainingSeconds:0}с";taskHint.text=plaque.Failed?"ОККЛЮЗИЯ • повтор через 3 секунды":$"Trigger / E — очередь • прибыло +{plaque.ReinforcementCount}";}
             if(m.SceneNumber==7&&m.world.embolusWave)taskProgress.text=$"Ловушка {m.world.embolusWave.StabilizedCount}/6";
             if(m.world.immunity&&m.Current?.target=="immune-engulf")taskProgress.text=m.SceneNumber==8?"НАБЛЮДАЙ КОНТАКТ":$"Нагрузка {m.ViralLoad:0}%";
-            if(m.SceneNumber==12&&m.world.hemostasisPuzzle&&m.world.hemostasisPuzzle.flowLayering)
+            if(m.SceneNumber==12&&!m.world.plateletLaunch&&m.world.hemostasisPuzzle&&m.world.hemostasisPuzzle.flowLayering)
             {var puzzle=m.world.hemostasisPuzzle;taskProgress.text=puzzle.Activated?$"Фибрин {m.world.FibrinGrowth:P0}":puzzle.Attached<11?$"Первичная {puzzle.Attached}/11":$"Цепочка {puzzle.activationPuzzle.Progress}/3";if(m.Current?.action==StudyAction.Activate)taskHint.text="Grip / ЛКМ — три этапа стабилизации по порядку";else if(m.Current?.target=="platelet")taskHint.text="Удерживай Capture • подведи: адгезия автоматическая";}
             if(overview)overview.SetActive(!ShowPractice);
             if(referenceView)referenceView.SetActive(ShowPractice);
@@ -160,7 +170,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(goal.action==StudyAction.Grab)return "Grip / ЛКМ — достать из потока";
             if(goal.action==StudyAction.Enlarge)return "Две руки / Z — учебное увеличение";
             if(goal.target=="oxygen")return "Взять O₂ · перенести · отпустить у гема";
-            if(m.SceneNumber==12&&goal.action==StudyAction.Direct&&goal.target=="platelet")return "BioTool Capture: удерживать Trigger / E • подвести к ране";
+            if(m.SceneNumber==12&&goal.action==StudyAction.Direct&&goal.target=="platelet")return m.world.plateletLaunch?"ПРИТЯЖЕНИЕ → Scanner → РЕВЕРС в разрыв":"BioTool Capture: удерживать Trigger / E • подвести к ране";
             if(goal.action==StudyAction.Bind||((m.SceneNumber==12||m.SceneNumber==13)&&(goal.action==StudyAction.Direct||goal.action==StudyAction.Balance)))return "Grip / ЛКМ — взять · перенести · отпустить";
             if(goal.action==StudyAction.Capture||goal.action==StudyAction.Deposit)return "Удерживать Trigger / E — поле захвата";
             if(goal.target=="phagocyte"&&goal.action==StudyAction.Activate)return m.world.freeTools?"АКТИВАЦИЯ: правый курок / E":"Scanner: удерживать левый Trigger / F • реакция в модели";

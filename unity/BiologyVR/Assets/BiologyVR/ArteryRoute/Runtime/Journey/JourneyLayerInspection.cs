@@ -24,6 +24,15 @@ namespace BiologyVR.ArteryRoute.Journey
         MaterialPropertyBlock block;
         JourneyMission mission;bool subscribed;
         int lastScene=-1,lastStep=-1;
+        bool externalInspection;
+        float externalStation,externalReveal;
+        Mesh externalWindow;
+        public void ExternalReveal(float station,float progress,Mesh colliderWindow)
+        {
+            externalInspection=true;externalStation=station;externalReveal=progress;externalWindow=colliderWindow;
+            if(!mission)mission=world.mission;Initialize();
+        }
+        public void EndExternalReveal(){externalInspection=false;externalWindow=null;Shader.SetGlobalFloat("_InspectionReveal",0);if(vesselCollider&&vesselOriginal)vesselCollider.sharedMesh=vesselOriginal;ApplyState();}
         public JourneyTarget[] BandTargets=>bands;
         public int FocusedBand{get;private set;}=-1;
         public bool AnimationBusy{get;private set;}
@@ -64,6 +73,7 @@ namespace BiologyVR.ArteryRoute.Journey
         void ApplyState()
         {
             if(!mission||runtime==null)return;
+            if(externalInspection)return;
             bool active=mission.SceneNumber==4;
             bool dormant=world.IsEpisodeCompleted(4)&&!active;
             if(active&&(lastScene!=4||(mission.StepIndex==0&&lastStep>0)))
@@ -83,6 +93,7 @@ namespace BiologyVR.ArteryRoute.Journey
         void LateUpdate()
         {
             if(!mission||runtime==null)return;
+            if(externalInspection){UpdateExternal();return;}
             if(lastScene!=mission.SceneNumber||lastStep!=mission.StepIndex)ApplyState();
             if(mission.SceneNumber!=4)return;
             RestorePose();AnimationBusy=false;
@@ -129,6 +140,14 @@ namespace BiologyVR.ArteryRoute.Journey
             patch.SetPositionAndRotation(path.Centre(s),path.Frame(s));
             foreach(var target in bands)if(target){target.transform.SetPositionAndRotation(patch.position,patch.rotation);target.transform.localScale=Vector3.one;}
             if(activation){activation.transform.SetPositionAndRotation(patch.position,patch.rotation);activation.transform.localScale=Vector3.one;}
+        }
+        void UpdateExternal()
+        {
+            var path=world.mover.path;patch.gameObject.SetActive(true);patch.SetPositionAndRotation(path.Centre(externalStation),path.Frame(externalStation));
+            for(int i=0;i<4;i++){bands[i].gameObject.SetActive(true);bands[i].transform.SetPositionAndRotation(patch.position,patch.rotation);renderers[i].gameObject.SetActive(true);contacts[i].enabled=false;Write(i,i<3?externalReveal:0);}
+            if(activationContact)activationContact.enabled=false;foreach(var label in labels)if(label)label.gameObject.SetActive(false);
+            Shader.SetGlobalVector("_InspectionOriginWS",path.Offset(externalStation,path.Radius(externalStation),0));Shader.SetGlobalVector("_InspectionUpWS",path.Up(externalStation));Shader.SetGlobalVector("_InspectionForwardWS",path.Forward(externalStation));Shader.SetGlobalVector("_InspectionRightWS",path.Right(externalStation));Shader.SetGlobalVector("_InspectionHalfSize",new Vector4(path.Radius(externalStation)*.40f,1.22f,0,0));Shader.SetGlobalFloat("_InspectionReveal",Mathf.SmoothStep(0,1,externalReveal));
+            if(vesselCollider)vesselCollider.sharedMesh=externalReveal>.02f&&externalWindow?externalWindow:vesselOriginal;
         }
     }
 }

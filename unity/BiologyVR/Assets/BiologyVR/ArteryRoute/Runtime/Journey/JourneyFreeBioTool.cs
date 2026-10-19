@@ -44,8 +44,8 @@ namespace BiologyVR.ArteryRoute.Journey
             if(mode==BioToolMode.Tonus&&trigger&&!scan&&!selected){world.hemodynamics.Control(dt,true,aim,hit,desktop);return true;}
             if(world.EmbolusCaptured&&mode==BioToolMode.Capture)return false;
             var bond=hit?hit.GetComponent<JourneyFlowBond>():null;var carrier=bond&&bond.carrier?bond.carrier:hit;
-            bool phag=Held&&Held.GetComponent<JourneyPhagocyteEntity>();
-            if(mode==BioToolMode.Bio&&trigger&&!scan&&carrier&&world.bloodEntities.Owns(carrier)){var platelet=carrier.GetComponent<JourneyPlateletEntity>();if(platelet)platelet.SetState(JourneyPlateletState.Activated);}
+            bool phag=Held&&Held.GetComponent<JourneyPhagocyteEntity>();var platelet=Held?Held.GetComponent<JourneyPlateletEntity>():null;
+            if(mode==BioToolMode.Bio&&trigger&&!scan&&carrier&&world.bloodEntities.Owns(carrier)){var comparedPlatelet=carrier.GetComponent<JourneyPlateletEntity>();if(comparedPlatelet)comparedPlatelet.SetState(JourneyPlateletState.Activated);}
             if(mode==BioToolMode.Impulse&&trigger&&!scan&&Time.time>=nextShot)
             {
                 nextShot=Time.time+.24f;Shots++;var end=hit?hit.transform.position:aim.position+aim.forward*12;
@@ -62,16 +62,17 @@ namespace BiologyVR.ArteryRoute.Journey
             {
                 int count=Physics.RaycastNonAlloc(new Ray(aim.position,aim.forward),contacts,12,~0,QueryTriggerInteraction.Collide);XRGrabInteractable nearest=null;float distance=12;
                 for(int i=0;i<count;i++){var grab=contacts[i].collider.GetComponentInParent<XRGrabInteractable>();if(grab&&grab.enabled&&!grab.GetComponent<JourneyHemostasisPiece>()&&!grab.GetComponent<JourneyFlowBond>()&&contacts[i].distance<distance){distance=contacts[i].distance;nearest=grab;}}
-                if(nearest){selected=nearest;Held=nearest.GetComponent<JourneyTarget>();Selecting=true;depth=desktop?Mathf.Clamp(distance,.7f,6):.5f;dock.SetPositionAndRotation(nearest.transform.position,nearest.transform.rotation);}
+                if(nearest){selected=nearest;Held=nearest.GetComponent<JourneyTarget>();Selecting=true;depth=Mathf.Clamp(distance,.7f,6);dock.SetPositionAndRotation(nearest.transform.position,nearest.transform.rotation);}
             }
             if(selected)
             {
-                if(mode==BioToolMode.Reverse&&phag)
+                hand.interactionLayers=selected.interactionLayers;
+                if(mode==BioToolMode.Reverse&&(phag||platelet&&world.plateletLaunch))
                 {
                     if(trigger&&!previousTrigger){pullStart=aim.position;reverseAge=0;}
                     if(trigger){reverseAge+=dt;float pull=Mathf.Clamp(Vector3.Dot(pullStart-aim.position,aim.forward),0,.25f);ReverseCharge=Mathf.Max(Mathf.Clamp01(reverseAge/.65f),pull/.25f);}
-                    world.immunity.Preview(Held.GetComponent<JourneyPhagocyteEntity>(),aim,ReverseCharge);
-                    if(!trigger&&previousTrigger&&ReverseCharge>.15f){var cell=Held.GetComponent<JourneyPhagocyteEntity>();Release(false);world.immunity.LaunchFromField(cell,aim,ReverseCharge);ReverseCharge=0;previousTrigger=false;return true;}
+                    if(phag)world.immunity.Preview(Held.GetComponent<JourneyPhagocyteEntity>(),aim,ReverseCharge);else world.plateletLaunch.Preview(Held,aim,ReverseCharge);
+                    if(!trigger&&previousTrigger&&ReverseCharge>.15f){var target=Held;var cell=Held.GetComponent<JourneyPhagocyteEntity>();Release(false);if(cell)world.immunity.LaunchFromField(cell,aim,ReverseCharge);else world.plateletLaunch.Launch(target,aim,ReverseCharge);ReverseCharge=0;previousTrigger=false;return true;}
                 }
                 if(mode==BioToolMode.Bio&&phag&&trigger&&!scan)world.immunity.Activate(Held.GetComponent<JourneyPhagocyteEntity>(),dt);
                 else if(mode==BioToolMode.Bio&&trigger&&!previousTrigger&&!scan&&carrier&&!world.bloodEntities.Owns(carrier))world.Primary(carrier);
@@ -85,6 +86,8 @@ namespace BiologyVR.ArteryRoute.Journey
                 // Scanner still sees the actual held object and drives normal journal/mission scan.
                 return !scan;
             }
+            if(world.plateletLaunch&&mode==BioToolMode.Reverse&&trigger&&!previousTrigger&&!scan&&carrier&&world.mission.Current?.action==StudyAction.Direct&&world.mission.Current.target==carrier.targetId)
+            {previousTrigger=true;world.Primary(carrier);return true;}
             previousTrigger=trigger;
             if(mode==BioToolMode.Impulse)return !scan;
             return false;
@@ -96,7 +99,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(!hit||!world.bloodEntities.Owns(hit)&&!payload.Available(hit))return false;
             if(world.immunity.Active&&hit.GetComponent<JourneyPhagocyteEntity>())return false;
             if(scanTarget!=hit){scanTarget=hit;scanAge=0;scanConsumed=false;}
-            if(!scanConsumed){scanAge+=dt;if(scanAge>=.75f){scanConsumed=true;var page=world.research.Find(hit.targetId);if(page){Inspection=page.theory;InspectionUntil=Time.time+10;world.mission.FeedbackMessage("Изучен элемент потока: "+page.theory.displayName);}var phag=hit.GetComponent<JourneyPhagocyteEntity>();if(phag)phag.Studied=true;}}
+            if(!scanConsumed){scanAge+=dt;if(scanAge>=.75f){scanConsumed=true;var page=world.research.Find(hit.targetId);if(page){Inspection=page.theory;InspectionUntil=Time.time+10;world.mission.FeedbackMessage("Изучен элемент потока: "+page.theory.displayName);}var phag=hit.GetComponent<JourneyPhagocyteEntity>();if(phag)phag.Studied=true;if(world.plateletLaunch&&Held==hit){var platelet=hit.GetComponent<JourneyPlateletEntity>();if(platelet){platelet.ActivateByScanner();world.mission.GetComponent<JourneyInstrumentRig>().ScannerActivated(hit.transform.position);world.mission.FeedbackMessage("Тромбоцит активирован. РЕВЕРС: направь в повреждённую стенку.");}}}}
             return true;
         }
         public void ModeChanged(BioToolMode mode){previousTrigger=false;ReverseCharge=reverseAge=0;}

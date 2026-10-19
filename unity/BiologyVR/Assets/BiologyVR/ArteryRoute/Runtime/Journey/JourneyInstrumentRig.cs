@@ -23,6 +23,11 @@ namespace BiologyVR.ArteryRoute.Journey
         public int ImpulseBursts{get;private set;}
         float shotAge=1,shotDuration=.24f;
         float cellReleaseAge=1;
+        public Transform plasmaOrb,scannerActivationOrb;
+        public LineRenderer scannerActivationTrail;
+        float activationAge=1;
+        Vector3 activationFrom;
+        public void ScannerActivated(Vector3 point){activationFrom=point;activationAge=0;}
         Vector3 shotEnd;
         Vector3 bioPCMount;
         void Awake(){if(bioPC)bioPCMount=bioPC.transform.localPosition;scannerGuide=CreateGuide("Persistent Scanner aim guide");bioGuide=CreateGuide("Persistent BioTool aim guide");}
@@ -69,8 +74,11 @@ namespace BiologyVR.ArteryRoute.Journey
             var target=input.LockedTarget;var cameraRef=input.mover.viewCamera;
             Vector3 start=ActiveScanner.muzzle.position;
             Vector3 scanEnd=target?target.transform.position:start+ActiveScanner.muzzle.forward*.40f;
-            scanEnd=start+(scanEnd-start).normalized*Mathf.Min(.45f,Vector3.Distance(start,scanEnd));
-            Draw(scannerBeam,start,scanEnd,scan&&ActiveScanner.gameObject.activeInHierarchy,.0015f);
+            scanEnd=start+(scanEnd-start).normalized*Mathf.Min(input.world.plateletLaunch?8:.45f,Vector3.Distance(start,scanEnd));
+            Draw(scannerBeam,start,scanEnd,scan&&ActiveScanner.gameObject.activeInHierarchy,input.world.plateletLaunch?.0035f:.0015f);
+            activationAge+=Time.deltaTime;float activation=Mathf.Clamp01(activationAge/.32f);var activatedPoint=Vector3.Lerp(activationFrom,start,Mathf.SmoothStep(0,1,activation));
+            if(scannerActivationOrb){scannerActivationOrb.gameObject.SetActive(activationAge<.32f);scannerActivationOrb.position=activatedPoint;scannerActivationOrb.localScale=Vector3.one*(.075f*(1-activation*.6f));}
+            if(scannerActivationTrail)Draw(scannerActivationTrail,Vector3.Lerp(activationFrom,activatedPoint,.7f),activatedPoint,activationAge<.32f,.012f*(1-activation));
             bool capture=fire&&mode==BioToolMode.Capture||fieldHeld&&(mode==BioToolMode.Bio||mode==BioToolMode.Reverse);
             Vector3 origin=ActiveBioTool.muzzle.position;
             Vector3 end=fieldHeld?fieldHeld.transform.position:phagHeld?input.world.immunity.Held.transform.position:plateletHeld?input.plateletCapture.HeldPiece.transform.position:input.world.EmbolusCaptured?input.world.bubble.position:target?target.transform.position:origin+ActiveBioTool.muzzle.forward*.45f;
@@ -103,6 +111,7 @@ namespace BiologyVR.ArteryRoute.Journey
             Draw(impulseBeam,Vector3.Lerp(origin,pulseEnd,Mathf.Clamp01(phase*1.6f)),pulseEnd,shot&&phase<.82f,.009f*Mathf.Sin(Mathf.PI*phase));
             pulseRing.enabled=shot;
             if(shot){pulseRing.transform.SetPositionAndRotation(pulseEnd,cameraRef.transform.rotation);pulseRing.transform.localScale=Vector3.one*Mathf.Lerp(.055f,.27f,phase);pulseRing.widthMultiplier=.01f*(1-phase);}
+            if(plasmaOrb){plasmaOrb.gameObject.SetActive(shot);plasmaOrb.position=pulseEnd;plasmaOrb.localScale=Vector3.one*Mathf.Lerp(.10f,.18f,Mathf.Sin(phase*Mathf.PI));}
         }
         void Draw(LineRenderer line,Vector3 start,Vector3 end,bool visible,float width)
         {

@@ -1,0 +1,11 @@
+{
+  "utc": "2026-10-18T20:55:29.3430857Z",
+  "scene": "Assets/BiologyVR/ArteryJourney/Scenes/ArteryNarrativeVR_VisualRework.unity",
+  "existingWound": "WALL_A — persistent defect/state controller",
+  "closerStationOffset": 3.8,
+  "diagnosticPressure": 92,
+  "contextualSteps": "capture / Scanner / Reverse / aim / release",
+  "visibleContact": "warm contour, mint on valid aim, adhesion flash",
+  "platelets": "existing pooled cells; existing meshes face lumen",
+  "newUiSystem": false
+}

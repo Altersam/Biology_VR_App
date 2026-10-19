@@ -125,7 +125,7 @@ namespace BiologyVR.ArteryRoute.Journey
         void Update()
         {
             if(!path||!mover||!mover.viewCamera||cells==null||offsets==null||lanesX==null||lanesY==null)return;
-            if(teachingLegend)teachingLegend.gameObject.SetActive(mission&&mission.SceneNumber>=3&&mission.SceneNumber<=16&&!(mission.world.hemodynamics&&mission.world.hemodynamics.Active));
+            if(teachingLegend)teachingLegend.gameObject.SetActive(!(continuousBackground&&continuousBackground.uniformCirculation)&&mission&&mission.SceneNumber>=3&&mission.SceneNumber<=16&&!(mission.world.hemodynamics&&mission.world.hemodynamics.Active));
             if(phases==null||phases.Length!=cells.Length)InitializePhases();
             if(routes==null||routes.Length!=cells.Length)InitializeRoutes();
             if(absoluteArc==null||absoluteArc.Length!=cells.Length)InitializeWorldPositions();

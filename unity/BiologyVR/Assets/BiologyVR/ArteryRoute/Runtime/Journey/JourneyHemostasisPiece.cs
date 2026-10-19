@@ -35,6 +35,6 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         public void SetPlaced(bool value){Placed=value;if(Grab)Grab.enabled=!value;var state=GetComponent<JourneyPlateletEntity>();if(state)state.SetState(value?JourneyPlateletState.Adhered:JourneyPlateletState.Flowing);}
         public void SetPlacementSlot(int slot){PlacementSlot=slot;}
-        public void EnableBalanceGrab(){if(Grab)Grab.enabled=true;}
+        public void EnableBalanceGrab(){if(Grab)Grab.enabled=!FieldHeld;}
     }
 }

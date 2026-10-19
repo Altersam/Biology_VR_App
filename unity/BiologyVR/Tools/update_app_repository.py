@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parent.parent
-REPO=ROOT.parent/'Biology_VR_App'
+REPO=ROOT.parent/'Github_VR'/'Biology_VR_App'
 RELEASE=json.loads((ROOT/'Tools/release_settings.json').read_text(encoding='utf-8-sig'))
 VERSION=RELEASE['version']
 EXCLUDED={'McpUnitySettings.json','prepared_project.json','TRANSFER_VERIFICATION.json','RECOVERY_VERIFICATION.json','CURRENT_PROJECT_TRANSFER.json'}
@@ -70,12 +70,13 @@ def main():
         if relative.parts[:2]==('unity','BiologyVR') and relative.parts[2] in ('Library','Temp','Logs','UserSettings','GitHubUpload'):forbidden.append(relative.as_posix())
     oversized=[p.relative_to(REPO).as_posix() for p in upload if p.stat().st_size>=100*1024*1024]
     after=git('rev-parse','HEAD')
-    report={'utc':datetime.now(timezone.utc).isoformat(),'version':VERSION,'art':'Coral V6 + trigger-only BioTool field capture + carrier-bound gas/iron + five manual modes and reverse phagocyte launch + dynamic vascular telemetry + evasive emboli + readable VR screens and timed assistance','repository':str(REPO),'remote':remote,
+    report={'utc':datetime.now(timezone.utc).isoformat(),'version':VERSION,'art':'Immune patrol integrated into Scene10; six tissue focuses, pooled leukocytes, existing Reverse/cutaway; visible-wound platelet adhesion and remote plug balance; unified Scanner instructions','repository':str(REPO),'remote':remote,
             'passed':not failures and not forbidden and not oversized and before==after,'head_unchanged':before==after,'committed':False,'pushed':False,
             'verified_copies':len(copied),'upload_files':len(upload),'upload_bytes':sum(p.stat().st_size for p in upload),
             'mismatches':failures,'forbidden':forbidden,'oversized':oversized,'release_files':releases,'backup':backup['backup']}
     (ROOT/'GITHUB_UPDATE_VERIFICATION.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
-    (REPO/'VERSION.json').write_text(json.dumps({'version':VERSION,'unity':'6000.1.9f1','art':report['art'],'updated_utc':report['utc'],'webgl_version':VERSION,'android_release_version':previous.get('android_release_version',previous.get('version','0.2.0')),'releases':releases},ensure_ascii=False,indent=2),encoding='utf-8')
+    previous.update({'version':VERSION,'unity':'6000.1.9f1','art':report['art'],'updated_utc':report['utc'],'webgl_version':VERSION,'releases':releases})
+    (REPO/'VERSION.json').write_text(json.dumps(previous,ensure_ascii=False,indent=2),encoding='utf-8')
     print(json.dumps(report,ensure_ascii=False,indent=2))
     return 0 if report['passed'] else 1
 

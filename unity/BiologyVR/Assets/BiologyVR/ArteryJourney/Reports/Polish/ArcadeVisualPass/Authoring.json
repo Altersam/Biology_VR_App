@@ -1,0 +1,9 @@
+{
+  "utc": "2026-10-13T19:36:27.4503567Z",
+  "leftPanel": "(-0.43, 0.04, 1.25)",
+  "gas": "smooth 2/3-atom molecules",
+  "phagocytes": "opaque vertex-colored mesh / no external texture",
+  "blood": "prefix-balanced 48m local circuit / timed hidden returns",
+  "viralMotion": "three-axis bounded evasive motion",
+  "fragmentPool": 36
+}

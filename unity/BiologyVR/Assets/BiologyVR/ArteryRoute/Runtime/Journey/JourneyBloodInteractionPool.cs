@@ -65,7 +65,7 @@ namespace BiologyVR.ArteryRoute.Journey
                 foreach(var surface in slot.legacyRenderers)if(surface)surface.enabled=false;slot.body.gameObject.SetActive(true);slot.body.GetComponent<Renderer>().enabled=true;slot.target.gameObject.SetActive(true);slot.contact.enabled=true;slot.grab.enabled=true;
                 slot.contact.center=slot.body.sharedMesh.bounds.center*source.localScale.x;slot.contact.radius=Mathf.Max(.07f,slot.body.sharedMesh.bounds.extents.magnitude*source.localScale.x*.8f);
                  slot.target.SetHomePose();if(phag){phag.ResetForCell(index,stream.Generation(index));if(capacityGeneration[index]==phag.Generation)phag.RestoreCapacity(capacityRemaining[index]);}
-                var platelet=slot.target.GetComponent<JourneyPlateletEntity>();if(platelet)platelet.SetState(JourneyPlateletState.Flowing);
+                var platelet=slot.target.GetComponent<JourneyPlateletEntity>();if(platelet)platelet.ResetFlow();
                 return slot.target;
             }
             return null;
@@ -105,7 +105,8 @@ namespace BiologyVR.ArteryRoute.Journey
             {
                 if(slot.index<0){slot.target.gameObject.SetActive(false);continue;}
                 var phag=slot.target.GetComponent<JourneyPhagocyteEntity>();
-                if(slot.target.grabbed||slot.target.DesktopHeld||phag&&phag.Busy||world.analysis&&world.analysis.Subject==slot.target)continue;
+                var platelet=slot.target.GetComponent<JourneyPlateletEntity>();
+                if(slot.target.grabbed||slot.target.DesktopHeld||phag&&phag.Busy||platelet&&platelet.Flying||world.analysis&&world.analysis.Subject==slot.target)continue;
                 slot.target.transform.SetPositionAndRotation(stream.flow.cells[slot.index].position,stream.flow.cells[slot.index].rotation);
                 bool retain=phag&&world.immunity&&world.immunity.Active&&phag.State==JourneyPhagocyteState.Activated&&Vector3.Distance(slot.target.transform.position,world.mover.viewCamera.transform.position)<14||world.mission.FreeBloodResearch&&world.research.FocusedTarget==slot.target&&Vector3.Distance(slot.target.transform.position,world.mover.viewCamera.transform.position)<12;
                 if(!retain&&Time.time-slot.touched>3)Release(slot.target);

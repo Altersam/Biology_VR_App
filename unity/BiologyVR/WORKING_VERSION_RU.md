@@ -1,3 +1,15 @@
+# bio_0.3 — текущее состояние / 0.9.0
+
+Рабочий проект: `Z:\YandexDisk\ПетПроекты\Biology_VR\3д\bio_0.3`. GitHub-комплект: `Z:\YandexDisk\ПетПроекты\Biology_VR\3д\Github_VR\Biology_VR_App`.
+Android ASCII alias: `Z:\BiologyVR_bio_03` (Tools/create_ascii_build_alias.ps1).
+Unity 6000.1.9f1; мастер-сцена ArteryNarrativeVR_VisualRework.unity.
+
+Актуальные механики, управление, результаты PC/XR и параметры PICO/WebGL — **RELEASE_0_9_0_RU.md**.
+Патруль: Scanner → cutaway → Reverse → шесть очагов. Рана: притяжение → Scanner → Reverse в видимый разрыв; баланс — дистанционным полем.
+Версия PICO, Meta Quest / Oculus и WebGL — 0.9.0.
+
+## История прежних итераций (пути и управление ниже могут быть устаревшими)
+
 # bio_v0.2 — рабочая копия для дальнейшей разработки
 
 Проект: `Z:\YandexDisk\ПетПроекты\Biology_VR\3д\Unity\bio_v0.2`.
@@ -284,3 +296,17 @@ source/WebGL commit `057ee4f6c833c5ae8c827f9e3e49329656a14433`, оба APK за�
 GitHub SHA-256 совпадают с локальными. Pages run `38439296701` — success;
 публичный WebGL сообщает 0.7.0, loader/framework совпадают со сборкой.
 Ссылки и результаты — `RELEASE_PUBLICATION_0_7_0.json`.
+
+## Текущая доработка — 0.8.0 / Android code 9
+
+Описание: **ARCADE_VISUAL_PASS_RU.md**. Сокращена игровая подача левого экрана,
+панель ближе к центру/игроку, O₂/CO₂ — сферические молекулы, фагоциты — непрозрачные
+вершинно окрашенные клетки. Поток сбалансирован для мобильных 180 слотов и не
+истощает переднее окно. Вирус маневрирует по трём осям и разрушается фрагментами.
+«Далее» после tutorial обозначено как новая волна; промах не открывает переход.
+Актуальные проверки и кадры: `Reports/Polish/ArcadeVisualPass/`.
+
+PICO APK 0.8.0 **готов**, UTC `2026-10-14T05:59:59.2853493Z`,
+0 errors / 12 warnings; версия/manifest/ARM64/OpenXR/подпись PASS.
+Файл `Builds/Pico4/BiologyVR_Pico4_v0.8.0.apk`, 77 546 835 байт.
+Документ с SHA и управлением: **PICO4_BUILD_0_8_0_RU.md**.

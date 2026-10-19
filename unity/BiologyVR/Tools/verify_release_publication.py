@@ -9,9 +9,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 root = Path(__file__).resolve().parent.parent
-repo = root.parent / 'Biology_VR_App'
+repo = root.parent / 'Github_VR' / 'Biology_VR_App'
 settings = json.loads((root / 'Tools/release_settings.json').read_text(encoding='utf-8-sig'))
 version, repository = settings['version'], settings['repository']
+prefixes = settings.get('android_artifacts', ['PICO4', 'QUEST'])
 
 def gh(*args):
     result = subprocess.run([sys.executable, str(root / 'Tools/github_cli.py'), *args],
@@ -37,7 +38,7 @@ checks = {
     'pages_deployed_current_head': bool(pages and pages['status'] == 'completed' and pages['conclusion'] == 'success'),
 }
 artifacts = []
-for prefix in ('PICO4', 'QUEST'):
+for prefix in prefixes:
     proof_path = root / f"{prefix}_APK_{version.replace('.', '_')}.json"
     proof = json.loads(proof_path.read_text(encoding='utf-8-sig'))
     digest = hashlib.sha256(Path(proof['local_path']).read_bytes()).hexdigest()
@@ -70,7 +71,7 @@ report = {'utc': stamp.isoformat(), 'version': version, 'passed': all(checks.val
 report_name = f"RELEASE_PUBLICATION_{version.replace('.', '_')}.json"
 (root / report_name).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
 if report['passed']:
-    for prefix in ('PICO4', 'QUEST'):
+    for prefix in prefixes:
         path = root / f"{prefix}_APK_{version.replace('.', '_')}.json"
         proof = json.loads(path.read_text(encoding='utf-8-sig'))
         proof['github_release_uploaded'] = True

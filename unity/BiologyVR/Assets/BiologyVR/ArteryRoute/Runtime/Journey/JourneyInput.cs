@@ -219,6 +219,8 @@ namespace BiologyVR.ArteryRoute.Journey
             var goal=CurrentGoal();
             var source=AimSource(scanning?scanner:bioTool);
             var hit=Aim(source);LockedTarget=hit;
+            if(world.immunePatrol&&world.immunePatrol.Handle(deltaTime,scanning,firing,hit,AimSource(bioTool),bioModes.CurrentMode)){previousPhysicalTool=firing;return;}
+            if(!scanning&&world.plateletLaunch&&mission.SceneNumber==13&&bioModes.CurrentMode==BioToolMode.Capture&&plateletCapture&&plateletCapture.UpdateField(deltaTime,firing,AimSource(bioTool),LockedContact,desktopControls&&desktopControls.Active)){previousPhysicalTool=firing;return;}
             if(world.bloodEntities&&hit)world.bloodEntities.Touch(hit);
             if(world.freeTools&&world.freeTools.Handle(deltaTime,scanning,firing,hit,AimSource(bioTool),desktopControls&&desktopControls.Active,bioModes.CurrentMode)){ChargeProgress=world.freeTools.ReverseCharge;previousPhysicalTool=firing;return;}
             if(world.freeTools&&world.freeTools.ScanFlow(deltaTime,scanning,hit)){previousPhysicalTool=firing;return;}
@@ -238,7 +240,7 @@ namespace BiologyVR.ArteryRoute.Journey
                     {
                         if(scanTarget!=hit){scanTarget=hit;ScanProgress=0;mission.Accept(StudyAction.Measure,hit.targetId);}
                         ScanProgress=Mathf.Clamp01(ScanProgress+Mathf.Max(0,deltaTime)/scanDuration);
-                        if(ScanProgress>=1){scanConsumed=true;mission.Accept(StudyAction.Scan,hit.targetId);var phag=hit.GetComponent<JourneyPhagocyteEntity>();if(phag)phag.Studied=true;}
+                        if(ScanProgress>=1){scanConsumed=true;mission.Accept(StudyAction.Scan,hit.targetId);var phag=hit.GetComponent<JourneyPhagocyteEntity>();if(phag)phag.Studied=true;if(world.plateletLaunch&&world.freeTools.Held==hit){if(phag)phag.SetState(JourneyPhagocyteState.Activated);var platelet=hit.GetComponent<JourneyPlateletEntity>();if(platelet)platelet.ActivateByScanner();if(phag||platelet)GetComponent<JourneyInstrumentRig>().ScannerActivated(hit.transform.position);}}
                     }
                 }
                 else if(!world.freeTools&&firing&&!toolConsumed&&!previousPhysicalTool&&correct){toolConsumed=true;world.Primary(hit);}
@@ -281,7 +283,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(AdjustingTone){AdjustingTone=false;ToneStability=0;}
             if(scanning&&!scanConsumed)
             {
-                bool correct=hit&&(goal!=null&&goal.action==StudyAction.Scan&&goal.target==hit.targetId||goal==null&&mission.FreeResearchUnlocked)&&world.CanInspectBlood(hit);
+                bool correct=hit&&(goal!=null&&(goal.action==StudyAction.Scan||world.plateletLaunch&&(goal.action==StudyAction.Activate||goal.action==StudyAction.Measure))&&goal.target==hit.targetId||goal==null&&mission.FreeResearchUnlocked)&&world.CanInspectBlood(hit);
                 if(!correct){ScanProgress=0;scanTarget=null;}
                 else
                 {
@@ -292,7 +294,7 @@ namespace BiologyVR.ArteryRoute.Journey
                         scanConsumed=true;
                         if(goal==null)mission.FreeInspect(hit.targetId);
                         else if(mission.SceneNumber==14&&hit.targetId=="debris"&&world.recoveryDebris!=null)world.ScanRecoveryDebris(hit);
-                        else mission.Accept(StudyAction.Scan,hit.targetId);
+                        else{mission.Accept(goal.action,hit.targetId);if(world.plateletLaunch&&(goal.action==StudyAction.Activate||goal.action==StudyAction.Measure))GetComponent<JourneyInstrumentRig>().ScannerActivated(hit.transform.position);}
                     }
                 }
                 if(instrumentFeedback)instrumentFeedback.PresentLock(hit,ScanProgress,correct,true,source);

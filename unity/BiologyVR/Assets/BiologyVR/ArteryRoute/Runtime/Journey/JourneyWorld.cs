@@ -21,6 +21,8 @@ namespace BiologyVR.ArteryRoute.Journey
         public JourneyErythrocyteAnalysis analysis;
         public JourneyInnateImmunity immunity;
         public JourneyFreeBioTool freeTools;
+        public JourneyImmunePatrol immunePatrol;
+        public JourneyPlateletLaunch plateletLaunch;
         public GameObject[] remainingComplexes;
         public GameObject virusPrefab;
         public Renderer[] toneWall;
@@ -43,6 +45,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public int FinalPulseHits{get;private set;}
         bool antibodyPlacement,complexEngulfReady,complexEngulfBusy;
         int selectedResidual=-1,finalSpawnSerial;
+        readonly HashSet<GameObject> removingResiduals=new HashSet<GameObject>();
         public int HomeostasisChecks{get;private set;}
         public bool EmbolusCaptured=>captured;
         public float VesselTone{get;private set;}=1;
@@ -86,7 +89,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(immunity)state.phagocyteLaunchTutorialCompleted=immunity.TutorialCompleted;
         }
         public void ForgetEpisode(int scene){if(scene>=3&&scene<=16&&episodeMemory!=null)episodeMemory[scene-3]=new EpisodeMemory{scene=scene,visited=true};if(scene==3&&research){if(analysis)analysis.Close();if(bloodEntities)foreach(var slot in bloodEntities.slots)bloodEntities.Release(slot.target);research.ResetRun();}}
-        public void ResetJourneyMemory(){episodeMemory=new EpisodeMemory[14];if(research)research.ResetRun();if(immunity)immunity.ResetRun();}
+        public void ResetJourneyMemory(){episodeMemory=new EpisodeMemory[14];if(research)research.ResetRun();if(immunity)immunity.ResetRun();if(immunePatrol)immunePatrol.ResetRun();}
         Vector3[] residualPositions;
         Vector3 repairStartScale=Vector3.one,clotBaseScale=Vector3.one,fibrinBaseScale=Vector3.one;
         public bool Returning{get;private set;}
@@ -176,7 +179,7 @@ namespace BiologyVR.ArteryRoute.Journey
                 3=>new[]{"rbc","hemoglobin","heme","oxygen","co2","leukocyte","platelet","plasma"},
                 4=>new[]{"endothelium","layers","intima","media","adventitia"},5=>new[]{"flow","flow-model","normal-flow","small-radius","large-radius","pressure"},
                 6=>new[]{"plaque","plaque-flow","pulse-mode","lipid","cap"},7=>new[]{"embolus","attract-mode"},8=>new[]{"virus-study","genome","capsid","epitope"},
-                9=>new[]{"immune-mode","phagocyte"},10=>new[]{"pressure-low","pressure-stable","pressure-return","tone-mode","tone"},
+                9=>new[]{"immune-mode","phagocyte"},10=>immunePatrol?new[]{"patrol-wall","patrol-reveal"}:new[]{"pressure-low","pressure-stable","pressure-return","tone-mode","tone"},
                 11=>new[]{"wound","leak","pressure-low"},12=>new[]{"wound","platelet","thrombin","fibrin"},13=>new[]{"clot","insufficient","excessive","optimal","open-flow"},
                  14=>new[]{"debris","cleanup-mode","plasmin","repair","healed-wall"},15=>new[]{"epitope","antibody-A","antibody-B","antibody-C","neutralized","infected-cell","t-cell","remaining"},
                 16=>new[]{"healed-wall","vitals","homeostasis"},_=>new[]{"return-field"}
@@ -204,7 +207,7 @@ namespace BiologyVR.ArteryRoute.Journey
                 PlaceExperimentTarget("pressure",mover.path.Anchor(5)+1.8f,.0f,-.25f);
                 PlaceExperimentTarget("normal-flow",mover.path.Anchor(5)+1.8f,.78f,-.25f);
             }
-            if(scene==10)
+            if(scene==10&&!immunePatrol)
             {
                 float s=mover.path.Anchor(10)+1.8f;
                 PlaceExperimentTarget("pressure-low",s,-.85f,.3f);PlaceExperimentTarget("tone-mode",s,0,.3f);PlaceExperimentTarget("tone",s,.85f,.3f);
@@ -242,6 +245,7 @@ namespace BiologyVR.ArteryRoute.Journey
                 foreach(var id in new[]{"cleanup-mode","plasmin"}){var t=Find(id);if(t)t.transform.position=woundSite.position-mover.path.Right(mover.path.Anchor(11)+5)*.85f+mover.path.Up(mover.path.Anchor(11)+5)*.8f+mover.path.Forward(mover.path.Anchor(11)+5)*(id=="plasmin"?.45f:-.45f);}
             }
             if(scene==15){AntibodyBound=false;FinalPulseHits=finalSpawnSerial=0;antibodyPlacement=complexEngulfReady=complexEngulfBusy=false;selectedResidual=-1;sourceRemoved=false;residualsPrepared=false;if(remainingComplexes!=null)for(int i=0;i<remainingComplexes.Length;i++)if(remainingComplexes[i]){remainingComplexes[i].SetActive(false);if(residualPositions!=null&&i<residualPositions.Length)remainingComplexes[i].transform.position=residualPositions[i];}if(infected){infected.localScale=Vector3.one*.70f;infected.position=mover.path.Offset(mover.path.Anchor(15)+3.8f,1.4f,-.1f);infected.gameObject.SetActive(true);}if(phagocyte){phagocyte.SetParent(locationRoots[location].transform,true);phagocyte.position=mover.path.Offset(mover.path.Anchor(15)+2,-1.25f,-.3f);phagocyte.gameObject.SetActive(true);}}
+            if(scene==15)removingResiduals.Clear();
             if(scene==15&&infected)
             {var contact=infected.GetComponent<SphereCollider>();if(contact){contact.center=Vector3.zero;contact.radius=.42f/Mathf.Max(.001f,infected.lossyScale.x);}}
             if(scene==16)
@@ -253,6 +257,9 @@ namespace BiologyVR.ArteryRoute.Journey
             if(scene!=9&&scene!=15)ClearWave();
             if(scene==17)StartCoroutine(ReturnToLab());
             if(art)art.Stage(scene);
+            if(scene==11&&plateletLaunch)
+                foreach(var id in new[]{"wound","leak","pressure-low"}){var t=Find(id);if(t){t.transform.position=woundSite.position-mover.path.Right(mover.path.Anchor(11)+5)*.16f;t.SetHomePose();}}
+            if(scene==10&&immunePatrol)immunePatrol.EnterStage();
             PrepareGoal(mission.Current);
         }
         void PlaceExperimentTarget(string id,float s,float x,float y)
@@ -337,6 +344,7 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         public bool CanApply(StudyAction action,string target)
         {
+            if(immunePatrol&&immunePatrol.Active&&target.StartsWith("patrol-"))return immunePatrol.CanApply(action,target);
             if(immunity&&immunity.Active&&(target=="immune-engulf"||target=="phagocyte"||target=="virus-study"))return immunity.CanApply(action,target);
             if(hemodynamics&&target.StartsWith("hdx-"))return hemodynamics.CanApply(action,target);
             if(mission.FreeBloodResearch)return research.CanInvestigate(Find(target));
@@ -361,7 +369,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(action==StudyAction.Mark)return incoming.Count>0;
             if(mission.SceneNumber==9&&action==StudyAction.Direct&&target=="phagocyte")return MarkedViruses>=JourneyMission.AssaultVirusCount&&EngulfedViruses>=MarkedViruses;
             if(mission.SceneNumber==10&&action==StudyAction.Measure&&target=="pressure-return")return mission.PressureSystolic<=92.1f;
-            if(target=="remaining")return sourceRemoved;
+            if(target=="remaining")return sourceRemoved&&selectedResidual>=0&&selectedResidual<remainingComplexes.Length&&remainingComplexes[selectedResidual]&&remainingComplexes[selectedResidual].activeInHierarchy&&!removingResiduals.Contains(remainingComplexes[selectedResidual]);
             if(mission.SceneNumber==15&&action==StudyAction.Bind&&target.StartsWith("antibody"))return antibodyPlacement;
             if(mission.SceneNumber==15&&target=="neutralized")return complexEngulfReady;
             if(target=="healed-wall"&&mission.SceneNumber==14)return repairGrowth>=.999f;
@@ -426,6 +434,7 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         public void Apply(StudyAction action,string target,int progress)
         {
+            if(immunePatrol&&immunePatrol.Active&&target.StartsWith("patrol-"))return;
             if(immunity&&immunity.Active&&(target=="immune-engulf"||target=="phagocyte"||target=="virus-study"))return;
             if(hemodynamics&&target.StartsWith("hdx-")){hemodynamics.Accepted(action,target);return;}
             if(mission.SceneNumber==16&&target.StartsWith("check-"))HomeostasisChecks++;
@@ -463,7 +472,7 @@ namespace BiologyVR.ArteryRoute.Journey
                 case "incoming-virus":if(incoming.Count>0){var virus=selectedIncoming&&incoming.Contains(selectedIncoming)?selectedIncoming:incoming[0];incoming.Remove(virus);selectedIncoming=null;foreach(var contact in virus.GetComponentsInChildren<Collider>())contact.enabled=false;MarkedViruses++;StartCoroutine(Neutralize(virus,mission.SceneNumber==9));}break;
                 case "neutralized":if(mission.SceneNumber!=15&&phagocyte&&Find("neutralized"))StartCoroutine(MoveAgent(phagocyte,Find("neutralized").transform.position,1.0f));break;
                 case "t-cell":if(tCell&&infected)StartCoroutine(RemoveSource());break;
-                case "remaining":int residual=selectedResidual>=0?selectedResidual:progress;if(remainingComplexes!=null&&residual<remainingComplexes.Length&&remainingComplexes[residual])StartCoroutine(Neutralize(remainingComplexes[residual]));if(progress>=2){foreach(var t in targets)if(t&&t.targetId.StartsWith("antibody"))t.gameObject.SetActive(false);ClearWave();}break;
+                case "remaining":int residual=selectedResidual>=0?selectedResidual:progress;if(remainingComplexes!=null&&residual<remainingComplexes.Length&&remainingComplexes[residual]){removingResiduals.Add(remainingComplexes[residual]);StartCoroutine(Neutralize(remainingComplexes[residual]));}if(progress>=2){foreach(var t in targets)if(t&&t.targetId.StartsWith("antibody"))t.gameObject.SetActive(false);ClearWave();}break;
                 case "return-field":StartCoroutine(ReturnToLab());break;
             }
         }

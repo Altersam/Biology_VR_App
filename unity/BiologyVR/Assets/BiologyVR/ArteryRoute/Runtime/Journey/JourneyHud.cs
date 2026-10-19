@@ -72,6 +72,7 @@ namespace BiologyVR.ArteryRoute.Journey
             string chapter = scene <= 16
                 ? ArteryRouteController.Titles[Mathf.Clamp(scene - 3, 0, ArteryRouteController.Titles.Length - 1)]
                 : scene == 17 ? "Возвращение в лабораторию" : "Финальный отчёт";
+            if(scene==10&&mission.world.immunePatrol)chapter="Иммунный патруль";
             Set(title, mission.Victory ? "ИССЛЕДОВАНИЕ • ГОМЕОСТАЗ ВОССТАНОВЛЕН" : $"{scene:00} / {chapter}");
             Set(goal, mission.CurrentGoalLabel);
             if(goal){goal.fontSize=scene==16&&mission.Complete?19:28;if(scene==16&&mission.Complete)goal.text=mission.CompactResult;}
@@ -102,7 +103,7 @@ namespace BiologyVR.ArteryRoute.Journey
                 progressFill.anchorMax = anchorMax;
             }
 
-            bool radiusVisible = scene == 5 || scene == 10;
+            bool radiusVisible = scene == 5 || scene == 10&&!mission.world.immunePatrol;
             bool pressureVisible = scene == 5;
             bool balanceVisible = scene == 13;
             bool experiment = radiusVisible || pressureVisible || balanceVisible;

@@ -8,6 +8,11 @@ namespace BiologyVR.ArteryRoute.Journey
         public JourneyPlateletState State{get;private set;}=JourneyPlateletState.Flowing;
         public MeshFilter body;
         public Mesh resting,activated;
+        public bool ScannerActivated{get;private set;}
+        public bool Flying{get;private set;}
+        public void ActivateByScanner(){ScannerActivated=true;SetState(JourneyPlateletState.Activated);}
+        public void SetFlying(bool value){Flying=value;}
+        public void ResetFlow(){ScannerActivated=Flying=false;SetState(JourneyPlateletState.Flowing);}
         Mesh inactiveMesh;
         Vector3 inactiveScale;
         public void SetState(JourneyPlateletState state)

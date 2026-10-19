@@ -80,14 +80,14 @@ namespace BiologyVR.ArteryRoute.Journey
             if(contacts==null)return;
             foreach(var entry in contacts)
             {
-                if(!entry.target||(entry.target.targetId!="wound"&&entry.target.targetId!="leak"&&entry.target.targetId!="repair"&&entry.target.targetId!="healed-wall"))continue;
+                if(!entry.target||(entry.target.targetId!="wound"&&entry.target.targetId!="leak"&&entry.target.targetId!="pressure-low"&&entry.target.targetId!="repair"&&entry.target.targetId!="healed-wall"))continue;
                 var contact=entry.target.GetComponent<SphereCollider>();if(!contact)continue;
                 // These semantic contacts describe the current wall defect. Bounds
                 // from a hidden imported teaching assembly contain distant offsets.
                 contact.center=Vector3.zero;
                 var scale=entry.target.transform.lossyScale;
                 float size=Mathf.Max(Mathf.Abs(scale.x),Mathf.Abs(scale.y),Mathf.Abs(scale.z));
-                contact.radius=.32f/Mathf.Max(.0001f,size);
+                contact.radius=.42f/Mathf.Max(.0001f,size);
             }
         }
 
@@ -121,8 +121,15 @@ namespace BiologyVR.ArteryRoute.Journey
                 if(!contact.target)continue;
                 bool enabled=atWound&&mission.Goals!=null&&mission.Current!=null&&mission.Current.target==contact.target.targetId;
                 for(int i=0;i<contact.colliders.Length;i++)if(contact.colliders[i])
-                    contact.colliders[i].enabled=enabled&&contact.originallyEnabled[i];
+                    contact.colliders[i].enabled=enabled&&(contact.originallyEnabled[i]||contact.colliders[i]==contact.target.GetComponent<SphereCollider>());
             }
+            if(world.plateletLaunch&&scene==11)
+                foreach(var id in new[]{"wound","leak","pressure-low"})
+                {
+                    var target=world.Find(id);if(!target)continue;var sphere=target.GetComponent<SphereCollider>();
+                    foreach(var collider in target.GetComponentsInChildren<Collider>(true))collider.enabled=false;
+                    if(sphere){sphere.center=Vector3.zero;var scale=target.transform.lossyScale;sphere.radius=.42f/Mathf.Max(.0001f,Mathf.Max(Mathf.Abs(scale.x),Mathf.Max(Mathf.Abs(scale.y),Mathf.Abs(scale.z))));sphere.enabled=mission.Current?.target==id;}
+                }
         }
 
         float DesiredStrength()
@@ -132,6 +139,7 @@ namespace BiologyVR.ArteryRoute.Journey
             {
                 case 11:return 1f;
                 case 12:
+                    if(world.plateletLaunch)return Mathf.Pow(1-Mathf.Clamp01(world.AttachedPlatelets/(float)world.hemostasisPuzzle.RequiredPlatelets),1.5f);
                     if(world.hemostasisPuzzle&&world.hemostasisPuzzle.flowLayering)return Mathf.Lerp(1,.35f,Mathf.Clamp01(world.AttachedPlatelets/11f))*(1-Mathf.SmoothStep(0,1,world.FibrinGrowth));
                     return (1f-.84f*Mathf.Clamp01(world.AttachedPlatelets/(float)(world.hemostasisPuzzle?world.hemostasisPuzzle.RequiredPlatelets:6)))*(1f-world.FibrinGrowth)*(world.hemostasisPuzzle?1f-.75f*world.hemostasisPuzzle.Connections/3f:1f);
                 case 13:return mission.ClotBalance<.28f?.75f:mission.ClotBalance<.5f?.35f:0f;

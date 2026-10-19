@@ -38,7 +38,7 @@ namespace BiologyVR.ArteryRoute.Journey
         float[] rejoin;
         readonly Plane[] planes=new Plane[6];
         public Vector3 Slot(int index)
-        {if(flowLayering){int column=index%4,row=index/4;return world.woundSite.position+normal*(.18f+row*.06f)+up*((column%2==0?-.1f:.1f)+row*.012f)+forward*((column-1.5f)*.62f);}float a=index*Mathf.PI*2/6;float radius=index<6?.34f:.57f;return world.woundSite.position+normal*(.17f+(index%2)*.045f)+up*Mathf.Sin(a)*radius+forward*Mathf.Cos(a)*radius;}
+        {if(flowLayering){if(world.plateletLaunch){int column=index%6,row=index/6;return world.woundSite.position+normal*(.16f+row*.045f)+up*(row==0?-.08f:.08f)+forward*((column-2.5f)*.40f+(row==1?.20f:0));}int c=index%4,r=index/4;return world.woundSite.position+normal*(.18f+r*.06f)+up*((c%2==0?-.1f:.1f)+r*.012f)+forward*((c-1.5f)*.62f);}float a=index*Mathf.PI*2/6;float radius=index<6?.34f:.57f;return world.woundSite.position+normal*(.17f+(index%2)*.045f)+up*Mathf.Sin(a)*radius+forward*Mathf.Cos(a)*radius;}
         void Start(){Frame();}
         void Frame(){float s=world.mover.path.Anchor(11)+5;normal=-world.mover.path.Right(s);up=world.mover.path.Up(s);forward=world.mover.path.Forward(s);}
         public void Begin()
@@ -46,7 +46,7 @@ namespace BiologyVR.ArteryRoute.Journey
             Frame();if(initialized)return;initialized=true;Attached=Connections=0;Activated=ReactionReady=false;reaction=0;
             for(int i=0;i<platelets.Length;i++)
             {
-                var p=platelets[i];p.gameObject.SetActive(i<RequiredPlatelets);p.SetPlaced(false);p.SetPlacementSlot(-1);p.transform.position=world.woundSite.position+normal*(1.05f+i*.13f)+up*((i%3-1)*.42f)+forward*((i/3-.5f)*.55f);
+                var p=platelets[i];p.gameObject.SetActive(!world.plateletLaunch&&i<RequiredPlatelets);p.SetPlaced(false);p.SetPlacementSlot(-1);p.transform.position=world.woundSite.position+normal*(1.05f+i*.13f)+up*((i%3-1)*.42f)+forward*((i/3-.5f)*.55f);
                 p.GetComponent<MeshFilter>().sharedMesh=resting;p.GetComponent<Renderer>().sharedMaterials=restingMaterials;
             }
             foreach(var p in strands){p.SetPlaced(false);p.gameObject.SetActive(false);}
@@ -74,6 +74,7 @@ namespace BiologyVR.ArteryRoute.Journey
             {reaction=Mathf.Min(1,reaction+Time.deltaTime/.75f);ReactionReady=reaction>=1;}
             if(m.SceneNumber==12)
             {
+                if(world.plateletLaunch){foreach(var p in platelets)if(!p.Placed)p.gameObject.SetActive(false);if(activationPuzzle&&activationPuzzle.panel)activationPuzzle.panel.SetActive(false);if(StabilizationComplete&&m.Current?.target=="hemostasis-stable")m.Accept(StudyAction.Measure,"hemostasis-stable");UpdateLaunchLabel();return;}
                 for(int i=0;i<platelets.Length;i++)if(platelets[i].gameObject.activeInHierarchy&&!platelets[i].Held&&!platelets[i].Placed)
                 {
                     if(flowLayering)
@@ -113,7 +114,8 @@ namespace BiologyVR.ArteryRoute.Journey
                 float balance=.06f+.44f*Mathf.Min(Attached,RequiredPlatelets)/RequiredPlatelets+.12f*Connections/3f+Mathf.Max(0,Attached-RequiredPlatelets)*.10f;
                 world.mission.UpdatePhysicalClotBalance(balance);
                 bool held=false;foreach(var item in platelets)held|=item.Held;foreach(var item in strands)held|=item.Held;
-                var goal=m.Current;bool correct=goal?.action==StudyAction.Balance&&(goal.target=="insufficient"&&balance<.28f||goal.target=="excessive"&&balance>.86f||goal.target=="optimal"&&balance>.50f&&balance<.72f);
+                bool optimal=world.plateletLaunch?Attached==RequiredPlatelets&&Connections==strands.Length:balance>.50f&&balance<.72f;
+                var goal=m.Current;bool correct=goal?.action==StudyAction.Balance&&(goal.target=="insufficient"&&balance<.28f||goal.target=="excessive"&&balance>.86f||goal.target=="optimal"&&optimal);
                 stableBalance=correct&&!held?stableBalance+Time.deltaTime:0;
                 if(stableBalance>.65f){stableBalance=0;m.Accept(StudyAction.Balance,goal.target);}
             }
@@ -133,6 +135,32 @@ namespace BiologyVR.ArteryRoute.Journey
         {
             if(flowLayering&&world.mission.SceneNumber==12&&!item.strand){RejoinFlow(item);world.mission.FeedbackMessage("Подведи тромбоцит удерживаемым полем BioTool: адгезия к обнажённому субэндотелию происходит автоматически.");return;}
             PlaceAtDamage(item,hand,false);
+        }
+        void UpdateLaunchLabel(){if(label){label.gameObject.SetActive(true);label.text=$"ТРОМБОЦИТЫ {Attached} / {RequiredPlatelets}\nУТЕЧКА {world.woundState.LeakStrength:P0}";label.transform.SetPositionAndRotation(world.woundSite.position-up*.60f+normal*.22f,world.mover.viewCamera.transform.rotation);}}
+        public bool AdhereLaunchedPlatelet(int slot)
+        {
+            if(!world.plateletLaunch||world.mission.SceneNumber!=12||slot<0||slot>=RequiredPlatelets||platelets[slot].Placed)return false;
+            ProcessingPlacement=true;bool accepted=world.mission.Accept(StudyAction.Direct,"platelet");ProcessingPlacement=false;if(!accepted)return false;
+            var p=platelets[slot];p.gameObject.SetActive(true);p.transform.SetPositionAndRotation(Slot(slot),Quaternion.LookRotation(forward,normal));p.SetPlacementSlot(slot);p.SetPlaced(true);SetPlatelet(p,true);Attached++;
+            foreach(var platelet in platelets)if(platelet.Placed){var state=platelet.GetComponent<JourneyPlateletEntity>();if(state)state.SetState(Attached>1?JourneyPlateletState.Aggregated:JourneyPlateletState.Adhered);}
+            if(Attached>=RequiredPlatelets)ActivatePlatelets();return true;
+        }
+        public bool TryAdhereAtWound(Vector3 from,Vector3 to)
+        {
+            if(world.mission.SceneNumber!=12||!world.mission.Ready)return false;
+            // Contact is the visible laceration, not eleven invisible precision targets.
+            var outward=-normal;var plane=world.woundSite.position+normal*.08f;
+            float a=Vector3.Dot(from-plane,outward),b=Vector3.Dot(to-plane,outward);
+            if(a>0||b<0||b-a<.00001f)return false;
+            var point=Vector3.Lerp(from,to,Mathf.Clamp01(-a/(b-a)));var offset=point-world.woundSite.position;
+            if(Mathf.Abs(Vector3.Dot(offset,forward))>1.30f||Mathf.Abs(Vector3.Dot(offset,up))>.28f)return false;
+            int best=-1;float nearest=float.MaxValue;
+            for(int slot=0;slot<RequiredPlatelets;slot++)
+            {
+                bool occupied=false;foreach(var p in platelets)if(p.Placed&&p.PlacementSlot==slot){occupied=true;break;}
+                if(occupied)continue;float distance=(Slot(slot)-point).sqrMagnitude;if(distance<nearest){nearest=distance;best=slot;}
+            }
+            return best>=0&&AdhereLaunchedPlatelet(best);
         }
         public bool TryAdhereFromField(JourneyHemostasisPiece item)
         {
@@ -158,12 +186,15 @@ namespace BiologyVR.ArteryRoute.Journey
             }
             Vector3 destination=item.strand?ends[slot].position:Slot(slot);
             if(item.strand&&!ReactionReady){Warn("Тромбин ещё превращает фибриноген в нить. Подожди реакцию.");return;}
-            if(Vector3.Distance(item.transform.position,destination)>(item.strand?.19f:.26f))
+            var woundOffset=item.transform.position-world.woundSite.position;
+            bool visibleWoundPlacement=m.SceneNumber==13&&world.plateletLaunch&&!item.strand&&Mathf.Abs(Vector3.Dot(woundOffset,normal))<.65f&&Mathf.Abs(Vector3.Dot(woundOffset,up))<.38f&&Mathf.Abs(Vector3.Dot(woundOffset,forward))<1.30f;
+            if(!visibleWoundPlacement&&Vector3.Distance(item.transform.position,destination)>(item.strand?.19f:.26f))
             {if(m.SceneNumber==12)Warn(item.strand?"Конец нити не соединён с парным anchor. Протяни к другому концу.":"Тромбоцит вне разрыва. Возьми снова и наложи на свободный участок.");RejoinFlow(item);return;}
             ProcessingPlacement=true;
             bool accepted=m.SceneNumber==13||m.Accept(StudyAction.Direct,item.strand?"fibrin":"platelet");ProcessingPlacement=false;
             if(!accepted)return;
             item.SetPlacementSlot(slot);item.SetPlaced(true);StartCoroutine(Snap(item.transform,destination));
+            if(!item.strand&&world.plateletLaunch)item.transform.rotation=Quaternion.LookRotation(forward,normal);
             if(item.strand)Connections++;else{Attached++;SetPlatelet(item,Activated||adhesion);if(Attached>1)foreach(var platelet in platelets)if(platelet.Placed){var state=platelet.GetComponent<JourneyPlateletEntity>();if(state)state.SetState(JourneyPlateletState.Aggregated);}}
             if(hand){var node=hand.name.Contains("Left")?XRNode.LeftHand:XRNode.RightHand;var device=InputDevices.GetDeviceAtXRNode(node);if(device.isValid)device.SendHapticImpulse(0,.12f,.04f);}
             if(item.strand&&Connections==strands.Length&&m.SceneNumber==12)world.StartPhysicalFibrinGrowth();

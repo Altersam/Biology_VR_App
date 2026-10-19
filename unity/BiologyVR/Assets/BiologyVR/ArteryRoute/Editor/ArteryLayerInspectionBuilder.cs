@@ -141,6 +141,8 @@ namespace BiologyVR.ArteryRoute.Editor
             }
         }
         static Mesh WindowCollider(MeshCollider collider,ArteryJourneyPath path,float s)
+        {return WindowColliderAt(collider,path,s,"Scene04_InspectionWallWindow");}
+        public static Mesh WindowColliderAt(MeshCollider collider,ArteryJourneyPath path,float s,string assetName)
         {
             var source=collider.sharedMesh;var vertices=source.vertices;var original=source.triangles;var indices=new List<int>(original.Length);
             var origin=path.Offset(s,path.Radius(s),0);var up=path.Up(s);var forward=path.Forward(s);var right=path.Right(s);
@@ -150,7 +152,7 @@ namespace BiologyVR.ArteryRoute.Editor
                 bool inside=Mathf.Abs(Vector3.Dot(centre,right))<.7f&&Mathf.Abs(Vector3.Dot(centre,up))<path.Radius(s)*HalfAngle+.15f&&Mathf.Abs(Vector3.Dot(centre,forward))<HalfLength+.20f;
                 if(!inside){indices.Add(original[i]);indices.Add(original[i+1]);indices.Add(original[i+2]);}
             }
-            var mesh=UnityEngine.Object.Instantiate(source);mesh.triangles=indices.ToArray();return SaveMesh(mesh,"Scene04_InspectionWallWindow");
+            var mesh=UnityEngine.Object.Instantiate(source);mesh.triangles=indices.ToArray();return SaveMesh(mesh,assetName);
         }
         static void RemoveBindings(JourneyArtComposition art)
         {

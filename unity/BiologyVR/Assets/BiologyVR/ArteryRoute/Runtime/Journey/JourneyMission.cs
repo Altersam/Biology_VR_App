@@ -71,6 +71,7 @@ namespace BiologyVR.ArteryRoute.Journey
         void Goal(string l,StudyAction a,string t,int n=1)=>Goals.Add(new StudyGoal(l,a,t,n));
         public void Enter(int scene,bool travel=true,bool retry=false)
         {
+            if(world.freeTools)world.freeTools.Release();
             if(retry)world.ForgetEpisode(scene);else world.RememberEpisode();
             SceneNumber=Mathf.Clamp(scene,3,18);StepIndex=0;Progress=0;Goals=new List<StudyGoal>();Victory=false;
             Feedback="Выполни действия текущего этапа. Следующая локация пока скрыта.";
@@ -105,6 +106,7 @@ namespace BiologyVR.ArteryRoute.Journey
                     for(int bubble=0;bubble<(world.embolusWave?JourneyEmbolusWave.Count:1);bubble++)
                     {Goal(world.embolusWave?$"Захвати газовый эмбол: {bubble+1} / 6":"Захвати пузырёк полем BioTool",StudyAction.Capture,"embolus");Goal(world.embolusWave?$"Удерживай поле: помести эмбол {bubble+1} / 6 в ловушку":"Удерживай Trigger: перенеси пузырёк и стабилизируй в ловушке",StudyAction.Deposit,"embolus");}break;
                 case 8:
+                    if(world.plateletLaunch){ViralLoad=25;Goal("ПРИТЯЖЕНИЕ: захвати фагоцит из крови",StudyAction.Capture,"phagocyte");Goal("Scanner: исследуй и активируй удерживаемую клетку",StudyAction.Scan,"phagocyte");Goal("РЕВЕРС: попади в учебный вирус",StudyAction.Direct,"immune-engulf");break;}
                     if(world.freeTools){ViralLoad=25;Goal("ПРИТЯЖЕНИЕ: захвати фагоцит из потока",StudyAction.Capture,"phagocyte");Goal("Scanner: просканируй захваченный фагоцит",StudyAction.Scan,"phagocyte");Goal("АКТИВАЦИЯ: удержи курок BioTool",StudyAction.Activate,"phagocyte");Goal("РЕВЕРС: направь три фагоцита в вирус",StudyAction.Direct,"immune-engulf",3);break;}
                     if(world.immunity){Goal("Найди и исследуй одну чужеродную частицу в потоке",StudyAction.Scan,"virus-study");Goal("Найди фагоцит: Scanner инициирует иммунную реакцию в модели",StudyAction.Activate,"phagocyte");Goal("Удерживай CAPTURE: притяни активную клетку",StudyAction.Capture,"phagocyte");Goal("Отведи руку, направь клетку и отпусти Trigger",StudyAction.Direct,"immune-engulf");break;}
                     Goal("Просканируй неизвестный вирион",StudyAction.Scan,"virus-study");Goal("Увеличь вирус в учебном режиме",StudyAction.Enlarge,"virus-study");
@@ -114,6 +116,7 @@ namespace BiologyVR.ArteryRoute.Journey
                     if(world.immunity){Temperature=36.6f;ViralLoad=25;Goal("Используй фагоциты общего потока для врождённой защиты",StudyAction.Direct,"immune-engulf",12);break;}
                     Temperature=36.6f;ViralLoad=25;Goal("Открой иммунное управление",StudyAction.Activate,"immune-mode");Goal("Отрази волну: 24 вириона — наведи BioTool и стреляй",StudyAction.Mark,"incoming-virus",AssaultVirusCount);Goal("Передай помеченные частицы фагоциту",StudyAction.Direct,"phagocyte");break;
                 case 10:
+                    if(world.immunePatrol){Goal("Найди изменённый участок и просканируй стенку",StudyAction.Scan,"patrol-wall");Goal("Scanner: открой глубокий просмотр участка",StudyAction.Scan,"patrol-reveal");Goal("РЕВЕРС: направляй иммунный ответ к очагам",StudyAction.Direct,"patrol-focus",6);break;}
                     if(world.freeTools){PressureSystolic=92;Goal("Scanner: проверь участок при сниженном давлении",StudyAction.Scan,"hdx-diameter");Goal("СОСУДИСТОЕ ПОЛЕ: удержи безопасный диаметр",StudyAction.Radius,"hdx-normal");Goal("Повторно проверь участок перед поиском повреждения",StudyAction.Scan,"hdx-final");break;}
                     if(world.hemodynamics)
                     {
@@ -125,8 +128,10 @@ namespace BiologyVR.ArteryRoute.Journey
                     Goal("Измерь падение артериального давления",StudyAction.Measure,"pressure-low");Goal("Включи сосудистое поле",StudyAction.Activate,"tone-mode");
                     Goal("Удерживай Trigger: опусти BioTool и удержи умеренный тонус",StudyAction.Radius,"tone");Goal("Замерь временную стабилизацию",StudyAction.Measure,"pressure-stable");Goal("Подтверди повторное падение и найди причину",StudyAction.Measure,"pressure-return");break;
                 case 11:
-                    Goal("Сканером определи повреждение эндотелия",StudyAction.Scan,"wound");Goal("BioTool измерь утечку крови",StudyAction.Measure,"leak");Goal("HUD подтверди снижение давления",StudyAction.Measure,"pressure-low");break;
+                    PressureSystolic=92;
+                    Goal("Scanner: исследуй видимый разрыв стенки",StudyAction.Scan,"wound");Goal(world.plateletLaunch?"Scanner: измерь утечку в том же разрыве":"BioTool измерь утечку крови",StudyAction.Measure,"leak");Goal(world.plateletLaunch?"Scanner: подтверди падение давления у раны":"HUD подтверди снижение давления",StudyAction.Measure,"pressure-low");break;
                 case 12:
+                    if(world.plateletLaunch){Goal("Кровь → притяжение → Scanner → реверс: тромбоциты к ране",StudyAction.Direct,"platelet",world.hemostasisPuzzle.RequiredPlatelets);Goal("Наблюдай закрытие дефекта и прекращение утечки",StudyAction.Measure,"hemostasis-stable");break;}
                     if(world.hemostasisPuzzle&&world.hemostasisPuzzle.flowLayering)
                     {Goal("BioTool Capture: подведи тромбоциты к субэндотелию — условная первичная пробка",StudyAction.Direct,"platelet",11);Goal("Стабилизируй пробку: активация → агрегация → тромбин/фибрин",StudyAction.Activate,"platelet");Goal("Наблюдай образование фибрина и постепенную остановку утечки",StudyAction.Measure,"hemostasis-stable");break;}
                     Goal("Возьми тромбоцит и прикрепи к exposed wound",StudyAction.Direct,"platelet");Goal("Активируй первый прикреплённый тромбоцит",StudyAction.Activate,"platelet");
@@ -165,7 +170,9 @@ namespace BiologyVR.ArteryRoute.Journey
                 case 7:LearningTerm="Газовый эмбол";LearningNote="Пузырёк может перемещаться с кровотоком и застрять там, где просвет становится уже.";ProfessorLine="Опасность определяется не размером объекта, а тем, где он окажется.";break;
                 case 8:LearningTerm="Первая чужеродная частица";LearningNote="Вирус не является клеткой. Он содержит генетический материал и использует клетку хозяина для размножения. Исследуй одну частицу, затем найди фагоцит в обычном потоке.";Formula="ИССЛЕДОВАТЬ → НАЙТИ КЛЕТКУ → НАБЛЮДАТЬ";ProfessorLine="Перед нами вирусная частица. Сначала выясни, с чем имеешь дело.";break;
                 case 9:LearningTerm="Врождённая иммунная защита";LearningNote="Используй ранее изученный цикл: распознай частицу, найди фагоцит, инициируй реакцию в модели и направь клетку к материалу. Настоящий противовирусный иммунитет значительно сложнее.";Formula="ВИРУСНАЯ НАГРУЗКА";ProfessorLine="Используй элементы той же живой среды, которую ты исследовал.";break;
-                case 10:LearningTerm="Диагностика низкого давления";LearningNote="Измерь локальный диаметр, скорость, давление по обе стороны участка и целостность стенки. Выбери действие на основании полученных данных.";Formula="";ProfessorLine="Обоснуй действие измерениями.";break;
+                case 10:
+                    if(world.immunePatrol){LearningTerm="Иммунный патруль";LearningNote="Кровоток продолжается, но на стенке есть небольшой изменённый участок. Найди его и удержи Scanner. Затем раскрой глубокий слой и направляй лейкоциты к шести очагам режимом РЕВЕРС.";Formula="ОБНАРУЖИТЬ → НАПРАВИТЬ → АКТИВИРОВАТЬ → УСТРАНИТЬ";ProfessorLine="Обрати внимание на структуру стенки. За небольшим изменением может скрываться локальный очаг.";break;}
+                    LearningTerm="Диагностика низкого давления";LearningNote="Измерь локальный диаметр, скорость, давление по обе стороны участка и целостность стенки. Выбери действие на основании полученных данных.";Formula="";ProfessorLine="Обоснуй действие измерениями.";break;
                 case 11:LearningTerm="Повреждение эндотелия";LearningNote="Разрыв стенки объясняет одновременно кровопотерю и падение давления.";Formula="Дефект стенки + утечка → снижение объёма кровотока";ProfessorLine="Три независимых наблюдения должны привести к одному выводу.";break;
                 case 12:LearningTerm="Гемостаз";LearningNote="Адгезия и активация тромбоцитов создают первичную пробку; тромбин запускает сеть фибрина.";Formula="Фибриноген —(тромбин)→ фибрин";ProfessorLine="Пробка должна расти поэтапно, а не возникать мгновенно.";break;
                 case 13:LearningTerm="Баланс гемостаза";LearningNote="Недостаточная пробка пропускает кровь, избыточная перекрывает просвет; нужен рабочий оптимум.";Formula="Кровотечение остановлено + поток сохранён";ProfessorLine="Хороший результат — это баланс, а не максимальное значение шкалы.";break;
@@ -178,6 +185,7 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         public void Continue()
         {
+            if(SceneNumber==10&&world.immunePatrol&&Complete&&!world.immunePatrol.ReadyToLeave){Feedback="Ответ завершён — стенка закрывается. Подожди короткую анимацию.";Changed?.Invoke();return;}
             if(!Complete){Feedback="Сначала заверши действия: "+CurrentGoalLabel;Changed?.Invoke();return;}
             if(mover.Moving)return;
             if(SceneNumber==17&&world!=null&&world.Returning){Feedback="Подожди завершения перехода масштаба в лабораторию.";Changed?.Invoke();return;}
@@ -293,6 +301,7 @@ namespace BiologyVR.ArteryRoute.Journey
         public void UpdateInnateViralLoad(float value){ViralLoad=Mathf.Clamp(value,0,100);Changed?.Invoke();}
         public void ObserveImmunePhenomenon(string title,string text,string professor)
         {if(!world.immunity||!world.immunity.Active)return;LearningTerm=title;LearningNote=text;ProfessorLine=professor;Changed?.Invoke();}
+        public void ObservePatrol(string title,string text,string professor){LearningTerm=title;LearningNote=text;ProfessorLine=professor;Changed?.Invoke();}
         public void WarnExcessiveTone()
         {WrongTargetActions++;Feedback="Чрезмерное сужение ограничивает поток. Подними BioTool и верни умеренный тонус.";Changed?.Invoke();}
         public void RecordPhysicalError(string text){WrongTargetActions++;Feedback=text;Changed?.Invoke();}

@@ -5,7 +5,7 @@ import shutil
 from pathlib import Path
 
 root = Path(__file__).resolve().parent.parent
-repo = root.parent / 'Biology_VR_App'
+repo = root.parent / 'Github_VR' / 'Biology_VR_App'
 release = json.loads((root / 'Tools/release_settings.json').read_text(encoding='utf-8-sig'))
 version = release['version']
 dest = repo / 'ReleaseFiles'
