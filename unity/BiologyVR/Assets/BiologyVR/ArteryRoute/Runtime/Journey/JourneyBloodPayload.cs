@@ -37,7 +37,8 @@ namespace BiologyVR.ArteryRoute.Journey
             foreach(var entry in slot)if(entry.index>=0&&entry.type==type&&world.bloodEntities.stream.flow.species[entry.index]==species){carrier=entry.target;break;}
             topic.gameObject.SetActive(carrier);if(!carrier)return;
             var bond=topic.GetComponent<JourneyFlowBond>();bond.carrier=carrier;
-            var frame=world.mover.viewCamera.transform.rotation;topic.transform.SetPositionAndRotation(carrier.transform.position+frame*offset,frame);
+            // Cargo belongs to the sampled carrier, not to the player's changing gaze.
+            var frame=carrier.transform.rotation;topic.transform.SetPositionAndRotation(carrier.transform.position+frame*offset,frame);
         }
         public bool Available(JourneyTarget target)
         {var bond=target?target.GetComponent<JourneyFlowBond>():null;return bond&&bond.carrier&&world.bloodEntities.Owns(bond.carrier)&&target.gameObject.activeInHierarchy;}

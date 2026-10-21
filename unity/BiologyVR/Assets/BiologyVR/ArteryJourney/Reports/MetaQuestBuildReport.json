@@ -1,12 +1,12 @@
 {
-  "utc": "2026-10-19T03:39:11.0828793Z",
+  "utc": "2026-10-21T05:54:22.8710817Z",
   "result": "Succeeded",
   "unityResult": "Succeeded",
   "apkExists": true,
   "errors": 0,
   "warnings": 12,
-  "sizeBytes": 82933582,
-  "seconds": 54.2395016,
+  "sizeBytes": 83171174,
+  "seconds": 27.3268252,
   "path": "Z:/BiologyVR_bio_03/Builds/MetaQuest/BiologyVR_MetaQuest.apk",
   "device": "Meta Quest",
   "headsetVerified": false

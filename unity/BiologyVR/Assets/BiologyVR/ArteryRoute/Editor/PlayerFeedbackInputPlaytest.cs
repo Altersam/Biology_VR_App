@@ -144,6 +144,10 @@ namespace BiologyVR.ArteryRoute.Editor
         static IEnumerator PatrolTest()
         {
             var world=mission.world;Check(world.immunePatrol&&world.plateletLaunch,"Patrol and platelet layers extend the existing world");
+            yield return Capture("erythrocyte-O2");yield return Scan(world.freeTools.Held);var screens=mission.GetComponent<JourneyHolographicScreens>();keys=new KeyboardState();yield return Wait(.3f);
+            Check(screens.ShowPractice&&screens.LearnedTopic=="rbc"&&screens.theoryText.text.Contains("Связано с темой")&&screens.taskRoot.gameObject.activeInHierarchy,"PC scan opens complete linked erythrocyte theory and retains the task after release");
+            pointer=mission.mover.viewCamera.WorldToScreenPoint(screens.theoryScroll.viewport.position);float scrollBefore=screens.theoryScroll.verticalNormalizedPosition;wheel=new Vector2(0,-8*JourneyDesktopControls.WheelUnitsPerStep);yield return Wait(.5f);
+            Check(screens.theoryScroll.verticalNormalizedPosition<scrollBefore-.01f,"Actual mouse wheel scrolls the complete educational card");ArteryPolishReview.Capture(mission.mover.viewCamera,"FlowLearningConsistency/PC_Erythrocyte_Full_Theory.png");
             mission.Enter(8,false);yield return Wait(.4f);Check(world.immunity.TutorialVirus.Integrity==1&&world.immunity.TutorialVirus.spikeGroups.All(g=>g.gameObject.activeSelf),"First trial virus starts with a full silhouette but needs only one contact");
             int attempts=0;while(!mission.Complete&&attempts++<10){yield return Capture("phagocyte");yield return Scan(world.freeTools.Held);Check(world.freeTools.Held.GetComponent<JourneyPhagocyteEntity>().State==JourneyPhagocyteState.Activated,"Scanner activates the held phagocyte without a BioTool activation mode");yield return FireCurrentAt(world.immunity.TutorialVirus);yield return Wait(1.3f);}
             Check(mission.Complete&&world.immunity.DamageContacts==1,"One real successful launch wins the trial virus");

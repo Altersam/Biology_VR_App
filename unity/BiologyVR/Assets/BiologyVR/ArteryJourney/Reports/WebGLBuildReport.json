@@ -1,9 +1,9 @@
 {
-  "utc": "2026-10-19T03:24:52.5504083Z",
-  "version": "0.9.0",
+  "utc": "2026-10-21T05:57:05.7566612Z",
+  "version": "0.10.0",
   "result": "Succeeded",
   "errors": 0,
-  "warnings": 7,
+  "warnings": 5,
   "path": "Z:\\BiologyVR_bio_03\\Builds\\WebGL\\play",
   "compression": "gzip with decompression fallback",
   "threads": false,

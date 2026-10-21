@@ -1,0 +1,10 @@
+{
+  "utc": "2026-10-19T18:25:07.4805771Z",
+  "centeredMeshes": 0,
+  "hemeVertices": 3393,
+  "fullTheoryAfterScan": true,
+  "pinnedTask": true,
+  "uniformScreenPlacement": true,
+  "controllerAim": "independent straight rays; one capture tether only",
+  "existingPool": 360
+}

@@ -27,6 +27,44 @@ namespace BiologyVR.ArteryRoute.Journey
         float refreshAt;
         Vector3 theoryHome,vitalsHome;
         Quaternion theoryRotation,vitalsRotation;
+        string learnedId,learnedTitle,learnedText,learnedSummary,learnedDiagram;
+        int learnedScene=-1;
+        public string LearnedTopic=>learnedId;
+        public void Learn(string id)
+        {
+            if(!hud||!hud.mission||string.IsNullOrEmpty(id))return;
+            var m=hud.mission;var topic=m.world.research?m.world.research.Find(id):null;
+            learnedScene=m.SceneNumber;learnedId=id;
+            if(topic&&topic.theory)
+            {
+                var data=topic.theory;learnedTitle=data.displayName;var text=new StringBuilder();AppendTheory(text,data);
+                string[] related=id=="rbc"?new[]{"hemoglobin","heme","oxygen","co2"}:id=="hemoglobin"?new[]{"heme","oxygen","co2"}:id=="platelet"?new[]{"plasma"}:System.Array.Empty<string>();
+                foreach(var key in related){var item=m.world.research.Find(key);if(item&&item.theory){text.Append("\n<b>Связано с темой: ").Append(item.theory.displayName).Append("</b>\n");AppendTheory(text,item.theory);}}
+                if(m.SceneNumber>=4&&m.SceneNumber<=16)text.Append("\n<b>Применение на этом участке</b>\n").Append(LessonDetails(m.SceneNumber));
+                text.Append("\nУчебные модели увеличены. Цвет и размер частиц условны.");learnedText=text.ToString();learnedSummary=data.pages.Length>0?data.pages[0].text:"";learnedDiagram=data.pages.Length>0?data.pages[0].visualConnection:"";
+            }
+            else
+            {
+                learnedTitle=m.SceneNumber==10?"Иммунный надзор":m.LearningTerm;learnedSummary=ShortExplanation(m.SceneNumber);learnedDiagram=MiniDiagram(m.SceneNumber);
+                learnedText="<b>"+learnedTitle+"</b>\n\n"+m.LearningNote+"\n\n"+LessonDetails(m.SceneNumber)+"\n\n<b>Связь с наблюдением</b>\n"+m.Formula;
+            }
+            ShowPractice=true;Refresh();Canvas.ForceUpdateCanvases();theoryScroll.verticalNormalizedPosition=1;
+        }
+        static void AppendTheory(StringBuilder text,JourneyResearchTheory data)
+        {foreach(var page in data.pages)text.Append("<b>").Append(page.heading).Append("</b>\n").Append(page.text).Append("\n").Append(page.visualConnection).Append("\n\n");}
+        public void PresentLearning()
+        {
+            if(!hud||!hud.mission||hud.mission.Goals==null)return;var m=hud.mission;
+            if(learnedScene!=m.SceneNumber){learnedId=null;learnedTitle=null;learnedText=null;learnedScene=m.SceneNumber;ShowPractice=false;}
+            bool learned=!string.IsNullOrEmpty(learnedId);
+            theoryTitle.text=learned?learnedTitle:m.LearningTerm;
+            if(learned){shortTheory.text=learnedSummary;illustrationText.text=learnedDiagram;theoryText.text=learnedText;}
+            else{shortTheory.text=ShortExplanation(m.SceneNumber);illustrationText.text=m.SceneNumber==10&&m.world.immunePatrol?"ОБНАРУЖИТЬ → НАПРАВИТЬ → УСТРАНИТЬ":MiniDiagram(m.SceneNumber);theoryText.text="<b>"+m.LearningTerm+"</b>\n\n"+m.LearningNote+"\n\n"+LessonDetails(m.SceneNumber);}
+            if(overview)overview.SetActive(!ShowPractice);if(referenceView)referenceView.SetActive(ShowPractice);if(taskRoot)taskRoot.gameObject.SetActive(true);theoryScroll.enabled=ShowPractice;
+            if(pageLabel)pageLabel.text=(ShowPractice?"ТЕОРИЯ · прокрути ниже":"УЧЕБНАЯ КАРТОЧКА")+" · v"+Application.version;
+            if(referenceButton)referenceButton.GetComponentInChildren<Text>().text=ShowPractice?"Кратко":"Вся теория";
+            if(practiceButton){practiceButton.GetComponentInChildren<Text>().text="К действию";practiceButton.SetActive(!m.Complete);}
+        }
         void Awake(){stick=new InputAction("Read holographic theory",InputActionType.Value,"<XRController>{RightHand}/thumbstick");if(theoryRoot&&vitalsRoot){theoryHome=theoryRoot.localPosition;vitalsHome=vitalsRoot.localPosition;theoryRotation=theoryRoot.localRotation;vitalsRotation=vitalsRoot.localRotation;}}
         void OnEnable(){stick?.Enable();Subscribe();}
         void OnDisable(){stick?.Disable();if(subscribed)subscribed.Changed-=Refresh;subscribed=null;}
@@ -59,13 +97,10 @@ namespace BiologyVR.ArteryRoute.Journey
             var m=hud.mission;
             if(theoryRoot&&vitalsRoot)
             {
-                bool tissue=m.SceneNumber>=10&&m.SceneNumber<=14&&m.world.immunePatrol;
-                theoryRoot.localPosition=tissue?new Vector3(-1.05f,-.12f,1.5f):theoryHome;
-                vitalsRoot.localPosition=tissue?new Vector3(1.05f,.40f,1.5f):vitalsHome;
-                theoryRoot.localRotation=tissue?Quaternion.LookRotation(theoryRoot.localPosition,Vector3.up):theoryRotation;
-                vitalsRoot.localRotation=tissue?Quaternion.LookRotation(vitalsRoot.localPosition,Vector3.up):vitalsRotation;
+                theoryRoot.localPosition=theoryHome;vitalsRoot.localPosition=vitalsHome;
+                theoryRoot.localRotation=theoryRotation;vitalsRoot.localRotation=vitalsRotation;
             }
-            if(m.FreeBloodResearch){RefreshResearch(m.world.research);RefreshVitals();return;}
+            if(m.FreeBloodResearch){RefreshResearch(m.world.research);RefreshVitals();PresentLearning();return;}
             shortTheory.resizeTextForBestFit=false;
             if(referenceButton)referenceButton.GetComponentInChildren<Text>().text="Подробнее";
             if(practiceButton)practiceButton.GetComponentInChildren<Text>().text="К практике";
@@ -95,6 +130,7 @@ namespace BiologyVR.ArteryRoute.Journey
             if(hud.continueButton)hud.continueButton.gameObject.SetActive(m.Complete);
             if(chapter!=m.SceneNumber){chapter=m.SceneNumber;Canvas.ForceUpdateCanvases();theoryScroll.verticalNormalizedPosition=1;}
             RefreshVitals();
+            PresentLearning();
         }
         void RefreshResearch(JourneyResearchManager research)
         {
@@ -136,8 +172,8 @@ namespace BiologyVR.ArteryRoute.Journey
             for(int i=0;i<5;i++){vitalValues[i].text=values[i];vitalStatuses[i].text=states[i];vitalStatuses[i].color=(i==0&&(m.PressureSystolic<110||m.PressureSystolic>130)||i==3&&m.Temperature>37.2f||i==4&&(infection||plaque&&!plaque.Cleared)||plaque&&((i==1&&plaque.PulseBpm>90)||(i==2&&plaque.OxygenPercent<95)))?HolographicStyle.Amber:HolographicStyle.Secondary;}
         }
         public void TogglePractice(){ShowPractice=!ShowPractice;Refresh();}
-        public void ShowOverview(){if(hud.mission.FreeBloodResearch&&!ShowPractice){hud.mission.world.research.TurnPage(-1);return;}ShowPractice=false;Refresh();}
-        public void NextTheoryPage(){if(hud.mission.FreeBloodResearch&&hud.mission.world.research.Focused){var world=hud.mission.world;if(!world.freeTools&&world.analysis&&(world.research.Focused.theory.id=="rbc"||world.research.Focused.theory.id=="plasma")&&!world.analysis.Opened){world.analysis.Open(world.research.FocusedTarget);return;}ShowPractice=false;world.research.TurnPage(1);}else TogglePractice();}
+        public void ShowOverview(){ShowPractice=false;Refresh();}
+        public void NextTheoryPage()=>TogglePractice();
         public void ShowResearchOverview(){if(hud.mission.FreeBloodResearch){ShowPractice=false;hud.mission.world.research.ShowOverview();}else ShowOverview();}
         public void ScrollDown(){ScrollBy(-.20f);}
         public void ScrollUp(){ScrollBy(.20f);}
@@ -200,7 +236,7 @@ namespace BiologyVR.ArteryRoute.Journey
             7=>"Пузырёк переносится кровотоком.\nВ узком участке он мешает потоку.\nПоле позволяет удержать пузырёк.",
             8=>"Вирус — не клетка. Он использует\nклетку хозяина для размножения.\nИсследуй его, затем найди фагоцит.",
             9=>"Фагоцит — один из типов\nлейкоцитов. Используй изученный\nцикл взаимодействия в потоке.",
-            10=>"Тонус временно поддерживает АД.\nУмеренное сужение сохраняет поток.\nПричину падения давления нужно найти.",
+            10=>"Иммунитет контролирует свои ткани.\nИзменённые клетки могут быть распознаны.\nКонтакт NK/T-клеток запускает апоптоз.",
             11=>"Целостность стенки нарушена.\nУтечка ↑ • обнажён субэндотелий.\nЧасть потока идёт наружу, основная — дальше.",
             12=>"Адгезия образует первичную пробку.\nАктивация и агрегация её усиливают.\nФибрин стабилизирует; утечка снижается.",
             13=>"Недостаток пробки оставляет утечку.\nИзбыток перекрывает просвет.\nРабочий результат — равновесие.",
@@ -210,6 +246,23 @@ namespace BiologyVR.ArteryRoute.Journey
             _=>"Исследование завершено.\nСравни результаты и повтори\nнаблюдения в свободном режиме."
         };
         static string MiniDiagram(int scene)=>scene switch
-        {3=>"Hb + O₂ ⇄ HbO₂",4=>"ЭНДОТЕЛИЙ · МЕДИА",5=>"Q ∝ ΔP · r⁴",6=>"ПОКРЫШКА / ЛИПИДЫ",7=>"ПОТОК → ЛОВУШКА",8=>"РАСПОЗНАТЬ → НАПРАВИТЬ → ПОГЛОТИТЬ",9=>"ОКРУЖЕНИЕ → ПОГЛОЩЕНИЕ",10=>"РАДИУС ↔ ДАВЛЕНИЕ",11=>"СТЕНКА → ПОТОК",12=>"ТРОМБОЦИТЫ + ФИБРИН",13=>"УТЕЧКА ← БАЛАНС → ПРОСВЕТ",14=>"ОЧИСТКА → REPAIR",15=>"Ag + Ab ⇄ AgAb",_=>"ПОТОК · ЗАЩИТА · БАЛАНС"};
+        {3=>"Hb + O₂ ⇄ HbO₂",4=>"ЭНДОТЕЛИЙ · МЕДИА",5=>"Q ∝ ΔP · r⁴",6=>"ПОКРЫШКА / ЛИПИДЫ",7=>"ПОТОК → ЛОВУШКА",8=>"РАСПОЗНАТЬ → НАПРАВИТЬ → ПОГЛОТИТЬ",9=>"ОКРУЖЕНИЕ → ПОГЛОЩЕНИЕ",10=>"СИГНАЛ → КОНТАКТ → АПОПТОЗ",11=>"СТЕНКА → ПОТОК",12=>"ТРОМБОЦИТЫ + ФИБРИН",13=>"УТЕЧКА ← БАЛАНС → ПРОСВЕТ",14=>"ОЧИСТКА → REPAIR",15=>"Ag + Ab ⇄ AgAb",_=>"ПОТОК · ЗАЩИТА · БАЛАНС"};
+        static string LessonDetails(int scene)=>scene switch
+        {
+            3=>"<b>Как исследовать</b>\nПросканируй выбранный образец: здесь появятся его строение, функции и связанные темы. Полная теория сохраняется после отпускания клетки. Можно прокручивать текст и вернуться к краткой карточке, не теряя прогресс.",
+            4=>"<b>Интима</b>\nЭндотелий образует внутренний барьер и регулирует обмен между кровью и тканями.\n\n<b>Медиа</b>\nГладкие мышечные клетки и эластические структуры изменяют тонус и поддерживают стенку.\n\n<b>Адвентиция</b>\nСоединительная ткань укрепляет сосуд; у крупных сосудов содержит собственные сосуды и нервы.",
+            5=>"<b>Давление и расход</b>\nДвижение крови обусловлено градиентом давления. Сопротивление зависит от геометрии сосуда. В идеализированной ламинарной модели R ∝ 1/r⁴.\n\n<b>Условия модели</b>\nПри фиксированном ΔP расширение повышает расход; при фиксированном расходе скорость меняется обратно площади сечения. Эти условия нельзя смешивать. Живые сосуды регулируются сложнее, чем учебный участок.",
+            6=>"<b>Атеросклероз</b>\nЛипиды и воспалительные клетки накапливаются в стенке. Бляшка уменьшает просвет и может ограничивать доставку крови.\n\n<b>Фиброзная покрышка</b>\nОтделяет липидное ядро от крови. Её повреждение может запускать тромбообразование. Импульсное удаление элементов здесь — условная игровая модель, не клинический метод лечения.",
+            7=>"<b>Газовый эмбол</b>\nГазовый пузырёк переносится потоком и способен перекрывать более узкие сосуды. Опасность зависит от места и объёма газа.\n\n<b>Игровая задача</b>\nПоле удерживает пузырёк, а кольцо обозначает учебную ловушку. Нельзя оставлять движущийся эмбол свободным внутри кровотока.",
+            8 or 9=>"<b>Вирус и клетка</b>\nВирусная частица содержит генетический материал и белковую оболочку, но не является клеткой. Для размножения нужна клетка хозяина.\n\n<b>Фагоцитоз</b>\nНекоторые лейкоциты распознают, окружают и поглощают чужеродный материал. После поглощения он разрушается внутри клетки. Настоящий противовирусный ответ также включает интерфероны, антитела и цитотоксические клетки.",
+            10=>"<b>Иммунный надзор</b>\nКлетки организма могут получать повреждения и изменения ДНК. Большинство нарушений устраняется естественными механизмами. NK-клетки и цитотоксические лимфоциты способны распознавать некоторые изменённые клетки.\n\n<b>Путь в ткань</b>\nСигналы направляют иммунные клетки к участку. Лейкоциты взаимодействуют с эндотелием и проходят через стенку — диапедез.\n\n<b>Апоптоз</b>\nПри цитотоксическом контакте перфорин/гранзимы могут запускать контролируемую гибель клетки. Reverse визуализирует направляющий сигнал, а не реальное дистанционное управление иммунитетом.",
+            11=>"<b>Разрыв стенки</b>\nПовреждение эндотелия обнажает структуры под ним. Часть крови выходит из сосуда, а остальная продолжает движение.\n\n<b>Диагностика</b>\nНужно сопоставить дефект стенки, наружную утечку и снижение давления. Это разные наблюдения одного процесса, а не три разных повреждения.",
+            12=>"<b>Адгезия</b>\nТромбоциты прикрепляются к повреждённой поверхности при участии коллагена и фактора фон Виллебранда.\n\n<b>Активация и агрегация</b>\nКлеточные фрагменты меняют форму и выделяют сигналы; фибриноген связывает активированные тромбоциты.\n\n<b>Фибрин</b>\nТромбин превращает фибриноген в фибрин, укрепляющий первичную пробку. Число 11 и активация Scanner — учебная условность, а не реальное число тромбоцитов или механизм прибора.",
+            13=>"<b>Баланс гемостаза</b>\nНедостаточная пробка не останавливает потерю крови. Чрезмерное тромбообразование может сужать просвет и уменьшать снабжение тканей.\n\n<b>Цель</b>\nЗакрыть дефект, сохранив движение крови. В организме этот баланс обеспечивают сосудистые, тромбоцитарные, коагуляционные и противосвёртывающие механизмы.",
+            14=>"<b>Очистка</b>\nФагоциты удаляют клеточный детрит.\n\n<b>Фибринолиз</b>\nПлазмин расщепляет фибрин, когда временный каркас больше не нужен.\n\n<b>Репарация</b>\nКлетки эндотелия восстанавливают барьер. Остановка кровотечения и восстановление стенки — разные этапы.",
+            15=>"<b>Специфичность</b>\nАнтитело узнаёт определённый участок антигена — эпитоп. Подходящая форма связывания помогает нейтрализовать материал и облегчает его удаление фагоцитами.\n\n<b>Источник инфекции</b>\nЦитотоксические T-лимфоциты распознают инфицированные клетки и могут запускать апоптоз. Удаление частиц и устранение клетки-источника — разные задачи.",
+            16=>"<b>Гомеостаз</b>\nСравни давление, температуру, кровоток, целостность стенки, вирусную нагрузку и гемостаз. Восстановление системы подтверждается совокупностью показателей, а не одним числом.",
+            _=>"Свяжи изученные клеточные процессы с состоянием организма. Исследованные темы доступны в учебных карточках."
+        };
     }
 }

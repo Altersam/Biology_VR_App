@@ -208,6 +208,7 @@ namespace BiologyVR.ArteryRoute.Journey
             var cell=hit?hit.GetComponent<JourneyPhagocyteEntity>():null;
             if(!cell||world.freeTools.Held!=hit){ScanProgress=0;scanAge=0;return false;}
             if(scanningTarget!=hit){scanningTarget=hit;scanAge=0;scanConsumed=false;}
+            if(!scanConsumed&&scanAge+dt>=.75f)world.mission.GetComponent<JourneyHolographicScreens>()?.Learn(hit.targetId);
             if(!scanConsumed){scanAge+=dt;ScanProgress=Mathf.Clamp01(scanAge/.75f);if(ScanProgress>=1){cell.Studied=true;scanConsumed=true;ProcessingScan=true;if(Tutorial&&world.mission.Current?.action==StudyAction.Scan&&world.mission.Current.target=="phagocyte")world.mission.Accept(StudyAction.Scan,"phagocyte");ProcessingScan=false;if(world.plateletLaunch){cell.SetState(JourneyPhagocyteState.Activated);world.mission.GetComponent<JourneyInstrumentRig>().ScannerActivated(cell.transform.position);world.mission.FeedbackMessage("Клетка активирована Scanner. РЕВЕРС: наведи и отпусти курок.");}else world.mission.FeedbackMessage("Фагоцит распознан. Переключи BioTool в АКТИВАЦИЮ и удержи курок.");}}
             return true;
         }

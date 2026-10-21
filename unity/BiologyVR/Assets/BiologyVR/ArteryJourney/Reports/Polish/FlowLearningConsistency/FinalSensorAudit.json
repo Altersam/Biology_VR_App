@@ -1,0 +1,92 @@
+[
+  {
+    "id": "check-pressure",
+    "raw": true,
+    "ui": false,
+    "locked": "check-pressure",
+    "obstruction": null,
+    "progress": 0.533768833,
+    "targetEnabled": true,
+    "origin": "(119.05, 15.42, 233.32)",
+    "direction": "(0.34, 0.12, 0.93)",
+    "centre": "(119.59, 15.61, 234.81)",
+    "rays": [
+      "Homeostasis sensor — check-pressure:1,422823"
+    ]
+  },
+  {
+    "id": "check-temperature",
+    "raw": true,
+    "ui": false,
+    "locked": "check-temperature",
+    "obstruction": null,
+    "progress": 0.0,
+    "targetEnabled": true,
+    "origin": "(119.18, 15.55, 233.46)",
+    "direction": "(0.32, 0.46, 0.83)",
+    "centre": "(119.66, 16.25, 234.70)",
+    "rays": [
+      "Homeostasis sensor — check-temperature:1,318924"
+    ]
+  },
+  {
+    "id": "check-flow",
+    "raw": true,
+    "ui": false,
+    "locked": "check-flow",
+    "obstruction": null,
+    "progress": 0.0,
+    "targetEnabled": true,
+    "origin": "(119.29, 15.74, 233.53)",
+    "direction": "(0.27, 0.71, 0.65)",
+    "centre": "(119.73, 16.88, 234.58)",
+    "rays": [
+      "Homeostasis sensor — check-flow:1,428581"
+    ]
+  },
+  {
+    "id": "check-wall",
+    "raw": true,
+    "ui": false,
+    "locked": "check-wall",
+    "obstruction": null,
+    "progress": 0.0,
+    "targetEnabled": true,
+    "origin": "(119.13, 15.41, 233.18)",
+    "direction": "(0.63, 0.04, 0.77)",
+    "centre": "(120.17, 15.48, 234.45)",
+    "rays": [
+      "Homeostasis sensor — check-wall:1,46597"
+    ]
+  },
+  {
+    "id": "check-virus",
+    "raw": true,
+    "ui": false,
+    "locked": "check-virus",
+    "obstruction": null,
+    "progress": 0.0,
+    "targetEnabled": true,
+    "origin": "(119.26, 15.52, 233.31)",
+    "direction": "(0.64, 0.39, 0.66)",
+    "centre": "(120.24, 16.12, 234.33)",
+    "rays": [
+      "Homeostasis sensor — check-virus:1,364296"
+    ]
+  },
+  {
+    "id": "check-hemostasis",
+    "raw": true,
+    "ui": false,
+    "locked": "check-hemostasis",
+    "obstruction": null,
+    "progress": 0.0,
+    "targetEnabled": true,
+    "origin": "(119.36, 15.68, 233.40)",
+    "direction": "(0.58, 0.65, 0.49)",
+    "centre": "(120.32, 16.75, 234.22)",
+    "rays": [
+      "Homeostasis sensor — check-hemostasis:1,471624"
+    ]
+  }
+]

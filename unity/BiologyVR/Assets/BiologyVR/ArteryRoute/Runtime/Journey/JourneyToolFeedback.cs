@@ -29,6 +29,7 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         public void PresentLock(JourneyTarget target,float progress,bool correct,bool scanning,Transform source)
         {
+            lockRefreshFrame=Time.frameCount;
             if(lockRing)
             {
                 lockRing.enabled=target&&source;
@@ -62,6 +63,7 @@ namespace BiologyVR.ArteryRoute.Journey
             return true;
         }
         float elapsed=1;
+        int lockRefreshFrame=-1;
         public int ConfirmedActions{get;private set;}
         public void Confirm(StudyAction action,string id)
         {
@@ -91,6 +93,7 @@ namespace BiologyVR.ArteryRoute.Journey
         void LateUpdate()
         {
             UpdateMode();
+            if(lockRefreshFrame<Time.frameCount-1){if(lockRing)lockRing.enabled=false;if(scanBeam)scanBeam.enabled=false;}
             if(!ring||elapsed>=.34f)return;
             elapsed+=Time.deltaTime;float t=Mathf.Clamp01(elapsed/.34f);
             ring.transform.localScale=Vector3.one*Mathf.Lerp(.65f,1.45f,t);

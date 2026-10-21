@@ -72,14 +72,15 @@ namespace BiologyVR.ArteryRoute.Journey
             FaceCaption(ActiveScanner,input.mover.viewCamera.transform);
             FaceCaption(ActiveBioTool,input.mover.viewCamera.transform);
             var target=input.LockedTarget;var cameraRef=input.mover.viewCamera;
-            Vector3 start=ActiveScanner.muzzle.position;
-            Vector3 scanEnd=target?target.transform.position:start+ActiveScanner.muzzle.forward*.40f;
-            scanEnd=start+(scanEnd-start).normalized*Mathf.Min(input.world.plateletLaunch?8:.45f,Vector3.Distance(start,scanEnd));
-            Draw(scannerBeam,start,scanEnd,scan&&ActiveScanner.gameObject.activeInHierarchy,input.world.plateletLaunch?.0035f:.0015f);
+            var scanSource=tracked?input.scanner:input.DesktopControls?input.DesktopControls.AimTransform:cameraRef.transform;
+            Vector3 start=scanSource.position;
+            Vector3 scanEnd=input.GuideEndpoint(scanSource,out _);
+            // A scan ray ends at the physical ray intersection, never at a target pivot.
+            Draw(scannerBeam,start,scanEnd,scan&&!tracked&&ActiveScanner.gameObject.activeInHierarchy,.002f);
             activationAge+=Time.deltaTime;float activation=Mathf.Clamp01(activationAge/.32f);var activatedPoint=Vector3.Lerp(activationFrom,start,Mathf.SmoothStep(0,1,activation));
             if(scannerActivationOrb){scannerActivationOrb.gameObject.SetActive(activationAge<.32f);scannerActivationOrb.position=activatedPoint;scannerActivationOrb.localScale=Vector3.one*(.075f*(1-activation*.6f));}
             if(scannerActivationTrail)Draw(scannerActivationTrail,Vector3.Lerp(activationFrom,activatedPoint,.7f),activatedPoint,activationAge<.32f,.012f*(1-activation));
-            bool capture=fire&&mode==BioToolMode.Capture||fieldHeld&&(mode==BioToolMode.Bio||mode==BioToolMode.Reverse);
+            bool capture=captured&&(fire&&mode==BioToolMode.Capture||fieldHeld&&(mode==BioToolMode.Bio||mode==BioToolMode.Reverse));
             Vector3 origin=ActiveBioTool.muzzle.position;
             Vector3 end=fieldHeld?fieldHeld.transform.position:phagHeld?input.world.immunity.Held.transform.position:plateletHeld?input.plateletCapture.HeldPiece.transform.position:input.world.EmbolusCaptured?input.world.bubble.position:target?target.transform.position:origin+ActiveBioTool.muzzle.forward*.45f;
             captureTether.enabled=capture&&captured;
@@ -96,7 +97,8 @@ namespace BiologyVR.ArteryRoute.Journey
             {
                 var tip=ActiveBioTool.prongs[i].position+ActiveBioTool.muzzle.forward*.055f;
                 var offset=Quaternion.AngleAxis(i*90,cameraRef.transform.forward)*cameraRef.transform.up*.05f;
-                Draw(captureRays[i],tip,end+offset,capture,.0020f);
+                // One restrained tether is enough; converging rays look like broken aim axes.
+                captureRays[i].enabled=false;
             }
             if(captureLockRing){captureLockRing.enabled=capture&&captured;captureLockRing.transform.SetPositionAndRotation(end,cameraRef.transform.rotation);captureLockRing.transform.localScale=Vector3.one*(.33f+.018f*Mathf.Sin(Time.time*7));captureLockRing.widthMultiplier=.0035f;}
             bool wide=fire&&(mode==BioToolMode.Tonus||mode==BioToolMode.Bio);

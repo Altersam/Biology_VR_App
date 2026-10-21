@@ -229,6 +229,7 @@ namespace BiologyVR.ArteryRoute.Journey
             // Geometry-dependent actions finish only after their motion/trigger result.
             if(!world.CanApply(action,target)){WrongTargetActions++;Feedback=SceneNumber==10&&target=="pressure-return"?"АД ещё снижается: наблюдай динамику и повтори измерение.":"Сначала захвати объект или доведи его в требуемую зону.";Changed?.Invoke();return false;}
             world.Apply(action,target,Progress);
+            var scannerInput=GetComponent<JourneyInput>();if(action==StudyAction.Scan||scannerInput&&scannerInput.ScannerHeld&&(action==StudyAction.Measure||action==StudyAction.Activate))GetComponent<JourneyHolographicScreens>()?.Learn(target);
             var instrumentFeedback=GetComponent<JourneyToolFeedback>();if(instrumentFeedback)instrumentFeedback.Confirm(action,target);
             AcceptedActions++;if(action==StudyAction.Scan)ScannerActions++;else if(action!=StudyAction.Grab)ToolActions++;
             Progress++;

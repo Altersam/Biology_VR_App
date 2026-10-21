@@ -59,6 +59,9 @@ namespace BiologyVR.ArteryRoute.Journey
             screens.taskHint.text=m.Complete?"Левая Y / → — следующий этап":world.mission.GetComponent<BioToolModeController>().Caption;
             screens.pageLabel.text+=$" · v{Application.version}";
             screens.vitalLabels[2].text=world.hemodynamics.Active?"ДИАМЕТР Ø":"SpO₂";screens.vitalLabels[4].text=world.hemodynamics.Active||m.SceneNumber==6?"КРОВОТОК":m.SceneNumber>=11&&m.SceneNumber<=14?"УТЕЧКА":"ВИРУС";
+            if(!complete&&m.SceneNumber>=10&&m.SceneNumber<=13)screens.taskText.text=screens.shortTheory.text;
+            // This presenter owns the task block. The learning screen owns theory.
+            screens.PresentLearning();
         }
     }
 }

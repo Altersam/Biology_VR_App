@@ -70,7 +70,7 @@ def main():
         if relative.parts[:2]==('unity','BiologyVR') and relative.parts[2] in ('Library','Temp','Logs','UserSettings','GitHubUpload'):forbidden.append(relative.as_posix())
     oversized=[p.relative_to(REPO).as_posix() for p in upload if p.stat().st_size>=100*1024*1024]
     after=git('rev-parse','HEAD')
-    report={'utc':datetime.now(timezone.utc).isoformat(),'version':VERSION,'art':'Immune patrol integrated into Scene10; six tissue focuses, pooled leukocytes, existing Reverse/cutaway; visible-wound platelet adhesion and remote plug balance; unified Scanner instructions','repository':str(REPO),'remote':remote,
+    report={'utc':datetime.now(timezone.utc).isoformat(),'version':VERSION,'art':'Full linked learning cards after Scanner; unified screen placement; continuous pooled blood with centred particles and rounded heme/iron; independent controller guides; immune patrol and readable wound preserved','repository':str(REPO),'remote':remote,
             'passed':not failures and not forbidden and not oversized and before==after,'head_unchanged':before==after,'committed':False,'pushed':False,
             'verified_copies':len(copied),'upload_files':len(upload),'upload_bytes':sum(p.stat().st_size for p in upload),
             'mismatches':failures,'forbidden':forbidden,'oversized':oversized,'release_files':releases,'backup':backup['backup']}

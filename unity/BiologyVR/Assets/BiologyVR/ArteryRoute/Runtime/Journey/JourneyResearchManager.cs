@@ -71,6 +71,7 @@ namespace BiologyVR.ArteryRoute.Journey
             string feedback=finished?"Исследование состава крови завершено.":fresh?$"Изучено: {item.theory.displayName}":item.State==JourneyResearchState.Investigated?$"Открыта изученная карточка: {item.theory.displayName}":$"Исследование: {item.theory.displayName}";
             if(fresh)world.mission.RecordResearchScan(id);
             world.mission.RefreshResearchJournal(finished,feedback,professor);
+            if(action==StudyAction.Scan)world.mission.GetComponent<JourneyHolographicScreens>()?.Learn(id);
             return true;
         }
         public void TurnPage(int direction)

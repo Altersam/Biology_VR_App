@@ -199,6 +199,7 @@ namespace BiologyVR.ArteryRoute.Journey
             {
                 var collider=guideHits[i].collider;if(!collider||mover&&mover.origin&&collider.transform.IsChildOf(mover.origin.transform))continue;
                 var target=TargetFrom(collider);bool physical=collider.GetComponentInParent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+                if(TargetingTissue&&world.bloodEntities.Owns(target))continue;
                 if(collider.isTrigger&&!IsUsableTarget(target)&&!physical)continue;
                 targetContact=IsUsableTarget(target)||physical;return guideHits[i].point;
             }
@@ -472,6 +473,16 @@ namespace BiologyVR.ArteryRoute.Journey
             return mover != null && mover.viewCamera ? mover.viewCamera.transform : preferred;
         }
 
+        bool TargetingTissue
+        {
+            get
+            {
+                if(!world||!world.freeTools||world.freeTools.Held||!mission||mission.Goals==null||mission.FreeBloodResearch)return false;
+                var goal=CurrentGoal();if(goal==null)return false;
+                if(RawScannerPressed)return (goal.action==StudyAction.Scan||goal.action==StudyAction.Measure||goal.action==StudyAction.Activate)&&world.research.Find(goal.target)==null;
+                return RawToolPressed&&bioModes&&bioModes.CurrentMode==BioToolMode.Reverse&&goal.action==StudyAction.Direct&&goal.target!="immune-engulf"&&goal.target!="platelet";
+            }
+        }
         JourneyTarget Aim(Transform source)
         {
             AimObstruction=null;LockedContact=null;
@@ -490,7 +501,7 @@ namespace BiologyVR.ArteryRoute.Journey
             // small content models must not promote a distant cell and close it.
             float contentsDistance=0;bool contents=world.analysis&&world.analysis.RayThroughContents(ray,out contentsDistance);
             if(contents)distance=Mathf.Min(distance,contentsDistance);
-            else if(world.bloodEntities&&(RawScannerPressed||RawToolPressed||!world.freeTools&&(GripPressed()||Mouse.current!=null&&Mouse.current.leftButton.isPressed))){world.bloodEntities.Promote(ray,Mathf.Min(maxAimDistance,12));Physics.SyncTransforms();}
+            else if(!TargetingTissue&&world.bloodEntities&&(RawScannerPressed||RawToolPressed||!world.freeTools&&(GripPressed()||Mouse.current!=null&&Mouse.current.leftButton.isPressed))){world.bloodEntities.Promote(ray,Mathf.Min(maxAimDistance,12));Physics.SyncTransforms();}
             int count = Physics.RaycastNonAlloc(ray, targetHits, distance, targetMask.value, QueryTriggerInteraction.Collide);
             // NonAlloc does not promise the nearest hits if its buffer is full.
             // Fail closed instead of aiming through an omitted nearer target.
@@ -499,6 +510,7 @@ namespace BiologyVR.ArteryRoute.Journey
             for (int i = 0; i < count; i++)
             {
                 var target = TargetFrom(targetHits[i].collider);
+                if(TargetingTissue&&world.bloodEntities.Owns(target))continue;
                 if(world.freeTools&&targetHits[i].collider.GetComponentInParent<JourneyHemostasisPiece>()&&target){LockedContact=targetHits[i].collider;return target;}
                 if (!IsUsableTarget(target)) continue;
                 if (!Obstructed(ray, targetHits[i].distance, target, 0f, source)){LockedContact=targetHits[i].collider;return target;}
@@ -564,6 +576,7 @@ namespace BiologyVR.ArteryRoute.Journey
                 // obstacles. A hand-held emitter can start inside the rig capsule.
                 if(mover&&mover.origin&&collider.transform.IsChildOf(mover.origin.transform))continue;
                 if (TargetFrom(collider) == target) continue;
+                if(TargetingTissue&&world.bloodEntities.Owns(TargetFrom(collider)))continue;
                 // Sensor volumes (e.g. the transparent embolus trap) are not solid
                 // line-of-sight blockers. Other target triggers still block normally.
                 if(collider.isTrigger&&!TargetFrom(collider))continue;

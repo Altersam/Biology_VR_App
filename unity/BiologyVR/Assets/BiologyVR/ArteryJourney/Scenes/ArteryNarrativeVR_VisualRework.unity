@@ -4325,7 +4325,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.12, y: 0.12, z: 0.12}
+  m_LocalScale: {x: 0.18, y: 0.18, z: 0.18}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 635182047}
@@ -4353,7 +4353,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b7362a4e2eab25b4eaa6218cb7818230, type: 2}
+  - {fileID: 2100000, guid: a055c7e3f2d8a2948901e8afd673c7c1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4382,7 +4382,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 37823972}
-  m_Mesh: {fileID: 4300000, guid: e630d644ce6d23a4dbeda559af5c4f5a, type: 2}
+  m_Mesh: {fileID: 4300000, guid: f1942476e00ab3f419adc76ba446739e, type: 2}
 --- !u!1 &38520849
 GameObject:
   m_ObjectHideFlags: 0
@@ -25213,7 +25213,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 78c7f42a7547f22448a621eaeeef3fd2, type: 3}
-    m_FontSize: 32
+    m_FontSize: 24
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 10
@@ -68160,7 +68160,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 78c7f42a7547f22448a621eaeeef3fd2, type: 3}
-    m_FontSize: 29
+    m_FontSize: 26
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 10
@@ -89784,8 +89784,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -32, y: -27}
-  m_SizeDelta: {x: 8, y: -294}
+  m_AnchoredPosition: {x: -32, y: 73}
+  m_SizeDelta: {x: 8, y: -494}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &748470278
 MonoBehaviour:
@@ -123588,7 +123588,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u0421\u041B\u0415\u0414\u0423\u042E\u0429\u0415\u0415 \u0414\u0415\u0419\u0421\u0422\u0412\u0418\u0415"
+  m_Text: "\u0423\u0427\u0415\u0411\u041D\u0410\u042F \u0418\u041D\u0424\u041E\u0420\u041C\u0410\u0426\u0418\u042F"
 --- !u!222 &1030889508
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -124340,7 +124340,7 @@ MonoBehaviour:
   hud: {fileID: 931878393}
   theoryRoot: {fileID: 1993215117}
   vitalsRoot: {fileID: 2061878030}
-  taskRoot: {fileID: 0}
+  taskRoot: {fileID: 1779676721}
   theoryScroll: {fileID: 1993215119}
   theoryTitle: {fileID: 951606863}
   theoryText: {fileID: 1240672915}
@@ -134924,7 +134924,6 @@ RectTransform:
   m_Children:
   - {fileID: 1475077656}
   - {fileID: 650584944}
-  - {fileID: 1779676721}
   m_Father: {fileID: 1993215117}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -150140,7 +150139,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 78c7f42a7547f22448a621eaeeef3fd2, type: 3}
-    m_FontSize: 27
+    m_FontSize: 26
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 10
@@ -150149,7 +150148,7 @@ MonoBehaviour:
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: 
 --- !u!114 &1240672916
@@ -165050,7 +165049,7 @@ MonoBehaviour:
     minDiameter: 0.18
     maxDiameter: 0.3
   - id: leukocyte
-    mesh: {fileID: 4300000, guid: d613980caf806d7419247156ea51c162, type: 2}
+    mesh: {fileID: 4300000, guid: af38326afe3271944987efc68f3bdef2, type: 2}
     materials:
     - {fileID: 2100000, guid: a5b0c25a60a71d84e97819e06405552e, type: 2}
     - {fileID: 2100000, guid: 9c6218fbd16aecd4cb5d137202cab7b2, type: 2}
@@ -165058,7 +165057,7 @@ MonoBehaviour:
     minDiameter: 0.28
     maxDiameter: 0.38
   - id: platelet
-    mesh: {fileID: 4300000, guid: a6771028bdb43554a9165135177a319e, type: 2}
+    mesh: {fileID: 4300000, guid: 59535709b40c9ce448e6d3ca9a880ffd, type: 2}
     materials:
     - {fileID: 2100000, guid: dfad6bd7b59ff1048acb9d2aab3287ce, type: 2}
     - {fileID: 2100000, guid: 85657ec1039aa604f87fd4527895bd92, type: 2}
@@ -165066,21 +165065,21 @@ MonoBehaviour:
     minDiameter: 0.07
     maxDiameter: 0.12
   - id: albumin
-    mesh: {fileID: 4300000, guid: 6d28f35ce1457214598fa6d7d48a9423, type: 2}
+    mesh: {fileID: 4300000, guid: d77c147f83434934dba74370bfe5f1bf, type: 2}
     materials:
     - {fileID: 2100000, guid: 759860ef1b11e6e4eb4aac4bc72a5edc, type: 2}
     weight: 2
     minDiameter: 0.035
     maxDiameter: 0.065
   - id: globulin
-    mesh: {fileID: 4300000, guid: 465d6c584ac03594a85bd37ecff9bd76, type: 2}
+    mesh: {fileID: 4300000, guid: ed425d16f001d4a408afd5eb452963cd, type: 2}
     materials:
     - {fileID: 2100000, guid: c3ef9e5714ce65e4d8826237f6fb4d57, type: 2}
     weight: 3
     minDiameter: 0.045
     maxDiameter: 0.075
   - id: lipoprotein
-    mesh: {fileID: 4300000, guid: 1bda77fb45fb7af4983a06553da56cc5, type: 2}
+    mesh: {fileID: 4300000, guid: eaf0ed6599906a6439b26eaef3514144, type: 2}
     materials:
     - {fileID: 2100000, guid: cddfb588f75e9f044a984aa77d313e53, type: 2}
     weight: 3
@@ -165101,7 +165100,7 @@ MonoBehaviour:
     minDiameter: 0.025
     maxDiameter: 0.045
   - id: platelet
-    mesh: {fileID: 4300000, guid: 3bcdd82149208494799db94aa9d19826, type: 2}
+    mesh: {fileID: 4300000, guid: 59535709b40c9ce448e6d3ca9a880ffd, type: 2}
     materials:
     - {fileID: 2100000, guid: dfad6bd7b59ff1048acb9d2aab3287ce, type: 2}
     - {fileID: 2100000, guid: 85657ec1039aa604f87fd4527895bd92, type: 2}
@@ -165109,7 +165108,7 @@ MonoBehaviour:
     minDiameter: 0.16
     maxDiameter: 0.22
   - id: phagocyte
-    mesh: {fileID: 4300000, guid: eade65f9b6cdf8e4ab16ba5ff4323618, type: 2}
+    mesh: {fileID: 4300000, guid: d9a8423f51e3e8449adef2666e2cf0fa, type: 2}
     materials:
     - {fileID: 2100000, guid: a055c7e3f2d8a2948901e8afd673c7c1, type: 2}
     weight: 9
@@ -166136,11 +166135,11 @@ MonoBehaviour:
   co2: {fileID: 1829922129}
   heme: {fileID: 635182049}
   gasMesh: {fileID: 4300000, guid: 7d836c860f80f85438d4d01cf623d3f7, type: 2}
-  ironMesh: {fileID: 4300000, guid: e630d644ce6d23a4dbeda559af5c4f5a, type: 2}
+  ironMesh: {fileID: 4300000, guid: f1942476e00ab3f419adc76ba446739e, type: 2}
   co2Mesh: {fileID: 4300000, guid: 29b298bca40510145867f79f5f0fbcf2, type: 2}
   oxygenMaterial: {fileID: 2100000, guid: a055c7e3f2d8a2948901e8afd673c7c1, type: 2}
   co2Material: {fileID: 2100000, guid: a055c7e3f2d8a2948901e8afd673c7c1, type: 2}
-  ironMaterial: {fileID: 2100000, guid: b7362a4e2eab25b4eaa6218cb7818230, type: 2}
+  ironMaterial: {fileID: 2100000, guid: a055c7e3f2d8a2948901e8afd673c7c1, type: 2}
 --- !u!114 &1373304213
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -210422,7 +210421,7 @@ RectTransform:
   - {fileID: 1844821273}
   - {fileID: 209982226}
   - {fileID: 2139847130}
-  m_Father: {fileID: 1116804031}
+  m_Father: {fileID: 1993215117}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -223821,8 +223820,10 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435 \u2014 \u0442\u043E\u043B\u044C\u043A\u043E
-    \u043F\u043E \u0436\u0435\u043B\u0430\u043D\u0438\u044E"
+  m_Text: "\u0421\u043A\u0430\u043D\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435
+    \u043E\u0442\u043A\u0440\u044B\u0432\u0430\u0435\u0442 \u0442\u0435\u043E\u0440\u0438\u044E
+    \xB7 \u043A\u043E\u043B\u0435\u0441\u043E / \u043F\u0440\u0430\u0432\u044B\u0439
+    \u0441\u0442\u0438\u043A"
 --- !u!222 &1892074023
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -227826,8 +227827,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -8, y: -27}
-  m_SizeDelta: {x: -72, y: -294}
+  m_AnchoredPosition: {x: -8, y: 73}
+  m_SizeDelta: {x: -72, y: -494}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1920909150
 MonoBehaviour:
@@ -235855,8 +235856,8 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1993215116}
-  m_LocalRotation: {x: -0.014917572, y: -0.16488431, z: -0.0024940995, w: 0.986197}
-  m_LocalPosition: {x: 0, y: 0, z: 1.25}
+  m_LocalRotation: {x: 0.021338938, y: -0.24404702, z: 0.00537146, w: 0.9695138}
+  m_LocalPosition: {x: 0, y: 0, z: 1.6}
   m_LocalScale: {x: 0.001, y: 0.001, z: 0.001}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -235876,11 +235877,12 @@ RectTransform:
   - {fileID: 650544469}
   - {fileID: 647750191}
   - {fileID: 1630170227}
+  - {fileID: 1779676721}
   m_Father: {fileID: 1839700913}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.43, y: 0.04}
+  m_AnchoredPosition: {x: -0.86, y: -0.08}
   m_SizeDelta: {x: 640, y: 820}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1993215118
@@ -242542,8 +242544,8 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2061878029}
-  m_LocalRotation: {x: -0.10172393, y: 0.2084235, z: 0.021801416, w: 0.9724899}
-  m_LocalPosition: {x: 0, y: 0, z: 1.38}
+  m_LocalRotation: {x: -0.09696562, y: 0.26337075, z: 0.026617512, w: 0.95944}
+  m_LocalPosition: {x: 0, y: 0, z: 1.6}
   m_LocalScale: {x: 0.00095, y: 0.00095, z: 0.00095}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -242567,7 +242569,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.62, y: 0.32}
+  m_AnchoredPosition: {x: 0.95, y: 0.38}
   m_SizeDelta: {x: 780, y: 380}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &2061878031
@@ -252182,7 +252184,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 78c7f42a7547f22448a621eaeeef3fd2, type: 3}
-    m_FontSize: 24
+    m_FontSize: 18
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 10

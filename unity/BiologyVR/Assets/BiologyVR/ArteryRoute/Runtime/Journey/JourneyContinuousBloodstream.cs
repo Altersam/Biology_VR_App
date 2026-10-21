@@ -50,6 +50,7 @@ namespace BiologyVR.ArteryRoute.Journey
         int[] route,forcedBranch,visualType;
         Quaternion[] pose;
         Vector3[] turnStart;
+        Vector3[] fullScales;
         bool[] leaking;
         float[] leakTime;
         Vector3[] leakStart,leakHole;
@@ -78,6 +79,7 @@ namespace BiologyVR.ArteryRoute.Journey
             int count=flow.cells.Length;reserved=new bool[count];local=new bool[count];arc=new float[count];progress=new float[count];speed=new float[count];spin=new float[count];phase=new float[count];laneX=new float[count];laneY=new float[count];route=new int[count];forcedBranch=new int[count];visualType=new int[count];pose=new Quaternion[count];turnStart=new Vector3[count];filters=new MeshFilter[count];renderers=new Renderer[count];
             if(!flow.mission.world.bloodEntities)foreach(var pickup in flow.interactiveCells)if(pickup)reserved[pickup.poolIndex]=true;
             leased=new bool[count];generations=new int[count];reuseAfter=new float[count];brokenUntil=new float[count];
+            fullScales=new Vector3[count];
             leaking=new bool[count];leakTime=new float[count];leakStart=new Vector3[count];leakHole=new Vector3[count];
             for(int i=0;i<count;i++)if(!reserved[i])active.Add(i);
             BackgroundCount=active.Count;BranchPassages=new int[flow.branchPaths.Length];CurrentSpeciesCounts=new int[palette.Length];RunSeed=varySeedEachRun?Environment.TickCount^GetInstanceID():randomSeed;rng=new System.Random(RunSeed);
@@ -112,8 +114,9 @@ namespace BiologyVR.ArteryRoute.Journey
             if(visualType[i]>=0){CurrentSpeciesCounts[visualType[i]]--;if(visualType[i]!=type)RandomSpeciesChanges++;}
             visualType[i]=type;CurrentSpeciesCounts[type]++;var source=palette[type];filters[i].sharedMesh=source.mesh;renderers[i].sharedMaterials=source.materials;
             flow.species[i]=source.id;float extent=Mathf.Max(source.mesh.bounds.size.x,Mathf.Max(source.mesh.bounds.size.y,source.mesh.bounds.size.z));flow.cells[i].localScale=Vector3.one*(Range(source.minDiameter,source.maxDiameter)/Mathf.Max(.001f,extent));
+            fullScales[i]=flow.cells[i].localScale;
             float angle=Range(0,Mathf.PI*2),radius=Mathf.Sqrt(Range(.08f,.85f))*3.25f;laneX[i]=Mathf.Cos(angle)*radius;laneY[i]=Mathf.Sin(angle)*radius;
-            speed[i]=uniformCirculation?Range(1.40f,1.60f):Range(1.15f,2.05f);spin[i]=Range(-18,18);phase[i]=Range(0,Mathf.PI*2);pose[i]=Quaternion.Euler(Range(25,155),Range(0,360),Range(0,360));
+            speed[i]=uniformCirculation?Range(1.40f,1.60f):Range(1.15f,2.05f);spin[i]=Range(-8,8);phase[i]=Range(0,Mathf.PI*2);pose[i]=Quaternion.Euler(Range(25,155),Range(0,360),Range(0,360));
             generations[i]++;
             if(flow.mission.world.freeTools)flow.mission.world.freeTools.payload.UpdateSource(i,source.id);
         }
@@ -145,7 +148,7 @@ namespace BiologyVR.ArteryRoute.Journey
                 float advance=dt*speed[i];
                 if(route[i]<0&&flow.mission.world.hemodynamics)advance*=flow.mission.world.hemodynamics.LocalSpeed(arc[i]);
                 if(route[i]<0&&flow.mission.SceneNumber==6&&flow.mission.world.plaqueChallenge&&arc[i]>flow.path.Anchor(6)-8&&arc[i]<flow.path.Anchor(6)+5)
-                    advance*=flow.mission.world.freeTools?Mathf.Pow(flow.mission.world.plaqueChallenge.FlowFraction,2):Mathf.Lerp(.82f,1,flow.mission.world.plaqueChallenge.FlowFraction);
+                    advance*=flow.mission.world.freeTools?Mathf.Max(.25f,flow.mission.world.plaqueChallenge.FlowFraction):Mathf.Lerp(.82f,1,flow.mission.world.plaqueChallenge.FlowFraction);
                 if(route[i]<0)
                 {
                     float previous=arc[i];arc[i]+=advance;
@@ -169,7 +172,7 @@ namespace BiologyVR.ArteryRoute.Journey
                 bool leftLocal=local[i]&&route[i]<0&&Mathf.Abs(arc[i]-coverageArc)>LocalHalfSpan;
                 // Both endpoints must be outside rendering or the camera frustum.
                 // A turn only reveals already-moving particles, never a camera reset.
-                if(!leased[i]&&(local[i]?leftLocal:pastEnd)&&Time.time>=reuseAfter[i]&&(!uniformCirculation||!local[i]||Time.time>=nextUniformReturn)&&Invisible(i,camera,distance))
+                if(!leased[i]&&(local[i]?leftLocal:pastEnd)&&Time.time>=reuseAfter[i]&&(!uniformCirculation||!local[i]||flow.mover.Moving||Time.time>=nextUniformReturn)&&Invisible(i,camera,distance))
                 {
                     if(TryEntry(i,camera,out float entry))
                     {route[i]=-1;progress[i]=0;SetEntry(i,entry);Randomize(i);Place(i,dt);RecycledCells++;PoolReturns++;reuseAfter[i]=Time.time+Range(.08f,.65f);LastRecycledFrame=Time.frameCount;}
@@ -209,7 +212,7 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         void RefillCoverage(Camera camera,int limit)
         {
-            if(uniformCirculation&&!flow.mover.Moving)return;
+            if(uniformCirculation)return; // The continuous boundary circuit owns uniform slots.
             CountDensity(limit);
             int allowance=limit<flow.cells.Length?3:6,moved=0;
             // Only invisible existing slots can refill under-populated windows.
@@ -236,10 +239,12 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         bool TryLocalEntry(int i,Camera camera,out float entry)
         {
-            if(uniformCirculation&&!flow.mover.Moving&&arc[i]>=coverageArc)
+            if(uniformCirculation)
             {
-                entry=coverageArc-LocalHalfSpan+Range(-.6f,.6f);
-                if(Time.time<nextUniformReturn||GeometryUtility.TestPlanesAABB(planes,new Bounds(MainPoint(entry,0,0),Vector3.one*7.5f)))return false;
+                // Boundary cells are already scaled to zero, independent of gaze.
+                // During travel seed ahead of the observer; at rest feed upstream.
+                entry=coverageArc+(flow.mover.Moving?1:-1)*LocalHalfSpan;
+                if(!flow.mover.Moving&&Time.time<nextUniformReturn)return false;
                 nextUniformReturn=Time.time+LocalHalfSpan*2/Mathf.Max(1,localBudget*1.5f);return true;
             }
             if(!uniformCirculation&&(flow.mission.SceneNumber==3&&flow.mission.world.bloodEntities||flow.mission.SceneNumber==6&&flow.mission.world.freeTools)&&!flow.mover.Moving)
@@ -306,6 +311,7 @@ namespace BiologyVR.ArteryRoute.Journey
         }
         bool Invisible(int i,Camera camera,float distance)
         {
+            if(uniformCirculation&&local[i]&&Mathf.Abs(arc[i]-coverageArc)>=LocalHalfSpan)return true;
             if(distance>visibleDistance+2||!GeometryUtility.TestPlanesAABB(planes,new Bounds(flow.cells[i].position,Vector3.one)))return true;
             if(!uniformCirculation||!local[i]||Mathf.Abs(arc[i]-coverageArc)<LocalHalfSpan)return false;
             var point=flow.cells[i].position;var right=camera.transform.right*.28f;
@@ -360,7 +366,10 @@ namespace BiologyVR.ArteryRoute.Journey
                 if(p>branch.Length)next+=branch.Forward(branch.Length)*(p-branch.Length);
                 float t=Mathf.SmoothStep(0,1,Mathf.Clamp01(p/4));point=Vector3.Lerp(turnStart[i]+flow.path.Forward(flow.branchEntries[route[i]])*p*.15f,next,t);frame=Quaternion.Slerp(flow.path.Frame(flow.branchEntries[route[i]]),branch.Frame(safe),t);
             }
-            flow.cells[i].SetPositionAndRotation(point,frame*pose[i]*Quaternion.AngleAxis(SimulatedSeconds*spin[i],Vector3.up));
+            var rotation=frame*pose[i]*Quaternion.AngleAxis(SimulatedSeconds*spin[i],Vector3.up);
+            float visibility=uniformCirculation&&local[i]&&route[i]<0?1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(LocalHalfSpan-4,LocalHalfSpan,Mathf.Abs(arc[i]-coverageArc))):1;
+            flow.cells[i].localScale=fullScales[i]*visibility;
+            flow.cells[i].SetPositionAndRotation(point,dt>0?Quaternion.RotateTowards(flow.cells[i].rotation,rotation,22*dt):rotation);
         }
     }
 }

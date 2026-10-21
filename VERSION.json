@@ -1,10 +1,10 @@
 {
-  "version": "0.9.0",
+  "version": "0.10.0",
   "unity": "6000.1.9f1",
-  "art": "Immune patrol integrated into Scene10; six tissue focuses, pooled leukocytes, existing Reverse/cutaway; visible-wound platelet adhesion and remote plug balance; unified Scanner instructions",
-  "updated_utc": "2026-10-19T03:42:10.168187+00:00",
-  "webgl_version": "0.9.0",
-  "android_release_version": "0.9.0",
+  "art": "Full linked learning cards after Scanner; unified screen placement; continuous pooled blood with centred particles and rounded heme/iron; independent controller guides; immune patrol and readable wound preserved",
+  "updated_utc": "2026-10-21T05:57:47.417712+00:00",
+  "webgl_version": "0.10.0",
+  "android_release_version": "0.10.0",
   "releases": [
     {
       "file": "BiologyVR_MetaQuest.apk",
@@ -87,9 +87,25 @@
       "version": "0.9.0",
       "device": "Meta Quest 2 / Pro / 3 / 3S",
       "tag": "v0.9.0"
+    },
+    {
+      "file": "BiologyVR_Pico4_v0.10.0.apk",
+      "bytes": 84055381,
+      "sha256": "456e81a69a032ef00c85f0c452a682076346cb85fc1bb179eaa97a7c4a7f2659",
+      "version": "0.10.0",
+      "device": "PICO 4 / PICO 4 Enterprise",
+      "tag": "v0.10.0"
+    },
+    {
+      "file": "BiologyVR_MetaQuest_v0.10.0.apk",
+      "bytes": 83171174,
+      "sha256": "d86f65231b2f8e474edd640e716cb8e889f3d1db67f271f2270d2f3fb8d430e8",
+      "version": "0.10.0",
+      "device": "Meta Quest 2 / Pro / 3 / 3S",
+      "tag": "v0.10.0"
     }
   ],
-  "pico_release_version": "0.9.0",
-  "quest_release_version": "0.9.0",
-  "android_version_code": 10
+  "pico_release_version": "0.10.0",
+  "quest_release_version": "0.10.0",
+  "android_version_code": 11
 }

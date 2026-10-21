@@ -13,6 +13,6 @@ namespace BiologyVR.ArteryRoute.Journey
             lines=visuals.SelectMany(b=>b.GetComponentsInChildren<LineRenderer>(true)).Distinct().ToArray();Apply();
         }
         void Update(){if(xr!=XRSettings.isDeviceActive)Apply();}
-        void Apply(){xr=XRSettings.isDeviceActive;if(visuals!=null)foreach(var visual in visuals)if(visual)visual.enabled=xr;if(lines!=null)foreach(var line in lines)if(line)line.enabled=xr;}
+        void Apply(){xr=XRSettings.isDeviceActive;bool ownGuides=GetComponentInParent<JourneyInstrumentRig>()||GetComponentInChildren<JourneyInstrumentRig>();if(visuals!=null)foreach(var visual in visuals)if(visual)visual.enabled=xr&&!ownGuides;if(lines!=null)foreach(var line in lines)if(line)line.enabled=xr&&!ownGuides;}
     }
 }

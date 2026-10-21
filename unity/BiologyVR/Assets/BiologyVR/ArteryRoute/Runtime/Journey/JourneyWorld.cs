@@ -324,6 +324,13 @@ namespace BiologyVR.ArteryRoute.Journey
             else if(goal!=null)FocusId=goal.target;
             if(art)art.PrepareGoal(goal);
             else if(mission.SceneNumber==3)PrepareBloodLesson();
+            if(mission.SceneNumber==16)
+            {
+                // Legacy aggregate sensors occupy the same rays as the six real checks.
+                foreach(var id in new[]{"vitals","homeostasis"}){var old=Find(id);if(old)old.gameObject.SetActive(false);}
+                foreach(var sensor in targets)if(sensor&&sensor.targetId.StartsWith("check-"))
+                {var contact=sensor.GetComponent<SphereCollider>();if(contact){contact.radius=.75f;contact.enabled=goal?.target==sensor.targetId;}}
+            }
             if(mission.SceneNumber==15&&!Victory)
             {
                 bool binding=goal?.action==StudyAction.Bind;
