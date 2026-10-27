@@ -1,0 +1,25 @@
+{
+  "utc": "2026-10-27T15:28:09.9244176Z",
+  "running": false,
+  "passed": true,
+  "note": "simulated input in the editor; not a headset test",
+  "log": [
+    "fps(editor, first 6 s) ≈ 293; cells drawn 251",
+    "0,0s beat 0 · ",
+    "0,4s beat 1 · Датчик 1/6 · пульс: проплыви сквозь кольцо",
+    "0,5s beat 1 · Датчик 2/6 · давление: проплыви сквозь кольцо",
+    "2,7s beat 1 · Сожми сосуд и смотри на пульс и давление",
+    "9,5s beat 1 · Датчик 3/6 · кислород (spo₂): проплыви сквозь кольцо",
+    "9,6s beat 2 · Датчик 4/6 · температура: проплыви сквозь кольцо",
+    "16,1s beat 2 · Датчик 5/6 · глюкоза: проплыви сквозь кольцо",
+    "22,5s beat 2 · Датчик 6/6 · кислотность (ph): проплыви сквозь кольцо",
+    "29,2s beat 3 · Плыви к выходу",
+    "29,4s beat 4 · Итоговый отчёт",
+    "32,3s beat 4 · Путешествие завершено",
+    "finished: stars 3, predictions 1, knowledge 4/4 · ch6 beat 4 · Путешествие завершено · s=2270 · flow=1,01 · stars 3 · read 6/6 · hr 72 · sys 120 · t 36,7 · drop 1,4",
+    "swim test: moved 11,7 m in 2.5 s; speed over wall 5,2 m/s; inside lumen r=0,2 of R=6,3",
+    "result: ok"
+  ],
+  "errors": [
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "utc": "2026-10-27T17:22:58.728480+00:00",
+  "version": "0.11.0",
+  "version_code": 12,
+  "application_id": "com.biologyvr.biologyvr2",
+  "tools": "androguard 4.1 (manifest), apksigtool (APK Signature Scheme v2), zip listing (one scene: level0)",
+  "passed": true,
+  "apks": [
+    {
+      "file": "BiologyVR2_Pico4_v0.11.0.apk",
+      "bytes": 60260119,
+      "sha256": "66f608f83a87a5d513435b67e389cc997d2e19d35b1f10da69316391085948d1",
+      "package": "com.biologyvr.biologyvr2",
+      "versionName": "0.11.0",
+      "versionCode": "12",
+      "label": "Biology VR 2",
+      "minSdk": "29",
+      "targetSdk": "34",
+      "vendor_meta": {
+        "pvr.app.type": "vr",
+        "pvr.sdk.version": "Unity OpenXR 1.4.1",
+        "pvr.app.splash": "0"
+      },
+      "checks": {
+        "application_id": true,
+        "app_name": true,
+        "version": true,
+        "min_sdk_29": true,
+        "target_sdk_34": true,
+        "arm64_only": true,
+        "unity_runtime": true,
+        "il2cpp_runtime": true,
+        "openxr_runtime": true,
+        "signed_v2_or_v3": true,
+        "pico_vr_manifest": true,
+        "pico_sdk_manifest": true,
+        "signature_v2_verified": true
+      },
+      "passed": true,
+      "native_count": 15
+    },
+    {
+      "file": "BiologyVR2_MetaQuest_v0.11.0.apk",
+      "bytes": 59375988,
+      "sha256": "ff8be4dbec9ef93cad8a5342e19c8be2ff007de98c120de0109d1f163d4d2b27",
+      "package": "com.biologyvr.biologyvr2",
+      "versionName": "0.11.0",
+      "versionCode": "12",
+      "label": "Biology VR 2",
+      "minSdk": "29",
+      "targetSdk": "34",
+      "vendor_meta": {
+        "com.oculus.vr.focusaware": "true",
+        "com.oculus.supportedDevices": "quest2|cambria|eureka|quest3s"
+      },
+      "checks": {
+        "application_id": true,
+        "app_name": true,
+        "version": true,
+        "min_sdk_29": true,
+        "target_sdk_34": true,
+        "arm64_only": true,
+        "unity_runtime": true,
+        "il2cpp_runtime": true,
+        "openxr_runtime": true,
+        "signed_v2_or_v3": true,
+        "quest_devices_manifest": true,
+        "quest_vr_category": true,
+        "no_pico_plugins": true,
+        "signature_v2_verified": true
+      },
+      "passed": true,
+      "native_count": 10
+    }
+  ],
+  "headset_verified": false
+}

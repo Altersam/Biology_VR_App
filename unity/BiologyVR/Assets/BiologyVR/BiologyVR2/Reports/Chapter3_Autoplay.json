@@ -1,0 +1,29 @@
+{
+  "utc": "2026-10-27T15:37:13.2586199Z",
+  "running": false,
+  "passed": true,
+  "note": "simulated input in the editor; not a headset test",
+  "log": [
+    "fps(editor, first 6 s) ≈ 246; cells drawn 229",
+    "0,0s beat 0 · Посмотри на температуру на запястье",
+    "0,5s beat 1 · Найди чужую частицу и отсканируй",
+    "6,9s beat 2 · Раскрой оболочку вируса",
+    "7,4s beat 2 · Отсканируй шип на оболочке",
+    "16,0s beat 3 · Отсканируй шип на оболочке",
+    "16,1s beat 3 · антитела",
+    "22,5s beat 4 · антитела",
+    "22,6s beat 4 · сигнал",
+    "35,3s beat 5 · сигнал",
+    "35,5s beat 5 · волна 1",
+    "75,5s beat 5 · волна 2",
+    "161,5s beat 5 · волна 3",
+    "215,8s beat 6 · волна 3",
+    "222,3s beat 6 · синхронизация",
+    "225,5s beat 7 · Глава 3 пройдена",
+    "finished: stars 2, predictions 1, knowledge 6/6 · ch3 beat 7 · Глава 3 пройдена · s=1480 · flow=1,18 · stars 2 · wave 3 · alive 0 · killed 92 · load 0,94 · t 39,3",
+    "swim test: moved 12,1 m in 2.5 s; speed over wall 5,3 m/s; inside lumen r=1,4 of R=6,3",
+    "result: ok"
+  ],
+  "errors": [
+  ]
+}

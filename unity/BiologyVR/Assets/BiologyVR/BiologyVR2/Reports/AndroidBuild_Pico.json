@@ -1,0 +1,23 @@
+{
+  "utc": "2026-10-27T17:20:40.2722419Z",
+  "headset": "Pico",
+  "device": "PICO 4 / PICO 4 Enterprise",
+  "result": "Succeeded",
+  "unityResult": "Succeeded",
+  "errors": 0,
+  "warnings": 14,
+  "errorMessages": [],
+  "seconds": 192.89857429999998,
+  "path": "Z:\\BiologyVR_bio_03\\Builds\\BiologyVR2\\BiologyVR2_Pico4_v0.11.0.apk",
+  "file": "BiologyVR2_Pico4_v0.11.0.apk",
+  "bytes": 60260119,
+  "sha256": "66f608f83a87a5d513435b67e389cc997d2e19d35b1f10da69316391085948d1",
+  "scene": "Assets/BiologyVR/BiologyVR2/Scenes/BiologyVR2.unity",
+  "appId": "com.biologyvr.biologyvr2",
+  "productName": "Biology VR 2",
+  "version": "0.11.0",
+  "versionCode": 12,
+  "msaa": 4,
+  "renderScale": 1.0,
+  "headsetVerified": false
+}

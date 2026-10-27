@@ -1,10 +1,10 @@
 {
-  "version": "0.10.0",
+  "version": "0.11.0",
   "unity": "6000.1.9f1",
-  "art": "Full linked learning cards after Scanner; unified screen placement; continuous pooled blood with centred particles and rounded heme/iron; independent controller guides; immune patrol and readable wound preserved",
-  "updated_utc": "2026-10-21T05:57:47.417712+00:00",
+  "art": "Biology VR 2: lab prologue + six chapters in one artery (flow, plaque, first contact, wound, focus, homeostasis); professor hologram with subtitles",
+  "updated_utc": "2026-10-27T17:31:07.479253+00:00",
   "webgl_version": "0.10.0",
-  "android_release_version": "0.10.0",
+  "android_release_version": "0.11.0",
   "releases": [
     {
       "file": "BiologyVR_MetaQuest.apk",
@@ -103,9 +103,35 @@
       "version": "0.10.0",
       "device": "Meta Quest 2 / Pro / 3 / 3S",
       "tag": "v0.10.0"
+    },
+    {
+      "file": "BiologyVR2_Pico4_v0.11.0.apk",
+      "bytes": 60260119,
+      "sha256": "66f608f83a87a5d513435b67e389cc997d2e19d35b1f10da69316391085948d1",
+      "version": "0.11.0",
+      "version_code": 12,
+      "application_id": "com.biologyvr.biologyvr2",
+      "device": "PICO 4 / PICO 4 Enterprise",
+      "tag": "v0.11.0",
+      "headset_verified": false
+    },
+    {
+      "file": "BiologyVR2_MetaQuest_v0.11.0.apk",
+      "bytes": 59375988,
+      "sha256": "ff8be4dbec9ef93cad8a5342e19c8be2ff007de98c120de0109d1f163d4d2b27",
+      "version": "0.11.0",
+      "version_code": 12,
+      "application_id": "com.biologyvr.biologyvr2",
+      "device": "Meta Quest 2 / Pro / 3 / 3S",
+      "tag": "v0.11.0",
+      "headset_verified": false
     }
   ],
-  "pico_release_version": "0.10.0",
-  "quest_release_version": "0.10.0",
-  "android_version_code": 11
+  "pico_release_version": "0.11.0",
+  "quest_release_version": "0.11.0",
+  "android_version_code": 12,
+  "product": "Biology VR 2",
+  "android_application_id": "com.biologyvr.biologyvr2",
+  "previous_android_application_id": "com.biologyvr.arteryjourney",
+  "headset_verified": false
 }

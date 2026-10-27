@@ -1,0 +1,31 @@
+{
+  "utc": "2026-10-27T15:31:12.2954314Z",
+  "running": false,
+  "passed": true,
+  "note": "simulated input in the editor; not a headset test",
+  "log": [
+    "fps(editor, first 6 s) ≈ 227; cells drawn 232",
+    "0,0s beat 0 · Посмотри на пульс и давление",
+    "6,7s beat 1 · Найди место утечки",
+    "6,9s beat 1 · Прицепись к маяку у разрыва",
+    "7,0s beat 1 · Отсканируй разрыв",
+    "15,4s beat 2 · Сожми сосуд полем",
+    "22,4s beat 3 · Сожми сосуд полем",
+    "22,7s beat 3 · Закрой разрыв пробкой",
+    "33,2s beat 4 · Закрой разрыв пробкой",
+    "33,5s beat 4 · Запусти свёртывание: звенья по порядку",
+    "41,5s beat 5 · Запусти свёртывание: звенья по порядку",
+    "41,7s beat 5 · Прошей пробку фибрином",
+    "43,5s beat 6 · Прошей пробку фибрином",
+    "43,6s beat 6 · Срежь лишние сгустки",
+    "44,6s beat 7 · Срежь лишние сгустки",
+    "44,7s beat 7 · Позови макрофагов к обломкам",
+    "59,1s beat 7 · Рана заживает",
+    "59,9s beat 8 · Глава 4 пройдена",
+    "finished: stars 2, predictions 1, knowledge 6/6 · ch4 beat 8 · Глава 4 пройдена · s=1795 · flow=0,98 · stars 2 · sealed 9/9 · leak 0,00 · fibrin 1,26 · vol 4,94 · sys 116 · hr 74 · torn 1 · strays 2 · rollbacks 0",
+    "swim test: moved 9,7 m in 2.5 s; speed over wall 4,8 m/s; inside lumen r=5,2 of R=6,3",
+    "result: ok"
+  ],
+  "errors": [
+  ]
+}

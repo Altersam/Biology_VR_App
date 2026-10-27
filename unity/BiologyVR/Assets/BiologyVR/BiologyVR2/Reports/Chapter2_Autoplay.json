@@ -1,0 +1,24 @@
+{
+  "utc": "2026-10-27T15:29:42.9436297Z",
+  "running": false,
+  "passed": true,
+  "note": "simulated input in the editor; not a headset test",
+  "log": [
+    "fps(editor, first 6 s) ≈ 248; cells drawn 228",
+    "0,0s beat 0 · Посмотри на кровоток на запястье",
+    "0,5s beat 1 · Найди, что мешает кровотоку",
+    "0,7s beat 1 · Отсканируй вздутие на стенке",
+    "7,2s beat 1 · Отсканируй клетку на бляшке",
+    "15,7s beat 2 · Прицепись к маяку напротив бляшки",
+    "15,9s beat 2 · Растопи жир в бляшке",
+    "19,9s beat 3 · Растопи жир в бляшке",
+    "22,1s beat 3 · Отсканируй то, что растёт на разрыве",
+    "36,7s beat 4 · Отсканируй то, что растёт на разрыве",
+    "59,1s beat 5 · Глава 2 пройдена",
+    "finished: stars 3, predictions 1, knowledge 6/6 · ch2 beat 5 · Глава 2 пройдена · s=1072 · flow=0,84 · stars 3 · lipids 6/6 · cap 100% · embolus Dissolved",
+    "swim test: moved 5,2 m in 2.5 s; speed over wall 0,5 m/s; inside lumen r=4,9 of R=6,0",
+    "result: ok"
+  ],
+  "errors": [
+  ]
+}

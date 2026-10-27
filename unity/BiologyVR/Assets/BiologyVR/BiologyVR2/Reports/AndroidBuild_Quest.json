@@ -1,0 +1,23 @@
+{
+  "utc": "2026-10-27T17:21:31.1421194Z",
+  "headset": "Quest",
+  "device": "Meta Quest 2 / Pro / 3 / 3S",
+  "result": "Succeeded",
+  "unityResult": "Succeeded",
+  "errors": 0,
+  "warnings": 13,
+  "errorMessages": [],
+  "seconds": 46.3604661,
+  "path": "Z:\\BiologyVR_bio_03\\Builds\\BiologyVR2\\BiologyVR2_MetaQuest_v0.11.0.apk",
+  "file": "BiologyVR2_MetaQuest_v0.11.0.apk",
+  "bytes": 59375988,
+  "sha256": "ff8be4dbec9ef93cad8a5342e19c8be2ff007de98c120de0109d1f163d4d2b27",
+  "scene": "Assets/BiologyVR/BiologyVR2/Scenes/BiologyVR2.unity",
+  "appId": "com.biologyvr.biologyvr2",
+  "productName": "Biology VR 2",
+  "version": "0.11.0",
+  "versionCode": 12,
+  "msaa": 4,
+  "renderScale": 1.0,
+  "headsetVerified": false
+}

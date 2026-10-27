@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Endothelium
+  m_Shader: {fileID: 4800000, guid: 17a05b4eedc5f244a8174e49dd6522eb, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _NormalTex:
+        m_Texture: {fileID: 2800000, guid: e554788337fe3864896948bf8492a04c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _PatternTex:
+        m_Texture: {fileID: 2800000, guid: 7836e354f2ef4ef4290900fc3b5f8b6e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _Gloss: 0.86
+    - _NormalStrength: 0.6
+    - _Translucency: 0.6
+    m_Colors:
+    - _Base: {r: 0.8, g: 0.28, b: 0.29, a: 1}
+    - _Deep: {r: 0.42, g: 0.09, b: 0.12, a: 1}
+    - _Nucleus: {r: 0.68, g: 0.3, b: 0.45, a: 1}
+    - _Sheen: {r: 1, g: 0.86, b: 0.8, a: 1}
+    - _Tiling: {r: 10, g: 12, b: 0, a: 0}
+    - _WindowEdge: {r: 0.34999996, g: 0.95, b: 1, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
