@@ -30,8 +30,8 @@ namespace BiologyVR.V2.Editor
     /// </summary>
     public static class Bvr2AndroidBuild
     {
-        public const string Version = "0.11.0";
-        public const int AndroidCode = 12;
+        public const string Version = "0.12.0";
+        public const int AndroidCode = 13;
         public const string AppId = "com.biologyvr.biologyvr2";
         public const string ProductName = "Biology VR 2";
         const string MobileUrp = "Assets/BiologyVR/ArteryJourney/Generated/ArteryQuestPico_URP.asset";
@@ -120,6 +120,9 @@ namespace BiologyVR.V2.Editor
                 string apk = Path.Combine(folder, ApkName(headset));
                 var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions { scenes = new[] { Bvr2SceneBuilder.ScenePath }, locationPathName = apk, target = BuildTarget.Android, options = BuildOptions.None });
                 bool exists = File.Exists(apk) && new FileInfo(apk).Length > 0;
+                // force the APK out of the OS write cache: on 28.10 the PC dropped off right after a build and the
+                // Quest APK came back with 48 MB of zeros although its hash had been computed from the cache
+                if (exists) using (var fs = new FileStream(apk, FileMode.Open, FileAccess.ReadWrite, FileShare.Read)) fs.Flush(true);
                 var errors = report.steps.SelectMany(s => s.messages).Where(m => m.type == LogType.Error || m.type == LogType.Exception).Select(m => m.content).Take(12).ToArray();
                 return new Dictionary<string, object>
                 {

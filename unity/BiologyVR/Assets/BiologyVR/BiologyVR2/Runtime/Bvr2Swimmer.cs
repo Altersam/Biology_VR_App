@@ -31,6 +31,8 @@ namespace BiologyVR.V2
         public Vector3 externalPull;
         [Header("Room mode (the lab prelude): walk on a floor, no blood current, no vessel walls")]
         public bool roomMode; public Vector3 roomCentre; public float roomRadius = 5.5f, walkSpeed = 2.2f;
+        /// <summary>Room mode with several rooms: walkable rectangles (x, z) in roomSpace local coordinates; replaces the circle when set.</summary>
+        public Rect[] roomRects; public Transform roomSpace;
         public bool frozen;
 
         public Vector3 Velocity { get; private set; }
@@ -47,6 +49,20 @@ namespace BiologyVR.V2
         Vector3 boostDir;
 
         public Vector3 HeadPosition => rig && rig.head ? rig.head.transform.position : transform.position;
+
+        /// <summary>Keeps a point inside the union of the walkable rectangles (nearest point when outside).</summary>
+        public Vector3 ClampToRooms(Vector3 world)
+        {
+            Vector3 l = roomSpace.InverseTransformPoint(world);
+            Vector2 q = new Vector2(l.x, l.z), best = q; float bestD = float.MaxValue;
+            foreach (var r in roomRects)
+            {
+                var c = new Vector2(Mathf.Clamp(q.x, r.xMin, r.xMax), Mathf.Clamp(q.y, r.yMin, r.yMax));
+                float d = (c - q).sqrMagnitude; if (d < bestD) { bestD = d; best = c; if (d == 0) break; }
+            }
+            l.x = best.x; l.z = best.y;
+            Vector3 w = roomSpace.TransformPoint(l); w.y = world.y; return w;
+        }
 
         public void Teleport(Vector3 world, Vector3 lookDir)
         {
@@ -82,8 +98,12 @@ namespace BiologyVR.V2
                 Vector3 w = fl * input.Move.y + rt * input.Move.x; if (w.sqrMagnitude > 1f) w.Normalize();
                 Velocity = Bvr2Math.Damp(Velocity, w * walkSpeed, 8f, dt);
                 Vector3 p = transform.position + Velocity * dt;
-                Vector3 flat = p - roomCentre; flat.y = 0;
-                if (flat.magnitude > roomRadius) p -= flat.normalized * (flat.magnitude - roomRadius);
+                if (roomRects != null && roomRects.Length > 0 && roomSpace) p = ClampToRooms(p);
+                else
+                {
+                    Vector3 flat = p - roomCentre; flat.y = 0;
+                    if (flat.magnitude > roomRadius) p -= flat.normalized * (flat.magnitude - roomRadius);
+                }
                 transform.position = p; rig.SetVignette(0);
                 return;
             }

@@ -414,7 +414,8 @@ namespace BiologyVR.V2
             NoPrompt();
             game.Reveal("narrowing", game.vessel.Centre(centre));
             yield return WaitKnowledge();
-            yield return Say($"Просвет меньше всего на пятую часть, а крови проходит {Mathf.RoundToInt(o.LocalFlow * 100)} %! И давление подросло: сердцу тяжелее.", Mood.Surprised);
+            Hud.Toast($"КРОВОТОК {Mathf.RoundToInt(o.LocalFlow * 100)} %", Bvr2Style.Danger, 3.5f); // the number on the visor, the voice stays fixed
+            yield return Say("Просвет меньше всего на пятую часть, а крови проходит вдвое меньше! И давление подросло: сердцу тяжелее.", Mood.Surprised);
             Objective("Верни сосуд в норму");
             while (Mathf.Abs(f.Factor - 1f) > 0.05f)
             {

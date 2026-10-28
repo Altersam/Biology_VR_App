@@ -32,6 +32,7 @@ Material:
     - _Alpha: 0.55
     - _Holo: 0.8
     - _Reveal: 1
+    - _Solid: 0
     m_Colors:
     - _ClipPlane: {r: 0, g: 0, b: 0, a: 0}
     - _Emission: {r: 0, g: 0, b: 0, a: 1}

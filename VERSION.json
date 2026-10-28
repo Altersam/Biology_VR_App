@@ -1,10 +1,10 @@
 {
-  "version": "0.11.0",
+  "version": "0.12.0",
   "unity": "6000.1.9f1",
-  "art": "Biology VR 2: lab prologue + six chapters in one artery (flow, plaque, first contact, wound, focus, homeostasis); professor hologram with subtitles",
-  "updated_utc": "2026-10-27T17:31:07.479253+00:00",
+  "art": "Biology VR 2: lab prologue in the SecVarLab room + six chapters in one artery (flow, plaque, first contact, wound, focus, homeostasis); voiced professor (full height in the lab, comm screen in the artery) with subtitles and lip sync",
+  "updated_utc": "2026-10-28T15:49:37.561324+00:00",
   "webgl_version": "0.10.0",
-  "android_release_version": "0.11.0",
+  "android_release_version": "0.12.0",
   "releases": [
     {
       "file": "BiologyVR_MetaQuest.apk",
@@ -125,11 +125,33 @@
       "device": "Meta Quest 2 / Pro / 3 / 3S",
       "tag": "v0.11.0",
       "headset_verified": false
+    },
+    {
+      "file": "BiologyVR2_Pico4_v0.12.0.apk",
+      "bytes": 70396291,
+      "sha256": "b0e74c101094a785e31b1f626373d5a5316357dc306d08cb54170e7991ea6d72",
+      "version": "0.12.0",
+      "version_code": 13,
+      "application_id": "com.biologyvr.biologyvr2",
+      "device": "PICO 4 / PICO 4 Enterprise",
+      "tag": "v0.12.0",
+      "headset_verified": false
+    },
+    {
+      "file": "BiologyVR2_MetaQuest_v0.12.0.apk",
+      "bytes": 69512076,
+      "sha256": "925c5434bdfeb2611ce4b5b5f6feb3f1a30a4cc085c01a4e5b58be2095b3a1c8",
+      "version": "0.12.0",
+      "version_code": 13,
+      "application_id": "com.biologyvr.biologyvr2",
+      "device": "Meta Quest 2 / Pro / 3 / 3S",
+      "tag": "v0.12.0",
+      "headset_verified": false
     }
   ],
-  "pico_release_version": "0.11.0",
-  "quest_release_version": "0.11.0",
-  "android_version_code": 12,
+  "pico_release_version": "0.12.0",
+  "quest_release_version": "0.12.0",
+  "android_version_code": 13,
   "product": "Biology VR 2",
   "android_application_id": "com.biologyvr.biologyvr2",
   "previous_android_application_id": "com.biologyvr.arteryjourney",

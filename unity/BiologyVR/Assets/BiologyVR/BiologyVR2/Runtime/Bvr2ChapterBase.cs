@@ -83,7 +83,7 @@ namespace BiologyVR.V2
             game.swimmer.externalPull = Vector3.zero; game.organism.leakRate = 0; game.blood.ClearSink();
             game.field.Deactivate(); game.field.scenarioFactor = 1f; game.field.SetFactor(1f); game.field.debugGrab = false;
             game.organism.stressDrive = 0;
-            Hud.SetCompass(null, null); Hud.SetPrompt(""); Hud.SetObjective(""); Hud.TopHidden = false; Prof.Interrupt();
+            Hud.SetCompass(null, null); Hud.SetPrompt(""); Hud.SetObjective(""); Hud.TopHidden = false; Prof.Interrupt(); Prof.LeaveStage();
             if (game.question) game.question.Cancel();
             game.CancelKnowledge();
             Bvr2Environment.Current?.SetFocus(false); game.blood.ClearFocus();

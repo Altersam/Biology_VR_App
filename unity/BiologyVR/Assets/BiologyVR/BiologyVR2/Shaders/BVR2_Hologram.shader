@@ -15,6 +15,7 @@ Shader "BVR2/Hologram"
         _RevealAxis ("Reveal axis (world)", Vector) = (0, 1, 0, 0)
         _ClipPlane ("Clip plane (world normal xyz, w); zero = off", Vector) = (0, 0, 0, 0)
         _Emission ("Emission", Color) = (0, 0, 0, 1)
+        _Solid ("Solid (physical presence, no hologram look)", Range(0, 1)) = 0
     }
     SubShader
     {
@@ -31,7 +32,7 @@ Shader "BVR2/Hologram"
             #pragma multi_compile_instancing
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             CBUFFER_START(UnityPerMaterial)
-            float4 _MainTex_ST; half4 _Tint, _RimColor, _Emission; half _Alpha, _Holo, _Reveal; float4 _RevealRange, _RevealAxis, _ClipPlane;
+            float4 _MainTex_ST; half4 _Tint, _RimColor, _Emission; half _Alpha, _Holo, _Reveal, _Solid; float4 _RevealRange, _RevealAxis, _ClipPlane;
             CBUFFER_END
             struct A { float4 p:POSITION; UNITY_VERTEX_INPUT_INSTANCE_ID };
             struct V { float4 p:SV_POSITION; float3 ws:TEXCOORD0; UNITY_VERTEX_OUTPUT_STEREO };
@@ -59,7 +60,7 @@ Shader "BVR2/Hologram"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             TEXTURE2D(_MainTex); SAMPLER(sampler_MainTex);
             CBUFFER_START(UnityPerMaterial)
-            float4 _MainTex_ST; half4 _Tint, _RimColor, _Emission; half _Alpha, _Holo, _Reveal; float4 _RevealRange, _RevealAxis, _ClipPlane;
+            float4 _MainTex_ST; half4 _Tint, _RimColor, _Emission; half _Alpha, _Holo, _Reveal, _Solid; float4 _RevealRange, _RevealAxis, _ClipPlane;
             CBUFFER_END
             struct A { float4 p:POSITION; float3 n:NORMAL; float2 uv:TEXCOORD0; UNITY_VERTEX_INPUT_INSTANCE_ID };
             struct V { float4 p:SV_POSITION; float3 ws:TEXCOORD0; half3 n:TEXCOORD1; float2 uv:TEXCOORD2; UNITY_VERTEX_OUTPUT_STEREO };
@@ -86,12 +87,13 @@ Shader "BVR2/Hologram"
                 half scan = 0.85 + 0.15 * sin(i.ws.y * 220.0 - _Time.y * 6.0);
                 half flick = 0.94 + 0.06 * sin(_Time.y * 37.0) * sin(_Time.y * 13.0);
                 half3 col = tex.rgb * lit;
-                col = lerp(col, col * scan + _RimColor.rgb * 0.12, _Holo);
-                col += _RimColor.rgb * fres * (0.35 + _Holo);
+                half holo = _Holo * (1.0 - _Solid);
+                col = lerp(col, col * scan + _RimColor.rgb * 0.12, holo);
+                col += _RimColor.rgb * fres * (0.35 + _Holo) * (1.0 - 0.9 * _Solid);
                 col += _RimColor.rgb * edge * 2.5;
                 col += _Emission.rgb;
-                half a = _Alpha * lerp(1.0, scan, _Holo * 0.5) * flick;
-                a = saturate(a + fres * 0.3 + edge);
+                half a = lerp(_Alpha * lerp(1.0, scan, holo * 0.5) * flick, 1.0, _Solid);
+                a = saturate(a + fres * 0.3 * (1.0 - _Solid) + edge);
                 return half4(col, a);
             }
             ENDHLSL

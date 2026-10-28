@@ -1,19 +1,21 @@
-# Biology VR App — 0.11.0 · Biology VR 2 (предпросмотр)
+# Biology VR App — 0.12.0 · Biology VR 2 (предпросмотр)
 
 Учебная VR-игра о крови и сосудах для 8–9 классов. Рабочий проект — **bio_0.3**, Unity **6000.1.9f1**.
 
-[PICO APK](https://github.com/Altersam/Biology_VR_App/releases/download/v0.11.0/BiologyVR2_Pico4_v0.11.0.apk) · [Quest / Oculus APK](https://github.com/Altersam/Biology_VR_App/releases/download/v0.11.0/BiologyVR2_MetaQuest_v0.11.0.apk) · [Релиз v0.11.0](https://github.com/Altersam/Biology_VR_App/releases/tag/v0.11.0) · [Прежняя версия 0.10.0](https://github.com/Altersam/Biology_VR_App/releases/tag/v0.10.0)
+[PICO APK](https://github.com/Altersam/Biology_VR_App/releases/download/v0.12.0/BiologyVR2_Pico4_v0.12.0.apk) · [Quest / Oculus APK](https://github.com/Altersam/Biology_VR_App/releases/download/v0.12.0/BiologyVR2_MetaQuest_v0.12.0.apk) · [Релиз v0.12.0](https://github.com/Altersam/Biology_VR_App/releases/tag/v0.12.0) · [Прошлый релиз v0.11.0](https://github.com/Altersam/Biology_VR_App/releases/tag/v0.11.0) · [Прежняя игра 0.10.0](https://github.com/Altersam/Biology_VR_App/releases/tag/v0.10.0)
 
 ## Biology VR 2 — новая игра
 
-Полностью переработанная игра: пролог в лаборатории профессора и шесть глав в одной артерии — «Поток», «Бляшка», «Первый контакт», «Прорыв», «Очаг», «Гомеостаз». Свободное плавание, способности BioTool (Притяжение, Импульс, Сигнал, Фактор), опыты с прогнозами, 38 знаний, профессор-голограмма с субтитрами.
+Полностью переработанная игра: пролог в лаборатории профессора и шесть глав в одной артерии — «Поток», «Бляшка», «Первый контакт», «Прорыв», «Очаг», «Гомеостаз». Свободное плавание, способности BioTool (Притяжение, Импульс, Сигнал, Фактор), опыты с прогнозами, 38 знаний.
 
-- Отдельное приложение **Biology VR 2** (`com.biologyvr.biologyvr2`): ставится рядом с прежней версией и не заменяет её.
-- APK **0.11.0**, versionCode **12**, ARM64/IL2CPP/OpenXR; PICO 4 / 4 Enterprise и Meta Quest 2 / Pro / 3 / 3S.
-- **В шлеме ещё не проверялась.** Автопрохождение пролога и глав 1–6 в редакторе (симуляция ввода) прошло; управление реальными контроллерами, комфорт и частота кадров — на проверке.
-- Исходники: `unity/BiologyVR/Assets/BiologyVR/BiologyVR2/`, сцена `Scenes/BiologyVR2.unity` (меню `Biology VR 2/Build Scene`); описание — [BIOLOGY_VR2_RU.md](unity/BiologyVR/BIOLOGY_VR2_RU.md), [заметки релиза](unity/BiologyVR/RELEASE_0_11_0_BVR2_RU.md). Голо-стол и стойка лаборатории — ассет Sci-Fi Hologram Screen Shader (Asset Store), в репозиторий не входит.
+**Новое в 0.12.0:** пролог в новой лаборатории (зал с верстаком и проектором, отсек с капсулой уменьшения); профессор в лаборатории — в полный рост рядом с игроком, в артерии — на экране связи; профессор говорит голосом (186 реплик, движение губ по записи) с субтитрами; обновлённая модель профессора. Подробно — [заметки релиза](unity/BiologyVR/RELEASE_0_12_0_BVR2_RU.md).
 
-**Управление (VR):** левый стик — плыть; правый стик — вверх/вниз и поворот; A/X — рывок; левый курок — сканер; правый курок — BioTool, B — сменить способность; хват — якорь; оба хвата — сузить/расширить сосуд; Menu или Y — меню.
+- Отдельное приложение **Biology VR 2** (`com.biologyvr.biologyvr2`): ставится рядом с прежней Biology VR и не заменяет её; 0.12.0 ставится обновлением поверх 0.11.0.
+- APK **0.12.0**, versionCode **13**, ARM64/IL2CPP/OpenXR; PICO 4 / 4 Enterprise и Meta Quest 2 / Pro / 3 / 3S.
+- **В шлеме ещё не проверялась.** Автопрохождение пролога и глав 1–6 в редакторе (симуляция ввода) прошло; управление реальными контроллерами, комфорт и частота кадров (лаборатория ≈0,5 млн треугольников) — на проверке.
+- Исходники: `unity/BiologyVR/Assets/BiologyVR/BiologyVR2/`, сцена `Scenes/BiologyVR2.unity` (меню `Biology VR 2/Build Scene`); скрипты озвучки и модели профессора — `unity/BiologyVR/Tools/`; описание — [BIOLOGY_VR2_RU.md](unity/BiologyVR/BIOLOGY_VR2_RU.md). Комната лаборатории (пакет SecVarLab) и ассет Sci-Fi Hologram Screen Shader в репозиторий не входят — без них билдер собирает простую лабораторию и доски без фона.
+
+**Управление (VR):** левый стик — плыть (в лаборатории — идти); правый стик — вверх/вниз и поворот; A/X — рывок; левый курок — сканер; правый курок — BioTool, B — сменить способность; хват — якорь; оба хвата — сузить/расширить сосуд; Menu или Y — меню.
 
 ## Прежняя версия — 0.10.0 (WebGL в `play/`)
 

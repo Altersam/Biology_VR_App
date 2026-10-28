@@ -1,10 +1,10 @@
 {
-  "utc": "2026-10-27T15:32:50.7780531Z",
+  "utc": "2026-10-28T13:53:37.8912060Z",
   "running": false,
   "passed": true,
   "note": "simulated input in the editor; not a headset test",
   "log": [
-    "fps(editor, first 6 s) ≈ 227; cells drawn 301",
+    "fps(editor, first 6 s) ≈ 255; cells drawn 309",
     "0,0s beat 0 · Плыви к очагу",
     "0,4s beat 1 · Отсканируй раздутую клетку стенки",
     "6,9s beat 2 · Отсканируй раздутую клетку стенки",
@@ -13,10 +13,10 @@
     "29,4s beat 5 · Подбери ключ: эпитоп к антителу",
     "35,9s beat 5 · Отметь заражённые клетки Сигналом",
     "55,0s beat 6 · Отметь заражённые клетки Сигналом",
-    "55,2s beat 6 · синхронизация",
+    "55,1s beat 6 · синхронизация",
     "59,2s beat 7 · Очаг погашен",
-    "66,2s beat 8 · Глава 5 пройдена",
-    "finished: stars 2, predictions 1, knowledge 6/6 · ch5 beat 8 · Глава 5 пройдена · s=2192 · flow=1,05 · stars 2 · key 1,00 · alive 0 · spots 0 · infectedCells 0 · load 0,00 · t 37,2 · peak 38,4 · healthyHit 1 · keyMistakes 1 · syncKills 2",
+    "66,1s beat 8 · Глава 5 пройдена",
+    "finished: stars 2, predictions 1, knowledge 6/6 · ch5 beat 8 · Глава 5 пройдена · s=2193 · flow=1,06 · stars 2 · key 1,00 · alive 0 · spots 0 · infectedCells 0 · load 0,00 · t 37,3 · peak 38,7 · healthyHit 1 · keyMistakes 1 · syncKills 4",
     "swim test: moved 10,5 m in 2.5 s; speed over wall 4,7 m/s; inside lumen r=0,3 of R=9,0",
     "result: ok"
   ],

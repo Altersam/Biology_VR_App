@@ -18,6 +18,8 @@ namespace BiologyVR.V2
         public override string Title => "Лаборатория";
 
         public Transform labRoot, desk, toolReplicas, patientMap, capsule, capsuleRings, monitor;
+        [Tooltip("Where the professor stands in the lab (full height): by the patient, at the bench, at the capsule door.")]
+        public Transform profIntro, profTools, profCapsule;
         public Bvr2Scannable patientScan;
         public Text monitorText;
         public Light labLight;
@@ -30,7 +32,10 @@ namespace BiologyVR.V2
         Color ambientBefore; bool ambientSaved; readonly List<Transform> plates = new List<Transform>();
         Vector3 labHome; bool homeSaved;
 
-        static readonly Vector3 StartLocal = new Vector3(0, 1.55f, -3f);
+        [Tooltip("Player start in labRoot local space (eye height included).")]
+        public Vector3 startLocal = new Vector3(0, 1.55f, -3f);
+        [Tooltip("Walkable rectangles (x, z) in labRoot space; empty = the old round room.")]
+        public Rect[] walkable = new Rect[0];
 
         void Start() { if (labRoot) { labHome = labRoot.position; homeSaved = true; labRoot.gameObject.SetActive(false); } if (labLight) labLight.enabled = false; }
 
@@ -55,8 +60,10 @@ namespace BiologyVR.V2
             if (on && !ambientSaved) { ambientBefore = RenderSettings.ambientLight; ambientSaved = true; RenderSettings.ambientLight = new Color(0.55f, 0.6f, 0.68f); }
             if (!on && ambientSaved) { RenderSettings.ambientLight = ambientBefore; ambientSaved = false; }
             game.blood.enabled = !on;
+            if (!on) Prof.LeaveStage();
             game.swimmer.roomMode = on; game.swimmer.frozen = false;
             if (on && labRoot) { game.swimmer.roomCentre = labRoot.position; game.swimmer.roomRadius = 5.2f; }
+            game.swimmer.roomRects = on && walkable != null && walkable.Length > 0 ? walkable : null; game.swimmer.roomSpace = labRoot;
             ShowTools(!on || ToolsTaken);
             if (toolReplicas) toolReplicas.gameObject.SetActive(on && !ToolsTaken);
         }
@@ -74,6 +81,12 @@ namespace BiologyVR.V2
             if (toolReplicas) { toolReplicas.Rotate(Vector3.up, 30f * Time.deltaTime, Space.World); toolReplicas.localPosition = new Vector3(toolReplicas.localPosition.x, 1.2f + 0.04f * Mathf.Sin(t * 1.6f), toolReplicas.localPosition.z); }
             if (patientMap) patientMap.Rotate(Vector3.up, 12f * Time.deltaTime, Space.Self);
             if (capsuleRings) capsuleRings.Rotate(Vector3.up, 25f * Time.deltaTime, Space.Self);
+            if (monitorText && game.rig && game.rig.head)
+            {
+                // the vitals panel turns to whoever looks at it (no mirrored text from behind)
+                var c = monitorText.canvas.transform; Vector3 d = c.position - game.Head; d.y = 0;
+                if (d.sqrMagnitude > 0.01f) c.rotation = Quaternion.Slerp(c.rotation, Quaternion.LookRotation(d), 1f - Mathf.Exp(-Time.unscaledDeltaTime * 3f));
+            }
             if (monitorText && Time.frameCount % 10 == 0)
             {
                 var o = game.organism;
@@ -88,8 +101,9 @@ namespace BiologyVR.V2
             game.organism.ResetState();
             game.scanner.locked = true;
             LabMode(true);
-            game.swimmer.Teleport(labRoot.TransformPoint(StartLocal), labRoot.forward);
+            game.swimmer.Teleport(labRoot.TransformPoint(startLocal), labRoot.forward);
             game.rig.Fade(Color.black, 1f, 50f); game.rig.FadeTo(Color.black, 0f, 0.8f);
+            Prof.StandAt(startBeat <= 0 || startBeat == 2 ? profIntro : startBeat == 1 ? profTools : profCapsule);
             if (startBeat <= 0) yield return Intro();
             if (startBeat <= 1) yield return Tools(); else TakeTools(false);
             if (startBeat <= 2) yield return ScanPatient(); else game.codex.Discover("internal");
@@ -100,7 +114,7 @@ namespace BiologyVR.V2
         {
             Beat = 0;
             Hud.Title("ЛАБОРАТОРИЯ", "пролог · путешествие начинается здесь", 3.5f);
-            Prof.Appear(true);
+            Prof.Appear(true); Prof.StandAt(profIntro);
             yield return Wait(2f);
             yield return Say("Добро пожаловать в лабораторию! Наш пациент — живой организм. Тебе предстоит отправиться внутрь его артерии.", Mood.Smile);
             yield return Say("Моё правило: сначала наблюдаем. Потом делаем вывод.", Mood.Neutral);
@@ -109,6 +123,7 @@ namespace BiologyVR.V2
         IEnumerator Tools()
         {
             Beat = 1;
+            Prof.StandAt(profTools);
             Objective("Возьми приборы со стола");
             Prompt("Подойди к столу и нажми хват (grip)", "Подойди к столу (W A S D) и нажми E");
             while (!ToolsTaken)
@@ -136,6 +151,7 @@ namespace BiologyVR.V2
         IEnumerator ScanPatient()
         {
             Beat = 2;
+            Prof.StandAt(profIntro);
             game.scanner.locked = false; game.scanner.allowPlasma = false;
             Objective("Отсканируй голограмму пациента");
             Prompt("Левый курок — держать на голограмме", "ПКМ / F — держать на голограмме");
@@ -156,6 +172,7 @@ namespace BiologyVR.V2
         IEnumerator Shrink()
         {
             Beat = 3;
+            Prof.StandAt(profCapsule);
             Objective("Встань в капсулу уменьшения");
             Prompt("Иди в светящийся круг", "Иди в светящийся круг (W A S D)");
             yield return Say("Теперь — в капсулу. Мы уменьшимся в десятки тысяч раз, до размеров клетки.", Mood.Smile);
@@ -261,10 +278,19 @@ namespace BiologyVR.V2
         // ---------------- debug hooks -------------------------------------------------------
         public void DebugLookAt(string what)
         {
-            Transform t = what == "desk" ? toolReplicas : what == "map" ? patientMap : what == "capsule" ? capsule : what == "monitor" ? monitor : null;
+            Transform t = what == "desk" ? toolReplicas : what == "map" ? patientMap : what == "capsule" ? capsule : what == "monitor" ? monitor : what == "prof" ? game.professor.headPivot : null;
+            if (what == "profbody") { game.rig.LookAt(game.professor.transform.position + Vector3.up * 0.95f * game.professor.transform.lossyScale.y); return; }
+            if (what == "profhands") { game.rig.LookAt(game.professor.transform.position + Vector3.up * 0.85f * game.professor.transform.lossyScale.y); return; }
             if (t) game.rig.LookAt(t.position);
         }
         public void DebugTake() { TakeTools(true); }
+        /// <summary>Tests: walk (teleport) to a lab-local floor point, clamped to the walkable rooms like real walking.</summary>
+        public void DebugWalkTo(float x, float z)
+        {
+            Vector3 p = labRoot.TransformPoint(new Vector3(x, startLocal.y, z));
+            if (walkable != null && walkable.Length > 0) { game.swimmer.roomRects = walkable; game.swimmer.roomSpace = labRoot; p = game.swimmer.ClampToRooms(p); }
+            game.swimmer.Teleport(p, labRoot.forward);
+        }
         public void DebugToCapsule() { if (capsule) game.swimmer.Teleport(capsule.position + Vector3.up * 1.55f, labRoot.forward); }
     }
 }

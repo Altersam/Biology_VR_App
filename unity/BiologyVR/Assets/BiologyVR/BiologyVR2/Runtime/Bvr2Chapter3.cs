@@ -281,7 +281,8 @@ namespace BiologyVR.V2
                 if (w < counts.Length - 1)
                 {
                     Imm.ClearSpots();
-                    yield return Say(w == 0 ? $"Волна отбита! Сердце уже {Mathf.RoundToInt(o.heartRate)} ударов в минуту — организм мобилизуется. Следующая будет сильнее." : "Держись! Последняя волна — самая большая.", Mood.Serious);
+                    if (w == 0) Hud.Toast($"ПУЛЬС {Mathf.RoundToInt(o.heartRate)} УД/МИН", Bvr2Style.Danger, 3f);
+                    yield return Say(w == 0 ? "Волна отбита! Сердце бьётся всё чаще — организм мобилизуется. Следующая будет сильнее." : "Держись! Последняя волна — самая большая.", Mood.Serious);
                     yield return Wait(1.5f);
                 }
             }
@@ -316,7 +317,8 @@ namespace BiologyVR.V2
             foreach (var v in Imm.viruses) if (v.gameObject.activeSelf && v.Alive) v.Kill(false);
             game.sound.Mood("recovery"); game.organism.stressDrive = 0;
             game.swimmer.regionMin = game.swimmer.regionMax = 0;
-            yield return Say($"Синхронизация завершена. Ты поглотил {SyncEaten} вирусов! Температура скоро спадёт.", Mood.Smile);
+            Hud.Toast($"ПОГЛОЩЕНО ВИРУСОВ: {SyncEaten}", Bvr2Style.Good, 3f);
+            yield return Say("Синхронизация завершена — отличная охота! Температура скоро спадёт.", Mood.Smile);
         }
 
         IEnumerator Debrief()

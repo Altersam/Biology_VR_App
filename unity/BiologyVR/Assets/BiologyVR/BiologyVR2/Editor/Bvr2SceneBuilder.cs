@@ -33,6 +33,8 @@ namespace BiologyVR.V2.Editor
             foreach (var d in new[] { Gen, Gen + "/Textures", Gen + "/Materials", Gen + "/Meshes", Root + "/Scenes" }) Directory.CreateDirectory(d);
             AssetDatabase.Refresh();
             ConfigureImports();
+            // the prologue room (SecVarLab) is converted before the new scene replaces the open one
+            if (Bvr2LabImport.Available && !File.Exists(Bvr2LabImport.PrefabPath)) Debug.Log("[BVR2] " + Bvr2LabImport.BuildPrefab());
 
             // ---------- textures & sprites ----------
             var pattern = SaveTexture(EndotheliumPattern(512, out var normal), "Endothelium_Pattern", false);
@@ -439,8 +441,13 @@ namespace BiologyVR.V2.Editor
         }
 
         /// <summary>The lab of the prologue: a round room with a holo desk, the patient hologram, a vitals monitor and the shrinking capsule.</summary>
+        // SecVarLab room (prefab coordinates are centred on the whole floor; the main room is offset by this)
+        static readonly Vector3 SecVarMainRoom = new Vector3(-0.6f, 0, -0.5f);
+
         static void BuildLab(Bvr2Prelude ch, Mesh sphere, Mesh torus, Mesh torusThick, Material device, Material deviceDark, Material glow, Material holo, Material floorMat, Material wallMat, Font font)
         {
+            var labPrefab = Bvr2LabImport.Available ? AssetDatabase.LoadAssetAtPath<GameObject>(Bvr2LabImport.PrefabPath) : null;
+            if (labPrefab) { BuildSecVarLab(ch, labPrefab, sphere, torus, torusThick, device, glow, font); return; }
             var root = new GameObject("Lab").transform; root.position = new Vector3(0, 600f, 0); ch.labRoot = root;
             Part("Floor", sphere, floorMat, root, Vector3.zero, new Vector3(6.6f, 0.05f, 6.6f));
             var domeMesh = SaveMesh(Inverted(Bvr2Meshes.IcoSphere(3, 0, 1, 1, "BVR2_LabDome")), "LabDome");
@@ -614,6 +621,85 @@ namespace BiologyVR.V2.Editor
             return s;
         }
 
+        /// <summary>
+        /// Prologue in the SecVarLab room (from SecVarLab_Full.unitypackage): main lab with the workbench, the
+        /// ceiling projector and the monitor wall; the shrinking capsule stands in the side bay behind the left door.
+        /// Coordinates are labRoot-local with the main room centred on the origin, +z towards the round window.
+        /// </summary>
+        static void BuildSecVarLab(Bvr2Prelude ch, GameObject labPrefab, Mesh sphere, Mesh torus, Mesh torusThick, Material device, Material glow, Font font)
+        {
+            var root = new GameObject("Lab").transform; root.position = new Vector3(0, 600f, 0); ch.labRoot = root;
+            var room = (GameObject)PrefabUtility.InstantiatePrefab(labPrefab, root);
+            room.transform.localPosition = -SecVarMainRoom; room.transform.localRotation = Quaternion.identity;
+            Vector3 P(float x, float y, float z) => new Vector3(x, y, z) - SecVarMainRoom; // prefab (floor-centred) → lab
+            ch.startLocal = new Vector3(0.3f, 1.55f, -2.7f);
+            ch.walkable = new[]
+            {
+                Rect.MinMaxRect(-2.6f, -3.45f, 2.0f, 1.8f),   // main lab, up to the workbench
+                Rect.MinMaxRect(-3.55f, 1.35f, -2.4f, 2.45f), // door to the capsule bay
+                Rect.MinMaxRect(-6.55f, 0.95f, -3.3f, 3.15f), // capsule bay
+            };
+            // the instruments float above the orange workbench (robot arms)
+            var bench = new GameObject("Workbench").transform; bench.SetParent(root, false); bench.localPosition = P(-1.44f, 0.3f, 2.1f);
+            ch.desk = bench;
+            var tools = new GameObject("Tool Replicas").transform; tools.SetParent(root, false); tools.localPosition = new Vector3(-0.1f, 1.2f, 2.3f); // right end of the bench, not behind the hologram
+            var sc = Part("Scanner Replica", sphere, device, tools, new Vector3(0, 0, -0.18f), new Vector3(0.06f, 0.045f, 0.17f));
+            Part("Scanner Lens", sphere, glow, sc.transform, new Vector3(0, 0, 1f), Vector3.one * 0.35f);
+            var bt = Part("BioTool Replica", sphere, device, tools, new Vector3(0, 0, 0.18f), new Vector3(0.06f, 0.05f, 0.2f));
+            Part("BioTool Coil", torus, glow, bt.transform, new Vector3(0, 0, 0.85f), Vector3.one * 0.7f);
+            Part("Pad", torusThick, glow, tools, new Vector3(0, -0.22f, 0), Vector3.one * 0.32f, new Vector3(90, 0, 0));
+            ch.toolReplicas = tools;
+            // the patient hologram under the ceiling projector
+            var map = new GameObject("Patient Hologram").transform; map.SetParent(root, false); map.localPosition = P(-1.15f, 1.35f, 0.33f);
+            BuildPatient(ch, map, sphere, torus, torusThick, glow);
+            // vitals: a holo panel to the left of the patient, facing the start
+            var mon = new GameObject("Monitor").transform; mon.SetParent(root, false); mon.localPosition = new Vector3(-1.6f, -0.2f, 0.7f); ch.monitor = mon;
+            var monCanvas = Bvr2UiEditor.Canvas("Vitals Screen", root, new Vector2(620, 420), 0.0017f);
+            monCanvas.localPosition = new Vector3(-1.6f, 1.45f, 0.7f); monCanvas.localRotation = Quaternion.Euler(0, -28f, 0); // left of the patient, the professor stands on the right
+            Bvr2UiEditor.MakeImage(monCanvas, new Color(0.02f, 0.06f, 0.09f, 0.88f), null, null);
+            var mt = Bvr2UiEditor.MakeText(monCanvas, "ПАЦИЕНТ · ПОКАЗАТЕЛИ", 44, Bvr2Style.Ally, font, null); mt.alignment = TextAnchor.MiddleLeft; mt.rectTransform.offsetMin = new Vector2(34, 20); mt.rectTransform.offsetMax = new Vector2(-20, -20);
+            ch.monitorText = mt;
+            // the shrinking capsule: the bay's glass cylinder + our pad and rings inside it
+            var spot = room.transform.Find("Markers/CapsuleSpot");
+            var cap = new GameObject("Shrink Capsule").transform; cap.SetParent(root, false);
+            cap.localPosition = spot ? root.InverseTransformPoint(spot.position) : P(-5.52f, 0, 1.53f); ch.capsule = cap;
+            Part("Pad", sphere, glow, cap, new Vector3(0, 0.36f, 0), new Vector3(0.8f, 0.02f, 0.8f));
+            var rings = new GameObject("Rings").transform; rings.SetParent(cap, false); ch.capsuleRings = rings;
+            Part("Ring Low", torusThick, glow, rings, new Vector3(0, 0.55f, 0), Vector3.one * 0.78f, new Vector3(90, 0, 0));
+            Part("Ring High", torusThick, glow, rings, new Vector3(0, 2.15f, 0), Vector3.one * 0.78f, new Vector3(90, 0, 0));
+            Part("Ring Tilted", torus, glow, rings, new Vector3(0, 1.35f, 0), Vector3.one * 0.86f, new Vector3(70, 0, 0));
+            // where the professor stands (full height) during the prologue
+            Transform Spot(string n, Vector3 pos) { var t = new GameObject(n).transform; t.SetParent(root, false); t.localPosition = pos; return t; }
+            ch.profIntro = Spot("Prof Spot · patient", new Vector3(0.4f, 0, 0.05f));
+            ch.profTools = Spot("Prof Spot · bench", new Vector3(0.95f, 0, 1.55f));
+            ch.profCapsule = Spot("Prof Spot · capsule door", new Vector3(-2.15f, 0, 0.85f));
+            ch.labLight = null; // the room is lit in its shader (Bvr2LabLighting), no realtime light
+            root.gameObject.SetActive(false);
+        }
+
+        static void BuildPatient(Bvr2Prelude ch, Transform map, Mesh sphere, Mesh torus, Mesh torusThick, Material glow)
+        {
+            var bodyGlow = Mat("Lab_Patient", "BVR2/Glow"); bodyGlow.SetColor("_Color", new Color(0.35f, 0.75f, 0.95f)); bodyGlow.SetFloat("_Intensity", 0.7f); bodyGlow.SetFloat("_Core", 0.15f); bodyGlow.SetFloat("_Fresnel", 2.5f);
+            Part("Body", sphere, bodyGlow, map, new Vector3(0, 0, 0), new Vector3(0.24f, 0.5f, 0.13f));
+            Part("Head", sphere, bodyGlow, map, new Vector3(0, 0.62f, 0), Vector3.one * 0.12f);
+            Part("Arm L", sphere, bodyGlow, map, new Vector3(-0.32f, 0.05f, 0), new Vector3(0.06f, 0.42f, 0.06f), new Vector3(0, 0, -12));
+            Part("Arm R", sphere, bodyGlow, map, new Vector3(0.32f, 0.05f, 0), new Vector3(0.06f, 0.42f, 0.06f), new Vector3(0, 0, 12));
+            Part("Leg L", sphere, bodyGlow, map, new Vector3(-0.11f, -0.78f, 0), new Vector3(0.08f, 0.45f, 0.08f));
+            Part("Leg R", sphere, bodyGlow, map, new Vector3(0.11f, -0.78f, 0), new Vector3(0.08f, 0.45f, 0.08f));
+            Part("Base", torusThick, glow, map, new Vector3(0, -1.2f, 0), Vector3.one * 0.45f, new Vector3(90, 0, 0));
+            Part("Beam", sphere, bodyGlow, map, new Vector3(0, 1.2f, 0), new Vector3(0.025f, 0.6f, 0.025f));
+            var heartMat = Mat("Lab_Heart", "BVR2/Glow"); heartMat.SetColor("_Color", new Color(1f, 0.3f, 0.35f)); heartMat.SetFloat("_Intensity", 1.8f); heartMat.SetFloat("_Core", 0.9f);
+            Part("Heart", sphere, heartMat, map, new Vector3(-0.04f, 0.2f, 0.03f), Vector3.one * 0.06f);
+            Part("Aorta", torus, heartMat, map, new Vector3(0, 0.3f, 0.02f), Vector3.one * 0.07f);
+            Part("Artery Arm", sphere, heartMat, map, new Vector3(0.33f, 0.02f, 0.03f), new Vector3(0.012f, 0.38f, 0.012f), new Vector3(0, 0, 12));
+            var entry = Part("Entry Marker", torus, Mat("Lab_Entry", "BVR2/Glow"), map, new Vector3(0.38f, -0.2f, 0.05f), Vector3.one * 0.06f);
+            entry.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", Bvr2Style.Knowledge); entry.GetComponent<Renderer>().sharedMaterial.SetFloat("_Intensity", 2f);
+            entry.AddComponent<Bvr2Spin>().speed = new Vector3(0, 90, 0);
+            map.gameObject.AddComponent<SphereCollider>().radius = 0.75f;
+            var ps = map.gameObject.AddComponent<Bvr2Scannable>(); ps.codexId = "internal"; ps.displayName = "Пациент"; ps.scanSeconds = 1.0f; ch.patientScan = ps;
+            ch.patientMap = map;
+        }
+
         static Bvr2Scanner BuildScanner(Bvr2Rig rig, Material device, Material dark, Material glow, Material coneMat, Mesh cone, Mesh torus, Mesh sphere, Sprite ring, Material overlay, Font font)
         {
             var root = new GameObject("Scanner"); root.transform.SetParent(rig.leftHand, false);
@@ -682,10 +768,19 @@ namespace BiologyVR.V2.Editor
             }
             b = Bounds(model);
             model.transform.position += new Vector3(-b.center.x, -b.min.y, -b.center.z);
+            // meshes with blend shapes (face, beard, moustache) need a SkinnedMeshRenderer to morph
+            foreach (var mf in model.GetComponentsInChildren<MeshFilter>(true))
+            {
+                var mesh = mf.sharedMesh; if (!mesh || mesh.blendShapeCount == 0) continue;
+                var go = mf.gameObject; var mr = go.GetComponent<MeshRenderer>(); var mats = mr ? mr.sharedMaterials : new Material[0];
+                if (mr) Object.DestroyImmediate(mr); Object.DestroyImmediate(mf);
+                var smr = go.AddComponent<SkinnedMeshRenderer>(); smr.sharedMesh = mesh; smr.sharedMaterials = mats; smr.rootBone = go.transform;
+                var lb = mesh.bounds; lb.Expand(0.06f); smr.localBounds = lb; smr.updateWhenOffscreen = false;
+            }
             // head pivot at the neck, carrying the face parts
             var pivot = new GameObject("HeadPivot").transform; pivot.SetParent(model.transform, false);
             pivot.position = head ? head.position : model.transform.position + Vector3.up * 1.5f;
-            foreach (var n in new[] { "Head", "Hair", "Glasses", "Mustache", "Beard" }) { var t = Find(model.transform, n); if (t) t.SetParent(pivot, true); }
+            foreach (var n in new[] { "Head", "Hair", "HairCap", "Glasses", "Mustache", "Beard" }) { var t = Find(model.transform, n); if (t) t.SetParent(pivot, true); }
             // materials: hologram with the original colours
             string tex = Root + "/Art/Professor/Textures/";
             foreach (var r in model.GetComponentsInChildren<Renderer>(true))
@@ -694,12 +789,32 @@ namespace BiologyVR.V2.Editor
                 var mat = Mat("Prof_" + key, "BVR2/Hologram");
                 var t2 = AssetDatabase.LoadAssetAtPath<Texture2D>(tex + "Prof_" + key + "_BaseColor.png");
                 mat.SetTexture("_MainTex", t2); mat.SetFloat("_Holo", 0.32f); mat.SetFloat("_Alpha", 0.93f);
-                mat.SetColor("_Tint", key.StartsWith("Hand") ? new Color(0.98f, 0.72f, 0.58f) : Color.white);
-                r.sharedMaterial = mat; r.shadowCastingMode = ShadowCastingMode.Off; r.receiveShadows = false;
+                mat.SetColor("_Tint", key.StartsWith("Hand") ? new Color(0.93f, 0.6f, 0.43f) : Color.white); // hands have no texture: the face's skin tone
+                int subs = 1;
+                if (r is SkinnedMeshRenderer smr0) { if (smr0.sharedMesh) subs = smr0.sharedMesh.subMeshCount; }
+                else { var mf0 = r.GetComponent<MeshFilter>(); if (mf0 && mf0.sharedMesh) subs = mf0.sharedMesh.subMeshCount; }
+                if (n == "Head" && subs >= 3)
+                {
+                    // head + mouth cavity + teeth (one mesh, so the jaw shape moves the lower teeth too)
+                    var mouth = Mat("Prof_Mouth", "BVR2/Hologram"); mouth.SetTexture("_MainTex", Texture2D.whiteTexture); mouth.SetColor("_Tint", new Color(0.2f, 0.05f, 0.06f)); mouth.SetFloat("_Holo", 0.15f); mouth.SetFloat("_Alpha", 0.97f); mouth.SetColor("_RimColor", new Color(0.05f, 0.02f, 0.02f));
+                    var teeth = Mat("Prof_Teeth", "BVR2/Hologram"); teeth.SetTexture("_MainTex", Texture2D.whiteTexture); teeth.SetColor("_Tint", new Color(0.86f, 0.84f, 0.78f)); teeth.SetFloat("_Holo", 0.2f); teeth.SetFloat("_Alpha", 0.97f);
+                    r.sharedMaterials = new[] { mat, mouth, teeth };
+                }
+                else r.sharedMaterial = mat;
+                r.shadowCastingMode = ShadowCastingMode.Off; r.receiveShadows = false;
             }
             prof.model = model.transform; prof.headPivot = pivot;
             prof.handL = Find(model.transform, "HandL"); prof.handR = Find(model.transform, "HandR"); prof.medallion = Find(model.transform, "Medallion");
             prof.face = head ? head.GetComponent<SkinnedMeshRenderer>() : null;
+            prof.speechParts = model.GetComponentsInChildren<SkinnedMeshRenderer>(true)
+                .Where(m => m != prof.face && m.sharedMesh && m.sharedMesh.GetBlendShapeIndex("MouthOpen") >= 0).ToArray();
+            // voice: the recorded lines + an audio source at the head
+            if (File.Exists(Bvr2VoiceImport.VoiceDir + "/voice_manifest.json")) Debug.Log("[BVR2] " + Bvr2VoiceImport.Import());
+            prof.voice = Bvr2VoiceImport.Load();
+            var vo = new GameObject("Voice"); vo.transform.SetParent(pivot, false); vo.transform.localPosition = Vector3.up * 0.1f;
+            var src = vo.AddComponent<AudioSource>(); src.playOnAwake = false; src.loop = false; src.spatialBlend = 0f; src.volume = 1f; src.priority = 32;
+            src.rolloffMode = AudioRolloffMode.Linear; src.minDistance = 1.5f; src.maxDistance = 18f; src.dopplerLevel = 0;
+            prof.voiceSource = src;
             root.transform.localScale = Vector3.one * prof.scale;
             return prof;
         }
@@ -728,6 +843,7 @@ namespace BiologyVR.V2.Editor
             foreach (var g in AssetDatabase.FindAssets("t:AudioClip", new[] { Root + "/Audio" }))
             {
                 var p = AssetDatabase.GUIDToAssetPath(g);
+                if (p.Contains("/Voice/")) continue; // the professor's voice: Bvr2VoiceImport (compressed, streamed from memory)
                 if (AssetImporter.GetAtPath(p) is AudioImporter ai)
                 {
                     var s = ai.defaultSampleSettings; bool loop = p.Contains("Loop");

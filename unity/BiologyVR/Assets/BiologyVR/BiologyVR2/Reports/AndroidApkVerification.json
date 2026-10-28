@@ -1,21 +1,38 @@
 {
-  "utc": "2026-10-27T17:22:58.728480+00:00",
-  "version": "0.11.0",
-  "version_code": 12,
+  "utc": "2026-10-28T15:47:57.500171+00:00",
+  "version": "0.12.0",
+  "version_code": 13,
   "application_id": "com.biologyvr.biologyvr2",
   "tools": "androguard 4.1 (manifest), apksigtool (APK Signature Scheme v2), zip listing (one scene: level0)",
   "passed": true,
   "apks": [
     {
-      "file": "BiologyVR2_Pico4_v0.11.0.apk",
-      "bytes": 60260119,
-      "sha256": "66f608f83a87a5d513435b67e389cc997d2e19d35b1f10da69316391085948d1",
+      "file": "BiologyVR2_Pico4_v0.12.0.apk",
+      "bytes": 70396291,
+      "sha256": "b0e74c101094a785e31b1f626373d5a5316357dc306d08cb54170e7991ea6d72",
       "package": "com.biologyvr.biologyvr2",
-      "versionName": "0.11.0",
-      "versionCode": "12",
+      "versionName": "0.12.0",
+      "versionCode": "13",
       "label": "Biology VR 2",
       "minSdk": "29",
       "targetSdk": "34",
+      "native": [
+        "lib/arm64-v8a/libCameraRenderingPlugin.so",
+        "lib/arm64-v8a/libPICO_TOBAPI.so",
+        "lib/arm64-v8a/libUnityARFoundationAndroidXR.so",
+        "lib/arm64-v8a/libUnityOpenXR.so",
+        "lib/arm64-v8a/libUnityOpenXRHands.so",
+        "lib/arm64-v8a/lib_burst_generated.so",
+        "lib/arm64-v8a/libc++_shared.so",
+        "lib/arm64-v8a/libil2cpp.so",
+        "lib/arm64-v8a/libmain.so",
+        "lib/arm64-v8a/libopenxr_loader.so",
+        "lib/arm64-v8a/libopenxr_pico.so",
+        "lib/arm64-v8a/libpvrcapturelib.so",
+        "lib/arm64-v8a/libpxrplatformloader.so",
+        "lib/arm64-v8a/libswappywrapper.so",
+        "lib/arm64-v8a/libunity.so"
+      ],
       "vendor_meta": {
         "pvr.app.type": "vr",
         "pvr.sdk.version": "Unity OpenXR 1.4.1",
@@ -33,22 +50,32 @@
         "openxr_runtime": true,
         "signed_v2_or_v3": true,
         "pico_vr_manifest": true,
-        "pico_sdk_manifest": true,
-        "signature_v2_verified": true
+        "pico_sdk_manifest": true
       },
-      "passed": true,
-      "native_count": 15
+      "passed": true
     },
     {
-      "file": "BiologyVR2_MetaQuest_v0.11.0.apk",
-      "bytes": 59375988,
-      "sha256": "ff8be4dbec9ef93cad8a5342e19c8be2ff007de98c120de0109d1f163d4d2b27",
+      "file": "BiologyVR2_MetaQuest_v0.12.0.apk",
+      "bytes": 69512076,
+      "sha256": "925c5434bdfeb2611ce4b5b5f6feb3f1a30a4cc085c01a4e5b58be2095b3a1c8",
       "package": "com.biologyvr.biologyvr2",
-      "versionName": "0.11.0",
-      "versionCode": "12",
+      "versionName": "0.12.0",
+      "versionCode": "13",
       "label": "Biology VR 2",
       "minSdk": "29",
       "targetSdk": "34",
+      "native": [
+        "lib/arm64-v8a/libUnityARFoundationAndroidXR.so",
+        "lib/arm64-v8a/libUnityOpenXR.so",
+        "lib/arm64-v8a/libUnityOpenXRHands.so",
+        "lib/arm64-v8a/lib_burst_generated.so",
+        "lib/arm64-v8a/libc++_shared.so",
+        "lib/arm64-v8a/libil2cpp.so",
+        "lib/arm64-v8a/libmain.so",
+        "lib/arm64-v8a/libopenxr_loader.so",
+        "lib/arm64-v8a/libswappywrapper.so",
+        "lib/arm64-v8a/libunity.so"
+      ],
       "vendor_meta": {
         "com.oculus.vr.focusaware": "true",
         "com.oculus.supportedDevices": "quest2|cambria|eureka|quest3s"
@@ -66,12 +93,11 @@
         "signed_v2_or_v3": true,
         "quest_devices_manifest": true,
         "quest_vr_category": true,
-        "no_pico_plugins": true,
-        "signature_v2_verified": true
+        "no_pico_plugins": true
       },
-      "passed": true,
-      "native_count": 10
+      "passed": true
     }
   ],
-  "headset_verified": false
+  "headset_verified": false,
+  "note": "Rebuilt 28.10 15:46 UTC: the first 0.12.0 Quest APK lost 48 MB to zeros on disk after the PC dropped off right after the build."
 }
