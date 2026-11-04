@@ -1,10 +1,10 @@
 {
-  "utc": "2026-10-28T13:25:45.1112934Z",
+  "utc": "2026-11-04T06:38:37.3497574Z",
   "running": false,
   "passed": true,
   "note": "simulated input in the editor; not a headset test",
   "log": [
-    "fps(editor, first 6 s) ≈ 255; cells drawn 259",
+    "fps(editor, first 6 s) ≈ 243; cells drawn 267",
     "0,0s beat 0 · ",
     "0,4s beat 1 · Датчик 1/6 · пульс: проплыви сквозь кольцо",
     "0,5s beat 1 · Датчик 2/6 · давление: проплыви сквозь кольцо",

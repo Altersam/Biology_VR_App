@@ -68,12 +68,12 @@ namespace BiologyVR.V2
             Prof.Say(text, m);
             if (autoplay) { yield return new WaitForSecondsRealtime(0.15f); Prof.Interrupt(); yield break; }
             yield return null;
-            while (Prof.Busy) yield return null;
+            while (Prof.Busy || Bvr2Pause.Active) yield return null;
         }
 
-        protected IEnumerator Wait(float seconds) { float t = 0; while (t < (autoplay ? Mathf.Min(seconds, 0.2f) : seconds)) { t += Time.unscaledDeltaTime; yield return null; } }
+        protected IEnumerator Wait(float seconds) { float t = 0; while (t < (autoplay ? Mathf.Min(seconds, 0.2f) : seconds)) { if (!Bvr2Pause.Active) t += Time.unscaledDeltaTime; yield return null; } }
 
-        protected IEnumerator WaitKnowledge() { yield return null; while (game.KnowledgeBusy || (Prof.Busy && !autoplay)) yield return null; }
+        protected IEnumerator WaitKnowledge() { yield return null; while (game.KnowledgeBusy || (Prof.Busy && !autoplay) || Bvr2Pause.Active) yield return null; }
 
         /// <summary>Common tidy-up for every chapter start.</summary>
         protected void ResetShared()
@@ -144,21 +144,23 @@ namespace BiologyVR.V2
         protected IEnumerator WaitContinue(float timeout = 30f)
         {
             Prompt("Курок — продолжить", "ЛКМ — продолжить");
-            for (float t = 0; t < timeout && !autoplay; t += Time.unscaledDeltaTime) { if (t > 1.2f && game.input.ToolDown) break; yield return null; }
+            for (float t = 0; t < timeout && !autoplay; t += Bvr2Pause.Active ? 0f : Time.unscaledDeltaTime) { if (t > 1.2f && game.input.ToolDown) break; yield return null; }
             NoPrompt();
         }
 
         /// <summary>End-of-chapter choice: next chapter / replay / free swim. Returns after acting on it.</summary>
         protected IEnumerator WhatNext(string freeSwimLine)
         {
+            if (!autoplay) Bvr2Save.Completed(Number, Stars); // progress for the main menu (Continue, chapter stars)
             bool hasNext = onNextChapter != null;
-            var options = hasNext ? new[] { $"глава {Number + 1} «{nextTitle}»", "пройти заново", "плавать свободно" } : new[] { "пройти главу заново", "плавать свободно" };
+            var options = hasNext ? new[] { $"глава {Number + 1} «{nextTitle}»", "пройти заново", "плавать свободно", "главное меню" } : new[] { "пройти главу заново", "плавать свободно", "главное меню" };
             yield return game.question.Ask("Что дальше?", options, -1);
             int choice = game.question.LastChoice - (hasNext ? 1 : 0);
             if (game.question.LastChoice < 0) yield break;
             if (choice < 0) onNextChapter();
             else if (choice == 0) { game.codex.ResetChapter(Number); CorrectPredictions = 0; Restart(0); }
-            else { Objective("Свободное плавание"); Prof.Say(freeSwimLine, Mood.Smile); }
+            else if (choice == 1) { Objective("Свободное плавание"); Prof.Say(freeSwimLine, Mood.Smile); }
+            else if (game.campaign) game.campaign.ToMainMenu();
         }
 
         /// <summary>Fade through white and place the player (chapter openings, retries).</summary>

@@ -190,7 +190,7 @@ namespace BiologyVR.V2.Editor
             sound.musicTension = Clip(GameFeelAudio + "/Mus_Tension_Loop.wav"); sound.musicRecovery = Clip(GameFeelAudio + "/Mus_Recovery_Pad_Loop.wav");
             sound.scanLoop = Clip(GameFeelAudio + "/SFX_Scan_Loop.wav"); sound.fieldLoop = Clip(GameFeelAudio + "/SFX_Field_Loop.wav");
             sound.thrustLoop = Clip(Root + "/Audio/BVR2_Thrust_Loop.wav"); sound.ambienceLoop = Clip(Root + "/Audio/BVR2_Ambience_Loop.wav");
-            sound.clips = AssetDatabase.FindAssets("t:AudioClip", new[] { GameFeelAudio, Root + "/Audio" }).Select(g => AssetDatabase.LoadAssetAtPath<AudioClip>(AssetDatabase.GUIDToAssetPath(g))).Where(c => c).ToList();
+            sound.clips = AssetDatabase.FindAssets("t:AudioClip", new[] { GameFeelAudio, Root + "/Audio" }).Select(AssetDatabase.GUIDToAssetPath).Where(p => !p.Contains("/Voice/")).Select(p => AssetDatabase.LoadAssetAtPath<AudioClip>(p)).Where(c => c).ToList(); // the professor's lines live in the voice bank
 
             // HUD
             var hud = Child<Bvr2Hud>(gameGo, "HUD"); game.hud = hud; hud.rig = rig; hud.organism = game.organism;
@@ -256,6 +256,7 @@ namespace BiologyVR.V2.Editor
             var sync = playerGo.AddComponent<Bvr2Sync>(); game.sync = sync;
             sync.rig = rig; sync.immune = immune; sync.fx = fx; sync.audioDirector = sound; sync.swimmer = swimmer;
             sync.hideWhileSynced = new[] { scanner.gameObject, bio.gameObject }; sync.blobMesh = whiteMesh; sync.blobMaterial = macroMat;
+            var trailMat = Mat("Sync_Trail", "BVR2/Trail"); trailMat.SetColor("_Color", new Color(1f, 1f, 1f, 0.8f)); trailMat.SetFloat("_Intensity", 1.3f); sync.trailMaterial = trailMat;
             var ch3 = Child<Bvr2Chapter3>(gameGo, "Chapter 3 · Первый контакт"); ch3.game = game;
             VirusExhibit(ch3, virusHalfA, virusHalfB, virusMat, sphere, torus, rnaMat, gateMat, props3);
 
@@ -308,6 +309,9 @@ namespace BiologyVR.V2.Editor
             var campaign = Child<Bvr2Campaign>(gameGo, "Campaign"); game.campaign = campaign; campaign.game = game;
             campaign.chapters = new List<Bvr2ChapterBase> { ch0, chapter, ch2, ch3, ch4, ch5, ch6 };
             ch6.campaign = campaign;
+            // title screen, main menu and pause menu (04.11) on a holographic stage far above the lab
+            var menu = Child<Bvr2Menu>(gameGo, "Menu"); menu.game = game; menu.version = Bvr2AndroidBuild.Version; campaign.menu = menu;
+            Debug.Log("[BVR2] " + Bvr2HoloFx.MenuStage(menu, device, deviceDark, glowMat));
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             Debug.Log($"[BVR2] Built {ScenePath}: artery {vessel.Length:F0} m, {chunk} wall chunks.");
@@ -643,21 +647,26 @@ namespace BiologyVR.V2.Editor
             var bench = new GameObject("Workbench").transform; bench.SetParent(root, false); bench.localPosition = P(-1.44f, 0.3f, 2.1f);
             ch.desk = bench;
             var tools = new GameObject("Tool Replicas").transform; tools.SetParent(root, false); tools.localPosition = new Vector3(-0.1f, 1.2f, 2.3f); // right end of the bench, not behind the hologram
-            var sc = Part("Scanner Replica", sphere, device, tools, new Vector3(0, 0, -0.18f), new Vector3(0.06f, 0.045f, 0.17f));
-            Part("Scanner Lens", sphere, glow, sc.transform, new Vector3(0, 0, 1f), Vector3.one * 0.35f);
-            var bt = Part("BioTool Replica", sphere, device, tools, new Vector3(0, 0, 0.18f), new Vector3(0.06f, 0.05f, 0.2f));
-            Part("BioTool Coil", torus, glow, bt.transform, new Vector3(0, 0, 0.85f), Vector3.one * 0.7f);
-            Part("Pad", torusThick, glow, tools, new Vector3(0, -0.22f, 0), Vector3.one * 0.32f, new Vector3(90, 0, 0));
+            // the real tool models, twice the size, floating crossed over a small holo pad
+            var scH = new GameObject("Scanner Replica").transform; scH.SetParent(tools, false); scH.localPosition = new Vector3(0, 0.02f, -0.14f); scH.localRotation = Quaternion.Euler(0, 90, 18);
+            var btH = new GameObject("BioTool Replica").transform; btH.SetParent(tools, false); btH.localPosition = new Vector3(0, -0.02f, 0.14f); btH.localRotation = Quaternion.Euler(0, -90, -18);
+            var deviceMat = AssetDatabase.LoadAssetAtPath<Material>(Gen + "/Materials/Device.mat"); var darkMat = AssetDatabase.LoadAssetAtPath<Material>(Gen + "/Materials/Device_Dark.mat");
+            if (Bvr2HoloFx.Tool("Scanner", scH, deviceMat ? deviceMat : device, darkMat ? darkMat : device, glow, 2.2f) == null) Part("Scanner Replica Body", sphere, device, scH, Vector3.zero, new Vector3(0.06f, 0.045f, 0.17f));
+            if (Bvr2HoloFx.Tool("BioTool", btH, deviceMat ? deviceMat : device, darkMat ? darkMat : device, glow, 2.2f) == null) Part("BioTool Replica Body", sphere, device, btH, Vector3.zero, new Vector3(0.06f, 0.05f, 0.2f));
+            Part("Pad", torusThick, glow, tools, new Vector3(0, -0.24f, 0), Vector3.one * 0.3f, new Vector3(90, 0, 0));
             ch.toolReplicas = tools;
             // the patient hologram under the ceiling projector
             var map = new GameObject("Patient Hologram").transform; map.SetParent(root, false); map.localPosition = P(-1.15f, 1.35f, 0.33f);
             BuildPatient(ch, map, sphere, torus, torusThick, glow);
+            Debug.Log("[BVR2] " + Bvr2HoloFx.Patient(ch, map, font)); // the human figure, circulation, projector, labels
             // vitals: a holo panel to the left of the patient, facing the start
             var mon = new GameObject("Monitor").transform; mon.SetParent(root, false); mon.localPosition = new Vector3(-1.6f, -0.2f, 0.7f); ch.monitor = mon;
-            var monCanvas = Bvr2UiEditor.Canvas("Vitals Screen", root, new Vector2(620, 420), 0.0017f);
-            monCanvas.localPosition = new Vector3(-1.6f, 1.45f, 0.7f); monCanvas.localRotation = Quaternion.Euler(0, -28f, 0); // left of the patient, the professor stands on the right
-            Bvr2UiEditor.MakeImage(monCanvas, new Color(0.02f, 0.06f, 0.09f, 0.88f), null, null);
-            var mt = Bvr2UiEditor.MakeText(monCanvas, "ПАЦИЕНТ · ПОКАЗАТЕЛИ", 44, Bvr2Style.Ally, font, null); mt.alignment = TextAnchor.MiddleLeft; mt.rectTransform.offsetMin = new Vector2(34, 20); mt.rectTransform.offsetMax = new Vector2(-20, -20);
+            var monCanvas = Bvr2UiEditor.Canvas("Vitals Screen", root, new Vector2(620, 540), 0.0017f);
+            monCanvas.localPosition = new Vector3(-1.6f, 1.5f, 0.7f); monCanvas.localRotation = Quaternion.Euler(0, -28f, 0); // left of the patient, the professor stands on the right
+            Bvr2UiEditor.MakeImage(monCanvas, new Color(0.02f, 0.055f, 0.08f, 1f), null, null); // fully opaque: the lab's HDR-bright screens behind would shine through a translucent panel
+            Bvr2HoloFx.PanelFrame(monCanvas, Bvr2Style.Ally, 88f); // a monitor frame with corner brackets and a divider under the title
+            var mt = Bvr2UiEditor.MakeText(monCanvas, "ПАЦИЕНТ · ПОКАЗАТЕЛИ", 44, Bvr2Style.Ally, font, null); mt.alignment = TextAnchor.UpperLeft; mt.rectTransform.offsetMin = new Vector2(34, 150); mt.rectTransform.offsetMax = new Vector2(-20, -26);
+            Bvr2HoloFx.Ecg(monCanvas, new Vector2(570, 120), new Vector2(0, -195)); // live ECG strip, one complex per heart beat
             ch.monitorText = mt;
             // the shrinking capsule: the bay's glass cylinder + our pad and rings inside it
             var spot = room.transform.Find("Markers/CapsuleSpot");
@@ -674,6 +683,8 @@ namespace BiologyVR.V2.Editor
             ch.profTools = Spot("Prof Spot · bench", new Vector3(0.95f, 0, 1.55f));
             ch.profCapsule = Spot("Prof Spot · capsule door", new Vector3(-2.15f, 0, 0.85f));
             ch.labLight = null; // the room is lit in its shader (Bvr2LabLighting), no realtime light
+            Bvr2LabDressing.Build(root, room, font); // warm palette, lamps, shelves, plants, screens, bench clutter (concept art)
+            Debug.Log("[BVR2] " + Bvr2HoloFx.LabFx(root, Bvr2LabDressing.PendantLamps, Bvr2LabDressing.BubbleSpots, Bvr2LabDressing.TubeSpots)); // dust, light shafts, bubbles
             root.gameObject.SetActive(false);
         }
 
@@ -703,23 +714,41 @@ namespace BiologyVR.V2.Editor
         static Bvr2Scanner BuildScanner(Bvr2Rig rig, Material device, Material dark, Material glow, Material coneMat, Mesh cone, Mesh torus, Mesh sphere, Sprite ring, Material overlay, Font font)
         {
             var root = new GameObject("Scanner"); root.transform.SetParent(rig.leftHand, false);
-            Part("Grip", toolBody, dark, root.transform, new Vector3(0, -0.026f, -0.03f), new Vector3(0.015f, 0.03f, 0.022f), new Vector3(-20, 0, 0));
-            Part("Body", toolBody, device, root.transform, new Vector3(0, 0, 0.02f), new Vector3(0.021f, 0.016f, 0.06f));
-            Part("Stripe", toolBody, glow, root.transform, new Vector3(0, 0.009f, 0.02f), new Vector3(0.006f, 0.009f, 0.05f));
-            Part("Lens Ring", torus, glow, root.transform, new Vector3(0, 0, 0.078f), Vector3.one * 0.017f);
-            Part("Lens", sphere, glow, root.transform, new Vector3(0, 0, 0.076f), Vector3.one * 0.008f);
-            var tip = new GameObject("Tip").transform; tip.SetParent(root.transform, false); tip.localPosition = new Vector3(0, 0, 0.082f);
+            // the model (Art/Holo/Tools.fbx): body, nose with a glowing lens, three turning ring segments, prongs,
+            // side light strips, a screen plate and a grip; primitives if the model is missing
+            var model = Bvr2HoloFx.Tool("Scanner", root.transform, device, dark, glow);
+            Transform tip;
+            if (model != null && model.tip) tip = model.tip;
+            else
+            {
+                Part("Grip", toolBody, dark, root.transform, new Vector3(0, -0.026f, -0.03f), new Vector3(0.015f, 0.03f, 0.022f), new Vector3(-20, 0, 0));
+                Part("Body", toolBody, device, root.transform, new Vector3(0, 0, 0.02f), new Vector3(0.021f, 0.016f, 0.06f));
+                Part("Lens Ring", torus, glow, root.transform, new Vector3(0, 0, 0.078f), Vector3.one * 0.017f);
+                tip = new GameObject("Tip").transform; tip.SetParent(root.transform, false); tip.localPosition = new Vector3(0, 0, 0.082f);
+            }
             var scanner = root.AddComponent<Bvr2Scanner>(); scanner.rig = rig; scanner.tip = tip;
+            if (model != null) { scanner.spinners = model.spinners.ToArray(); scanner.accents = model.accents.ToArray(); scanner.lens = model.lens; }
             var coneGo = new GameObject("Scan Cone"); coneGo.transform.SetParent(rig.transform, false);
             coneGo.AddComponent<MeshFilter>().sharedMesh = cone; var cr = coneGo.AddComponent<MeshRenderer>(); cr.sharedMaterial = coneMat; cr.shadowCastingMode = ShadowCastingMode.Off; cr.enabled = false;
             scanner.cone = cr;
-            // little screen on top of the scanner
-            var canvas = Bvr2UiEditor.Canvas("Scanner Screen", root.transform, new Vector2(360, 200), 0.00018f);
-            canvas.localPosition = new Vector3(0, 0.019f, 0.0f); canvas.localRotation = Quaternion.Euler(70, 0, 0);
-            var back = Bvr2UiEditor.MakeImage(canvas, new Color(0.02f, 0.05f, 0.08f, 0.9f), null, overlay);
-            var ringImg = Bvr2UiEditor.MakeImage(canvas, Bvr2Style.Knowledge, ring, overlay); var rr = ringImg.rectTransform; rr.anchorMin = rr.anchorMax = new Vector2(0, 0.5f); rr.sizeDelta = new Vector2(150, 150); rr.anchoredPosition = new Vector2(95, 0);
+            // little screen on the scanner's screen plate: the scan ring on top (towards the lens), the target's name below
+            bool onPlate = model != null && model.screen;
+            var canvas = Bvr2UiEditor.Canvas("Scanner Screen", root.transform, onPlate ? new Vector2(330, 540) : new Vector2(360, 200), onPlate ? 0.000088f : 0.00018f);
+            if (onPlate) { canvas.position = model.screen.position; canvas.localRotation = Quaternion.Euler(78, 0, 0); }
+            else { canvas.localPosition = new Vector3(0, 0.019f, 0.0f); canvas.localRotation = Quaternion.Euler(70, 0, 0); }
+            Bvr2UiEditor.MakeImage(canvas, new Color(0.02f, 0.05f, 0.08f, 0.92f), null, overlay);
+            var ringImg = Bvr2UiEditor.MakeImage(canvas, Bvr2Style.Knowledge, ring, overlay); var rr = ringImg.rectTransform;
+            if (onPlate) { rr.anchorMin = rr.anchorMax = new Vector2(0.5f, 1f); rr.sizeDelta = new Vector2(250, 250); rr.anchoredPosition = new Vector2(0, -160); }
+            else { rr.anchorMin = rr.anchorMax = new Vector2(0, 0.5f); rr.sizeDelta = new Vector2(150, 150); rr.anchoredPosition = new Vector2(95, 0); }
             ringImg.type = Image.Type.Filled; ringImg.fillMethod = Image.FillMethod.Radial360; ringImg.fillAmount = 0; ringImg.fillOrigin = (int)Image.Origin360.Top;
-            var text = Bvr2UiEditor.MakeText(canvas, "СКАНЕР", 34, Bvr2Style.Text, font, overlay); text.rectTransform.offsetMin = new Vector2(180, 0); text.alignment = TextAnchor.MiddleLeft;
+            if (onPlate)
+            {   // a faint full ring behind the progress ring, so the empty screen still reads as a scanner
+                var under = Bvr2UiEditor.MakeImage(canvas, new Color(0.35f, 0.85f, 1f, 0.18f), ring, overlay); var ur = under.rectTransform;
+                ur.anchorMin = ur.anchorMax = new Vector2(0.5f, 1f); ur.sizeDelta = new Vector2(250, 250); ur.anchoredPosition = new Vector2(0, -160); under.transform.SetSiblingIndex(1);
+            }
+            var text = Bvr2UiEditor.MakeText(canvas, "СКАНЕР", 34, Bvr2Style.Text, font, overlay);
+            if (onPlate) { text.rectTransform.offsetMin = new Vector2(16, 24); text.rectTransform.offsetMax = new Vector2(-16, -310); text.alignment = TextAnchor.MiddleCenter; text.resizeTextForBestFit = true; text.resizeTextMinSize = 24; text.resizeTextMaxSize = 64; }
+            else { text.rectTransform.offsetMin = new Vector2(180, 0); text.alignment = TextAnchor.MiddleLeft; }
             scanner.ring = ringImg; scanner.screenText = text;
             return scanner;
         }
@@ -727,19 +756,40 @@ namespace BiologyVR.V2.Editor
         static Bvr2BioTool BuildBioTool(Bvr2Rig rig, Material device, Material dark, Material glow, Mesh torus, Mesh sphere, Material overlay, Font font, out Text modeText, out Renderer[] coils)
         {
             var root = new GameObject("BioTool"); root.transform.SetParent(rig.rightHand, false);
-            Part("Grip", toolBody, dark, root.transform, new Vector3(0, -0.026f, -0.03f), new Vector3(0.015f, 0.03f, 0.022f), new Vector3(-20, 0, 0));
-            Part("Barrel", toolBody, device, root.transform, new Vector3(0, 0, 0.02f), new Vector3(0.018f, 0.018f, 0.065f));
-            var ca = Part("Coil A", torus, glow, root.transform, new Vector3(0, 0, 0.04f), Vector3.one * 0.02f);
-            var cb = Part("Coil B", torus, glow, root.transform, new Vector3(0, 0, 0.065f), Vector3.one * 0.016f);
-            coils = new[] { ca.GetComponent<Renderer>(), cb.GetComponent<Renderer>() };
-            var emitter = Part("Emitter", sphere, glow, root.transform, new Vector3(0, 0, 0.09f), Vector3.one * 0.01f);
-            var tip = new GameObject("Tip").transform; tip.SetParent(root.transform, false); tip.localPosition = new Vector3(0, 0, 0.1f);
-            var bio = root.AddComponent<Bvr2BioTool>(); bio.rig = rig; bio.tip = tip; bio.emitterGlow = emitter.GetComponent<Renderer>();
-            // little screen with the active ability
-            var canvas = Bvr2UiEditor.Canvas("BioTool Screen", root.transform, new Vector2(360, 110), 0.00018f);
-            canvas.localPosition = new Vector3(0, 0.02f, 0.005f); canvas.localRotation = Quaternion.Euler(70, 0, 0);
-            Bvr2UiEditor.MakeImage(canvas, new Color(0.02f, 0.05f, 0.08f, 0.9f), null, overlay);
+            // the model: barrel, a glass chamber with a pulsing core, two turning coils, a crystal emitter, prongs
+            var model = Bvr2HoloFx.Tool("BioTool", root.transform, device, dark, glow);
+            Transform tip; Renderer emitterR;
+            if (model != null && model.tip && model.emitter)
+            {
+                tip = model.tip; emitterR = model.emitter; var lit = new List<Renderer>(model.coils); lit.AddRange(model.accents); coils = lit.ToArray(); // the mode colour tints the coils and the light strips
+            }
+            else
+            {
+                Part("Grip", toolBody, dark, root.transform, new Vector3(0, -0.026f, -0.03f), new Vector3(0.015f, 0.03f, 0.022f), new Vector3(-20, 0, 0));
+                Part("Barrel", toolBody, device, root.transform, new Vector3(0, 0, 0.02f), new Vector3(0.018f, 0.018f, 0.065f));
+                var ca = Part("Coil A", torus, glow, root.transform, new Vector3(0, 0, 0.04f), Vector3.one * 0.02f);
+                var cb = Part("Coil B", torus, glow, root.transform, new Vector3(0, 0, 0.065f), Vector3.one * 0.016f);
+                coils = new[] { ca.GetComponent<Renderer>(), cb.GetComponent<Renderer>() };
+                emitterR = Part("Emitter", sphere, glow, root.transform, new Vector3(0, 0, 0.09f), Vector3.one * 0.01f).GetComponent<Renderer>();
+                tip = new GameObject("Tip").transform; tip.SetParent(root.transform, false); tip.localPosition = new Vector3(0, 0, 0.1f);
+            }
+            var bio = root.AddComponent<Bvr2BioTool>(); bio.rig = rig; bio.tip = tip; bio.emitterGlow = emitterR;
+            if (model != null) { bio.coilSpinners = model.spinners.ToArray(); bio.emitterSpin = model.emitterT; bio.core = model.core; }
+            // little screen with the active ability (fills the screen plate on the barrel)
+            bool onPlate = model != null && model.screen;
+            var canvas = Bvr2UiEditor.Canvas("BioTool Screen", root.transform, onPlate ? new Vector2(330, 500) : new Vector2(360, 110), onPlate ? 0.000078f : 0.00018f);
+            if (onPlate) { canvas.position = model.screen.position; canvas.localRotation = Quaternion.Euler(90, 0, 0); }
+            else { canvas.localPosition = new Vector3(0, 0.02f, 0.005f); canvas.localRotation = Quaternion.Euler(70, 0, 0); }
+            Bvr2UiEditor.MakeImage(canvas, new Color(0.02f, 0.05f, 0.08f, 0.92f), null, overlay);
+            if (onPlate)
+            {   // a thin frame line and a mode bar: the screen reads as a device display, not a sticker
+                var bar = Bvr2UiEditor.MakeImage(canvas, new Color(0.45f, 0.93f, 1f, 0.55f), null, overlay); var br = bar.rectTransform;
+                br.anchorMin = new Vector2(0.12f, 0.8f); br.anchorMax = new Vector2(0.88f, 0.8f); br.sizeDelta = new Vector2(0, 8); br.anchoredPosition = Vector2.zero;
+                var bar2 = Bvr2UiEditor.MakeImage(canvas, new Color(0.45f, 0.93f, 1f, 0.55f), null, overlay); var br2 = bar2.rectTransform;
+                br2.anchorMin = new Vector2(0.12f, 0.2f); br2.anchorMax = new Vector2(0.88f, 0.2f); br2.sizeDelta = new Vector2(0, 8); br2.anchoredPosition = Vector2.zero;
+            }
             modeText = Bvr2UiEditor.MakeText(canvas, "ПРИТЯЖЕНИЕ", 40, Bvr2Style.Ally, font, overlay); modeText.alignment = TextAnchor.MiddleCenter;
+            if (onPlate) { modeText.rectTransform.offsetMin = new Vector2(14, 120); modeText.rectTransform.offsetMax = new Vector2(-14, -120); modeText.resizeTextForBestFit = true; modeText.resizeTextMinSize = 24; modeText.resizeTextMaxSize = 60; }
             return bio;
         }
 
@@ -777,10 +827,20 @@ namespace BiologyVR.V2.Editor
                 var smr = go.AddComponent<SkinnedMeshRenderer>(); smr.sharedMesh = mesh; smr.sharedMaterials = mats; smr.rootBone = go.transform;
                 var lb = mesh.bounds; lb.Expand(0.06f); smr.localBounds = lb; smr.updateWhenOffscreen = false;
             }
-            // head pivot at the neck, carrying the face parts
+            // head pivot at the base of the neck, carrying the face parts: turning and nodding around the
+            // neck base keeps the neck inside the collars (a pivot at the head origin swung the neck base
+            // out over the shirt and the coat). Body layers around the neck (professor_v8): ShirtCollar ->
+            // Collar (lab coat) -> Strap (the amulet's strap around the neck); they stay on the body and
+            // leave room for +-48 deg of head turn
             var pivot = new GameObject("HeadPivot").transform; pivot.SetParent(model.transform, false);
             pivot.position = head ? head.position : model.transform.position + Vector3.up * 1.5f;
-            foreach (var n in new[] { "Head", "Hair", "HairCap", "Glasses", "Mustache", "Beard" }) { var t = Find(model.transform, n); if (t) t.SetParent(pivot, true); }
+            var headMesh = head ? (head.GetComponent<SkinnedMeshRenderer>() ? head.GetComponent<SkinnedMeshRenderer>().sharedMesh : head.GetComponent<MeshFilter>() ? head.GetComponent<MeshFilter>().sharedMesh : null) : null;
+            if (headMesh)
+            {
+                float minY = float.MaxValue; foreach (var v in headMesh.vertices) minY = Mathf.Min(minY, head.TransformPoint(v).y);
+                pivot.position = new Vector3(head.position.x, minY + 0.012f, head.position.z) - root.transform.forward * 0.012f;
+            }
+            foreach (var n in new[] { "Head", "Hair", "HairCap", "HairLocks", "Glasses", "Mustache", "Beard" }) { var t = Find(model.transform, n); if (t) t.SetParent(pivot, true); }
             // materials: hologram with the original colours
             string tex = Root + "/Art/Professor/Textures/";
             foreach (var r in model.GetComponentsInChildren<Renderer>(true))
@@ -790,6 +850,9 @@ namespace BiologyVR.V2.Editor
                 var t2 = AssetDatabase.LoadAssetAtPath<Texture2D>(tex + "Prof_" + key + "_BaseColor.png");
                 mat.SetTexture("_MainTex", t2); mat.SetFloat("_Holo", 0.32f); mat.SetFloat("_Alpha", 0.93f);
                 mat.SetColor("_Tint", key.StartsWith("Hand") ? new Color(0.93f, 0.6f, 0.43f) : Color.white); // hands have no texture: the face's skin tone
+                // the crest, beard and moustache are open shells: draw both sides (seen from behind they read as hair,
+                // not as see-through shards)
+                mat.SetFloat("_Cull", key == "Hair" || key == "Beard" || key == "Mustache" ? 0f : 2f);
                 int subs = 1;
                 if (r is SkinnedMeshRenderer smr0) { if (smr0.sharedMesh) subs = smr0.sharedMesh.subMeshCount; }
                 else { var mf0 = r.GetComponent<MeshFilter>(); if (mf0 && mf0.sharedMesh) subs = mf0.sharedMesh.subMeshCount; }

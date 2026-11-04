@@ -218,6 +218,7 @@ namespace BiologyVR.V2
             Finished = true;
             Objective("");
             if (autoplay) yield break;
+            Bvr2Save.Completed(0, 0);
             onNextChapter?.Invoke();
         }
 
@@ -281,6 +282,7 @@ namespace BiologyVR.V2
             Transform t = what == "desk" ? toolReplicas : what == "map" ? patientMap : what == "capsule" ? capsule : what == "monitor" ? monitor : what == "prof" ? game.professor.headPivot : null;
             if (what == "profbody") { game.rig.LookAt(game.professor.transform.position + Vector3.up * 0.95f * game.professor.transform.lossyScale.y); return; }
             if (what == "profhands") { game.rig.LookAt(game.professor.transform.position + Vector3.up * 0.85f * game.professor.transform.lossyScale.y); return; }
+            if (what == "prof" && t) { game.rig.LookAt(t.position + t.up * 0.12f * game.professor.transform.lossyScale.y); return; } // pivot sits at the neck base
             if (t) game.rig.LookAt(t.position);
         }
         public void DebugTake() { TakeTools(true); }

@@ -13,6 +13,9 @@ namespace BiologyVR.V2
     {
         public Bvr2Rig rig; public Bvr2Input input; public Bvr2Blood blood; public Bvr2Codex codex; public Bvr2Audio audioDirector; public Bvr2Fx fx;
         public Transform tip; public Renderer cone; public Image ring; public Text screenText;
+        /// <summary>Model effects: the lens ring segments turn (faster while scanning), the accent lights follow the state.</summary>
+        public Transform[] spinners; public Renderer[] accents; public Renderer lens;
+        float spin, flash;
         public float range = 22f, cellCone = 5.5f;
         public bool allowPlasma;
         public bool locked; // disabled by the chapter while not yet introduced
@@ -38,6 +41,7 @@ namespace BiologyVR.V2
             var hand = rig ? rig.leftHand : null; if (!hand) return;
             Vector3 origin = tip ? tip.position : hand.position; Vector3 dir = hand.forward;
             bool held = input && input.Scan && !locked && !suspended;
+            ModelFx(held);
             if (!held) { Clear(); return; }
             var ray = new Ray(origin, dir);
             // keep a moving cell locked while it stays inside a wider cone
@@ -74,8 +78,28 @@ namespace BiologyVR.V2
             Visuals(origin, dir);
         }
 
+        void ModelFx(bool held)
+        {
+            float speed = held ? 260f + 900f * Progress : 45f;
+            spin = Mathf.Repeat(spin + speed * Time.unscaledDeltaTime, 360f);
+            flash = Mathf.Max(0f, flash - Time.unscaledDeltaTime * 2.5f);
+            if (spinners != null)
+                for (int i = 0; i < spinners.Length; i++)
+                    if (spinners[i]) spinners[i].Rotate(transform.forward, speed * Time.unscaledDeltaTime * (i % 2 == 0 ? 1f : -0.6f), Space.World);
+            Color c = !held ? Bvr2Style.Ally * 0.55f : Color.Lerp(Bvr2Style.Ally, Bvr2Style.Knowledge, Progress) * (1f + Progress);
+            c = Color.Lerp(c, Color.white * 2f, flash);
+            c.a = 1f; // brightness in rgb only: the glow shader takes alpha as opacity, a dim idle colour must not fade the parts out
+            if (accents != null) foreach (var r in accents) if (r) { r.GetPropertyBlock(mpb); mpb.SetColor("_Color", c); r.SetPropertyBlock(mpb); }
+            if (lens)
+            {
+                float pulse = held ? 1.2f + 0.6f * Mathf.Sin(Time.unscaledTime * 18f) * Progress : 0.7f + 0.15f * Mathf.Sin(Time.unscaledTime * 2f);
+                lens.GetPropertyBlock(mpb); var lc = Color.Lerp(c, Color.white, 0.25f) * pulse; lc.a = 1f; mpb.SetColor("_Color", lc); lens.SetPropertyBlock(mpb);
+            }
+        }
+
         void Complete()
         {
+            flash = 1f;
             string id = TargetId; Vector3 p = TargetPoint;
             bool first = codex && !codex.Has(id);
             if (TargetKind == Kind.Thing && thing) thing.Fire();

@@ -26,6 +26,10 @@ namespace BiologyVR.V2
         RectTransform objectiveTop, promptTop; float topShown = 1;
         /// <summary>While a question/board is in front of the player the top lines step aside.</summary>
         public bool TopHidden { get; set; }
+        /// <summary>Main menu / pause: the visor, the wrist panel and the comm screen are hidden.</summary>
+        public bool Hidden { get; set; }
+        /// <summary>Professor subtitles (menu setting).</summary>
+        public bool subtitles = true;
 
         // ---- comm screen: the professor's waist-up hologram pops up here while he speaks ----
         public Transform CommDock { get; private set; }
@@ -215,6 +219,7 @@ namespace BiologyVR.V2
         public void Say(string who, string text, float seconds)
         {
             LastLine = text; if (!subtitle) return;
+            if (!subtitles) return;
             speaker.text = who.ToUpperInvariant(); subtitle.text = text; subtitleUntil = Time.unscaledTime + seconds; subtitleGroup.alpha = 1;
         }
         public void ClearSubtitle() { subtitleUntil = 0; }
@@ -236,6 +241,10 @@ namespace BiologyVR.V2
             if (!built) { Build(); if (!built) return; }
             var head = rig.head.transform;
             float dt = Time.unscaledDeltaTime;
+            if (Bvr2Pause.Active) { subtitleUntil += dt; toastUntil += dt; titleUntil += dt; } // timers hold during the pause
+            if (visor.gameObject.activeSelf == Hidden) visor.gameObject.SetActive(!Hidden);
+            if (wrist && wrist.gameObject.activeSelf == Hidden) wrist.gameObject.SetActive(!Hidden);
+            if (Hidden) { if (commCanvas) commCanvas.gameObject.SetActive(false); return; }
             // Visor: lazy follow in VR (comfortable), locked on desktop (it is the screen).
             visor.position = head.position;
             if (!rig.IsXR) visorForward = head.forward;

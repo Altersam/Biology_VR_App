@@ -1,5 +1,5 @@
 import bpy, os
-bpy.ops.wm.open_mainfile(filepath=os.path.abspath("professor_v4.blend"))
+bpy.ops.wm.open_mainfile(filepath=os.path.abspath("professor_v10.blend"))
 for o in bpy.data.objects:
     if o.type == 'MESH' and o.data.shape_keys:
         for k in o.data.shape_keys.key_blocks: k.value = 0

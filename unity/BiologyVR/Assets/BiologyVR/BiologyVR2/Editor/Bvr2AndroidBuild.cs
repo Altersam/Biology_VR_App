@@ -30,8 +30,8 @@ namespace BiologyVR.V2.Editor
     /// </summary>
     public static class Bvr2AndroidBuild
     {
-        public const string Version = "0.12.0";
-        public const int AndroidCode = 13;
+        public const string Version = "0.13.0";
+        public const int AndroidCode = 14;
         public const string AppId = "com.biologyvr.biologyvr2";
         public const string ProductName = "Biology VR 2";
         const string MobileUrp = "Assets/BiologyVR/ArteryJourney/Generated/ArteryQuestPico_URP.asset";

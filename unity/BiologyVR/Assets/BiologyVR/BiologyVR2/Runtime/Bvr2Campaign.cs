@@ -6,8 +6,9 @@ namespace BiologyVR.V2
 {
     /// <summary>
     /// Runs the chapters in one scene (one long artery, each chapter further downstream).
-    /// At start: a chapter choice (any chapter can be played on its own for a lesson), unless a chapter
-    /// was requested from the editor menu (PlayerPrefs "BVR2_StartChapter").
+    /// At start: the title screen and the main menu (<see cref="Bvr2Menu"/>: continue, new game, chapters,
+    /// settings), unless a chapter was requested from the editor menu (PlayerPrefs "BVR2_StartChapter").
+    /// Without a menu object the old in-artery chapter choice is used.
     /// </summary>
     public sealed class Bvr2Campaign : MonoBehaviour
     {
@@ -15,6 +16,7 @@ namespace BiologyVR.V2
         public Bvr2Game game;
         public List<Bvr2ChapterBase> chapters = new List<Bvr2ChapterBase>();
         public bool chapterMenu = true;
+        public Bvr2Menu menu;
         public Bvr2ChapterBase Current { get; private set; }
 
         IEnumerator Start()
@@ -29,6 +31,7 @@ namespace BiologyVR.V2
             int forced = PlayerPrefs.GetInt(StartChapterKey, -1); // 0 = the lab prelude
             if (forced >= 0) { PlayerPrefs.DeleteKey(StartChapterKey); PlayerPrefs.Save(); StartChapter(forced); yield break; }
             if (!chapterMenu || chapters.Count < 2) { StartChapter(1); yield break; }
+            if (menu) { menu.OpenTitle(); yield break; }
             yield return Menu();
         }
 
@@ -54,7 +57,25 @@ namespace BiologyVR.V2
             foreach (var c in chapters) if (c && c.Number == number) next = c;
             if (!next) next = chapters[0];
             foreach (var c in chapters) if (c && c != next) c.Stop();
+            if (menu) menu.CloseForGame();
+            if (!next.autoplay) Bvr2Save.Started(next.Number);
             Current = next; next.startBeat = beat; next.Begin();
+        }
+
+        /// <summary>Stop the running chapter and go back to the main menu (pause menu, end-of-chapter choice).</summary>
+        public void ToMainMenu()
+        {
+            foreach (var c in chapters) if (c) c.Stop();
+            Current = null;
+            if (menu) menu.OpenMain(); else StartCoroutine(Menu());
+        }
+
+        /// <summary>Restart the current chapter from its beginning (pause menu).</summary>
+        public void RestartCurrent()
+        {
+            if (!Current) return;
+            if (game.codex) game.codex.ResetChapter(Current.Number);
+            StartChapter(Current.Number);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace BiologyVR.V2.Editor
     /// release with both APKs attached, through the user's own git credentials and the project's
     /// gh wrapper (Tools/github_cli.py). Runs in the background; progress in
     /// Reports/GitHubPublish_{version}.json. Refuses on an unexpected remote, a diverged branch or
-    /// forbidden files in the commit. File names follow Bvr2AndroidBuild.Version (0.12.0 → *_0_12_0*).
+    /// forbidden files in the commit. File names follow Bvr2AndroidBuild.Version (0.13.0 → *_0_13_0*).
     /// </summary>
     public static class Bvr2GitHubPublish
     {
@@ -39,6 +39,26 @@ namespace BiologyVR.V2.Editor
             if (!Directory.Exists(Path.Combine(repo, ".git"))) throw new InvalidOperationException("App repository kit not found next to the project (open the project at its original path): " + repo);
             running = true;
             Task.Run(() => Run(project, repo));
+        }
+
+        /// <summary>Runs Tools/prepare_bvr2_release.py with the Windows Python in the background (APKs, sources,
+        /// README and VERSION.json into the app repository kit; no git). Result: Reports/GitHubPrepare_{version}.json.</summary>
+        [MenuItem("Biology VR 2/Android/Prepare GitHub Kit", false, 219)]
+        static void Prepare()
+        {
+            if (running) throw new InvalidOperationException("Publishing is already running");
+            string project = Path.GetFullPath(".");
+            string report = Path.GetFullPath(Bvr2SceneBuilder.Root + "/Reports/GitHubPrepare_" + Under + ".json");
+            running = true;
+            Task.Run(() =>
+            {
+                File.WriteAllText(report, JsonConvert.SerializeObject(new { utc = DateTime.UtcNow, result = "Running" }, Formatting.Indented));
+                string python = Exec("python", "--version", project).exit == 0 ? "python" : "py";
+                var s = Exec(python, "Tools/prepare_bvr2_release.py", project);
+                File.WriteAllText(report, JsonConvert.SerializeObject(new { utc = DateTime.UtcNow, result = s.exit == 0 ? "Succeeded" : "Failed", exit = s.exit, output = s.output }, Formatting.Indented));
+                running = false;
+                Debug.Log($"[BVR2] GitHub kit prepare: exit {s.exit}");
+            });
         }
 
         sealed class Step { public string name; public int exit; public string output; }
@@ -71,9 +91,11 @@ namespace BiologyVR.V2.Editor
                 if (staged.Count > 0)
                 {
                     string message = Path.Combine(Path.GetTempPath(), "bvr2_commit_message.txt");
-                    File.WriteAllText(message, $"Biology VR 2 {Bvr2AndroidBuild.Version}: new lab, voiced professor, headset builds\n\n" +
-                        "Prologue moves into the SecVarLab room with the professor standing in full height;\n" +
-                        "186 voiced professor lines with lip sync; professor model fixes (hair, mouth, hands, collar).\n" +
+                    File.WriteAllText(message, $"Biology VR 2 {Bvr2AndroidBuild.Version}: main menu, patient hologram, new tools\n\n" +
+                        "Title screen and main menu (continue, new game, chapters, settings, about, exit) on a holographic stage;\n" +
+                        "pause menu in the chapters; saved progress (chapters, stars) and settings (volumes, subtitles, turning, comfort).\n" +
+                        "Patient hologram with the circulatory system, a beating heart and a live ECG; new scanner and BioTool models\n" +
+                        "with turning rings and coils; lab effects (dust, light shafts, bubbles); professor head and neck fixes.\n" +
                         $"PICO 4 and Meta Quest APKs {Bvr2AndroidBuild.Version} (versionCode {Bvr2AndroidBuild.AndroidCode}) attached to release {Tag}.\n" +
                         "Editor autoplay of prologue and chapters 1-6 passed; not yet verified on a headset.\n\n" +
                         "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n" +

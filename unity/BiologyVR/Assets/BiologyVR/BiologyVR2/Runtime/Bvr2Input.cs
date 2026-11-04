@@ -39,6 +39,25 @@ namespace BiologyVR.V2
         public float FieldDelta { get; private set; }
         public int SnapTurn { get; private set; }
 
+        // ---- menus (Bvr2Menu) ----
+        /// <summary>While a menu is open the game sees no buttons and no movement; the menu reads the Ui* values.</summary>
+        public bool Captured;
+        /// <summary>Confirm: either trigger, Enter / Space; UiHandLeft tells which trigger (the pointer follows that hand).</summary>
+        public bool UiClickDown { get; private set; }
+        public bool UiHandLeft { get; private set; }
+        /// <summary>The confirm came from the keyboard (Enter / Space), not from a pointer.</summary>
+        public bool UiKeyConfirm { get; private set; }
+        /// <summary>Either trigger (or a mouse button) is held — raw, also while captured.</summary>
+        public bool UiTriggerHeld { get; private set; }
+        /// <summary>Back: B / Y, Esc / Backspace.</summary>
+        public bool UiBackDown { get; private set; }
+        /// <summary>Open / close the pause menu: the Menu button or Y, Tab / Esc.</summary>
+        public bool PauseDown { get; private set; }
+        /// <summary>Step the menu focus: −1 up, +1 down (stick or W/S / arrows), and left/right for values.</summary>
+        public int UiNavY { get; private set; }
+        public int UiNavX { get; private set; }
+        bool navArmed = true, prevAbilityRaw;
+
         InputAction move, stickR, scan, tool, gripL, gripR, boostA, boostX, menu, menuY, ability;
         bool snapArmed = true, prevBoost, prevScan, prevTool, prevGripL, prevGripR, prevMenu, prevAnchorV, prevAbility;
 
@@ -98,6 +117,34 @@ namespace BiologyVR.V2
             prevAnchorV = anchorV; GripL = gl; GripR = gr; prevGripL = gl; prevGripR = gr;
             MenuDown = mn && !prevMenu; prevMenu = mn;
             AbilityDown = ab && !prevAbility; prevAbility = ab;
+            // ---- menu values (raw, read before the capture below) ----
+            bool escape = kb != null && kb.escapeKey.wasPressedThisFrame;
+            UiKeyConfirm = kb != null && (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame);
+            UiClickDown = ToolDown || ScanDown || UiKeyConfirm;
+            UiTriggerHeld = Tool || Scan;
+            if (ScanDown) UiHandLeft = true; else if (ToolDown) UiHandLeft = false;
+            bool abilityRaw = ability.IsPressed();
+            UiBackDown = (abilityRaw && !prevAbilityRaw) || escape || (kb != null && kb.backspaceKey.wasPressedThisFrame);
+            prevAbilityRaw = abilityRaw;
+            PauseDown = MenuDown || escape;
+            Vector2 nav = m + r;
+            if (kb != null)
+            {
+                if (kb.upArrowKey.wasPressedThisFrame) nav.y = 1; if (kb.downArrowKey.wasPressedThisFrame) nav.y = -1;
+                if (kb.leftArrowKey.wasPressedThisFrame) nav.x = -1; if (kb.rightArrowKey.wasPressedThisFrame) nav.x = 1;
+            }
+            UiNavY = 0; UiNavX = 0;
+            if (navArmed && (Mathf.Abs(nav.y) > 0.7f || Mathf.Abs(nav.x) > 0.7f))
+            {
+                if (Mathf.Abs(nav.y) >= Mathf.Abs(nav.x)) UiNavY = nav.y > 0 ? -1 : 1; else UiNavX = nav.x > 0 ? 1 : -1;
+                navArmed = false;
+            }
+            if (nav.magnitude < 0.3f) navArmed = true;
+            if (Captured)
+            {
+                Move = Vector2.zero; Vertical = 0; Boost = BoostDown = false; Scan = ScanDown = false;
+                Tool = ToolDown = ToolUp = false; AnchorDown = false; GripL = GripR = false; AbilityDown = false; field = 0;
+            }
             FieldDelta = field;
             SnapTurn = 0;
             if (IsXR)

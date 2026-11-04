@@ -6,8 +6,8 @@ namespace BiologyVR.V2
 {
     /// <summary>
     /// Chapter 5 «Очаг» — the final battle (scene 15 of the script). The artery widens at a fork; a patch of the
-    /// wall is infected: swollen cells bud new virions, fever is high. Phases: hold the line with antibodies +
-    /// Signal and the allies (neutrophils, macrophages) while the scanner works on the key; armoured "hedgehogs"
+    /// wall is infected: swollen cells bud new virions, fever is high. Phases: hold the line synchronised with a
+    /// neutrophil (swing through virions, as in chapter 3) while the scanner works on the key; armoured "hedgehogs"
     /// shrug ordinary antibodies off → the key puzzle (fit the antibody's paratope to the epitope, slow motion)
     /// gives specific antibodies → traitors: infected cells show flags, mark them with the Signal and the
     /// T-killers make them die by apoptosis (a healthy cell marked by mistake gets damaged) → the last surge:
@@ -191,39 +191,55 @@ namespace BiologyVR.V2
         {
             Beat = 2; Phase = 1;
             var sw = game.swimmer; sw.regionMin = arenaS - 24f; sw.regionMax = arenaS + 22f;
+            var sync = game.sync;
             if (Imm.phagocytes.Count > 0 && !Imm.phagocytes[0].gameObject.activeSelf) DeployAllies();
             game.Reveal("neutrophil", game.Head + game.rig.head.transform.forward * 2.2f);
             yield return WaitKnowledge();
-            game.antibodies.unlocked = true; game.abilities.signalUnlocked = true; game.abilities.SetMode(Bvr2Abilities.Mode.Signal, false);
-            yield return Say("Левая рука — антитела, правая — Сигнал для фагоцитов. Держись, пока сканер подбирает ключ к этому вирусу!", Mood.Surprised);
+            // reworked 02.11: the line is held with the hands — synchronised with a neutrophil, swing through the
+            // virions (as in chapter 3); armoured hedgehogs bounce off, but every hit helps the scanner read them
+            yield return Say("Подключаю тебя к нейтрофилу: руки снова фагоциты. Держи оборону, пока сканер подбирает ключ к этому вирусу!", Mood.Surprised);
+            sync.tKiller = false; sync.Begin(0f); Step = "синхронизация";
+            Hud.Title("СИНХРОНИЗАЦИЯ", "ты — нейтрофил", 2.2f);
+            System.Action<Bvr2Virus> onBounce = v =>
+            {
+                keyBonus += 0.03f;
+                if (!glanced) { glanced = true; Prof.Say("Ёжик! Броня — фагоцит его не берёт. Но каждый удар помогает сканеру прочитать его шипы: ключ найдётся быстрее.", Mood.Serious); }
+            };
+            System.Action<int> onCombo = n => { if (Running) Hud.Toast($"КОМБО ×{n}!", Bvr2Style.Knowledge, 1.2f); };
+            sync.OnBounce += onBounce; sync.OnComboMilestone += onCombo;
             Objective("Держись, пока сканер ищет ключ");
-            foreach (var c in cells) if (c) { c.releasing = true; c.releaseEvery = 16f; }
-            Prompt("Левый курок — антитела · правый — Сигнал", "ПКМ — антитела · ЛКМ — Сигнал");
+            foreach (var c in cells) if (c) { c.releasing = true; c.releaseEvery = 18f; }
+            Prompt("Проводи руками сквозь вирусы · ёжиков бей — это ускоряет ключ", "Подплывай к вирусам — они поглощаются");
             float t = 0, spawnT = 0, autoT = 0; int spawned = 0;
-            float duration = autoplay ? 6f : 70f;
+            float duration = autoplay ? 6f : 60f;
             while (KeyProgress < 1f)
             {
                 float dt = Time.unscaledDeltaTime; t += dt; spawnT += dt;
                 KeyProgress = Mathf.Clamp01(t / duration + keyBonus);
-                if (spawnT > 2.6f && Imm.AliveViruses < 20)
+                if (spawnT > 2.4f && Imm.AliveViruses < 16)
                 {
                     spawnT = 0; spawned++;
                     if (spawned % 6 == 0) Swarm();
                     else SpawnLane(spawned % 3, spawned % 4 == 0);
                 }
-                Hud.SetObjective($"Держись!  Ключ {Mathf.RoundToInt(KeyProgress * 100)} %  ·  вирусов {Imm.AliveViruses}  ·  {game.organism.temperature:0.0}°");
+                Hud.SetObjective($"Держись!  Ключ {Mathf.RoundToInt(KeyProgress * 100)} %  ·  вирусов {Imm.AliveViruses}  ·  {game.organism.temperature:0.0}°" + (sync.Combo >= 2 ? $"  ·  комбо ×{sync.Combo}" : ""));
+                var near = Imm.NearestVirus(game.Head, 40f, false, false);
+                Hud.SetCompass(near && Vector3.Angle(game.rig.head.transform.forward, near.transform.position - game.Head) > 45f ? near.transform.position : (Vector3?)null, "вирус");
                 if (autoplay)
                 {
                     autoT += dt;
-                    if (autoT > 0.25f)
+                    if (autoT > 0.3f)
                     {
                         autoT = 0;
-                        foreach (var v in Imm.viruses) if (v.gameObject.activeSelf && v.Alive && !v.Tagged && !v.debris) { if (v.armored) Imm.Glance(v); else { v.AddTag(1f); Imm.Signal(v.transform.position, Imm.OnTheBeat); } break; }
+                        var v = Imm.NearestVirus(game.Head, 60f, false, false);
+                        if (v) sync.ForceEat(v); // a hedgehog bounces (and helps the key)
                     }
                 }
                 yield return null;
             }
-            NoPrompt();
+            sync.OnBounce -= onBounce; sync.OnComboMilestone -= onCombo;
+            sync.End();
+            Hud.SetCompass(null, null); NoPrompt();
             game.sound.Play("SFX_Reveal", 0.9f);
         }
 
@@ -312,13 +328,17 @@ namespace BiologyVR.V2
             yield return WaitKnowledge();
             game.abilities.SetMode(Bvr2Abilities.Mode.Signal, false);
             yield return Say("Заражённые клетки выставили флажки. Отмечай их Сигналом — Т-киллеры пойдут в атаку. Здоровые не трогай!", Mood.Serious);
+            Prof.Say("Вирусы в крови теперь берут на себя антитела. Твоя задача — найти клетки с флажками.", Mood.Neutral);
             Objective("Отметь заражённые клетки Сигналом");
             Prompt("Правый курок на клетку с флажками — Сигнал", "ЛКМ на клетку с флажками — Сигнал");
-            float t = 0, spawnT = 0, autoT = 0; bool autoMistake = false;
+            float t = 0, spawnT = 0, autoT = 0, neutralT = 0; bool autoMistake = false;
             while (AliveInfected > 0) // cells infected during the fight (spots) are left for the last surge
             {
                 float dt = Time.unscaledDeltaTime; t += dt; spawnT += dt;
-                if (spawnT > 5f && Imm.AliveViruses < 10) { spawnT = 0; SpawnLane(Random.Range(0, 2), Random.value < 0.3f); }
+                if (spawnT > 7f && Imm.AliveViruses < 8) { spawnT = 0; SpawnLane(Random.Range(0, 2), Random.value < 0.3f); }
+                // plasma cells already make the specific antibodies: virions in the blood are neutralised one by one
+                neutralT += dt;
+                if (neutralT > 0.7f) { neutralT = 0; foreach (var v in Imm.viruses) if (v.gameObject.activeSelf && v.Alive && !v.Tagged && !v.debris && v.Current == Bvr2Virus.State.Free && Vector3.Distance(v.transform.position, game.Head) < 35f) { v.Neutralize(); break; } }
                 Hud.SetObjective($"Заражённых клеток {AliveInfected + Imm.SpotCount}  ·  вирусов {Imm.AliveViruses}  ·  {game.organism.temperature:0.0}°");
                 Bvr2WallCell next = null; foreach (var c in cells) if (c && c.InfectedAlive && !c.Targeted) { next = c; break; }
                 if (next && !autoplay) Hud.SetCompass(Vector3.Angle(game.rig.head.transform.forward, next.transform.position - game.Head) > 35f ? next.transform.position : (Vector3?)null, "флажки");

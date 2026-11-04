@@ -16,6 +16,7 @@ Shader "BVR2/Hologram"
         _ClipPlane ("Clip plane (world normal xyz, w); zero = off", Vector) = (0, 0, 0, 0)
         _Emission ("Emission", Color) = (0, 0, 0, 1)
         _Solid ("Solid (physical presence, no hologram look)", Range(0, 1)) = 0
+        [Enum(UnityEngine.Rendering.CullMode)] _Cull ("Cull (Off for open shells: hair, beard)", Float) = 2
     }
     SubShader
     {
@@ -26,6 +27,7 @@ Shader "BVR2/Hologram"
             Tags { "LightMode"="SRPDefaultUnlit" }
             ColorMask 0
             ZWrite On
+            Cull [_Cull]
             HLSLPROGRAM
             #pragma vertex Vert
             #pragma fragment Frag
@@ -53,6 +55,7 @@ Shader "BVR2/Hologram"
             Blend SrcAlpha OneMinusSrcAlpha
             ZWrite Off
             ZTest LEqual
+            Cull [_Cull]
             HLSLPROGRAM
             #pragma vertex Vert
             #pragma fragment Frag
@@ -65,7 +68,7 @@ Shader "BVR2/Hologram"
             struct A { float4 p:POSITION; float3 n:NORMAL; float2 uv:TEXCOORD0; UNITY_VERTEX_INPUT_INSTANCE_ID };
             struct V { float4 p:SV_POSITION; float3 ws:TEXCOORD0; half3 n:TEXCOORD1; float2 uv:TEXCOORD2; UNITY_VERTEX_OUTPUT_STEREO };
             V Vert(A i) { V o = (V)0; UNITY_SETUP_INSTANCE_ID(i); UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o); o.ws = TransformObjectToWorld(i.p.xyz); o.p = TransformWorldToHClip(o.ws); o.n = TransformObjectToWorldNormal(i.n); o.uv = TRANSFORM_TEX(i.uv, _MainTex); return o; }
-            half4 Frag(V i) : SV_Target
+            half4 Frag(V i, FRONT_FACE_TYPE face : FRONT_FACE_SEMANTIC) : SV_Target
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
                 float y = (dot(i.ws, _RevealAxis.xyz) - _RevealRange.x) / max(_RevealRange.y - _RevealRange.x, 1e-3);
@@ -78,7 +81,7 @@ Shader "BVR2/Hologram"
                     clip(cd);
                     edge = max(edge, (1.0 - smoothstep(0.0, 0.012, cd)) * 0.8);
                 }
-                half3 n = normalize(i.n); half3 v = normalize(_WorldSpaceCameraPos - i.ws);
+                half3 n = normalize(i.n) * IS_FRONT_VFACE(face, 1.0, -1.0); half3 v = normalize(_WorldSpaceCameraPos - i.ws);
                 half4 tex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv) * _Tint;
                 // Soft studio light from above-front so the face reads in the dark lumen.
                 half3 key = normalize(half3(0.3, 0.8, 0.0) + v);

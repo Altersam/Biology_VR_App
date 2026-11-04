@@ -366,8 +366,14 @@ namespace BiologyVR.V2
             game.abilities.SetMode(Bvr2Abilities.Mode.Attract);
             game.bioTool.locked = true; // the beam is for the embolus now, not for cells
             game.sound.Mood("tension"); o.stressDrive = 12f;
+            embolus.speedFactor = 1.1f; // the first chase is a bit gentler; retries are faster
             yield return Say("Он плывёт к узкой ветви. Догони и поймай его лучом Притяжения!", Mood.Surprised);
-            Prompt("Рывок — A/X · правый курок на эмбол — держать луч", "Shift — рывок · ЛКМ на эмбол — держать луч");
+            const string xrHint = "Наведи BioTool на сгусток в красном кольце и держи правый курок · рядом можно схватить рукой (хват)";
+            const string pcHint = "Наведи прицел на сгусток в красном кольце и держи ЛКМ · Shift — рывок";
+            Prompt(xrHint, pcHint);
+            float idle = 0; bool hinted = false;
+            System.Action onMissed = () => Hud.Toast("Мимо! Наведи на сгусток в красном кольце", Bvr2Style.Danger, 1.4f);
+            embolus.OnMissed += onMissed;
             bool caughtSaid = false;
             System.Action onCaught = () => { if (!caughtSaid) { caughtSaid = true; Prof.Say("Держу! Ввожу тромболитик — не отпускай луч!", Mood.Serious); } };
             System.Action onEscaped = () => { Hud.Toast("Вырвался! Лови снова", Bvr2Style.Danger, 1.6f); caughtSaid = false; };
@@ -383,13 +389,17 @@ namespace BiologyVR.V2
                     embolus.Launch(launchS, V.plaques[Mathf.Max(0, ruptured)].angleDeg);
                     Arrive(launchS - 9f, 0.8f);
                     o.lesionConductance = 0.6f; game.environment.alarm = 0.4f;
+                    embolus.speedFactor = 1.25f;
                     yield return Say("Ещё раз — быстрее! Используй рывок.", Mood.Serious);
-                    Prompt("Рывок — A/X · правый курок на эмбол — держать луч", "Shift — рывок · ЛКМ на эмбол — держать луч");
+                    Prompt(xrHint, pcHint);
                     continue;
                 }
                 float left = Mathf.Max(0, narrowS - embolus.S);
                 Hud.SetCompass(embolus.transform.position, "эмбол");
-                if (embolus.Current == Bvr2Embolus.State.Caught) Hud.SetObjective($"Держи луч! Растворение {Mathf.RoundToInt(embolus.Lysis * 100)} %  ·  до узкой ветви {left:0} м");
+                // nobody is catching it: say once more what to do
+                idle = embolus.Current == Bvr2Embolus.State.Drifting && embolus.CatchProgress < 0.05f ? idle + Time.unscaledDeltaTime : 0f;
+                if (idle > 6f && !hinted) { hinted = true; Prof.Say("Подплыви ближе и направь BioTool прямо на сгусток. Луч сам притянется — держи курок.", Mood.Serious); }
+                if (embolus.Current == Bvr2Embolus.State.Caught) Hud.SetObjective(embolus.Grabbed ? $"Держи его в руке! Растворение {Mathf.RoundToInt(embolus.Lysis * 100)} %" : $"Держи луч! Растворение {Mathf.RoundToInt(embolus.Lysis * 100)} %  ·  до узкой ветви {left:0} м");
                 else Hud.SetObjective($"Поймай эмбол лучом!  Захват {Mathf.RoundToInt(embolus.CatchProgress * 100)} %  ·  до узкой ветви {left:0} м");
                 game.environment.alarm = Mathf.Lerp(game.environment.alarm, Mathf.Lerp(0.8f, 0.25f, left / Mathf.Max(1f, narrowS - launchS)), Time.unscaledDeltaTime);
                 if (autoplay)
@@ -404,7 +414,7 @@ namespace BiologyVR.V2
                 yield return null;
             }
             embolus.forceAim = false;
-            embolus.OnCaught -= onCaught; embolus.OnEscaped -= onEscaped;
+            embolus.OnCaught -= onCaught; embolus.OnEscaped -= onEscaped; embolus.OnMissed -= onMissed;
             CatchDistanceLeft = Mathf.Clamp01((narrowS - embolus.S) / Mathf.Max(1f, narrowS - launchS));
             Hud.SetCompass(null, null); NoPrompt();
             game.bioTool.locked = false;

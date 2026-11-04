@@ -1,0 +1,41 @@
+{
+  "utc": "2026-10-28T15:49:59.397005+00:00",
+  "version": "0.12.0",
+  "tag": "v0.12.0",
+  "application_id": "com.biologyvr.biologyvr2",
+  "repository": "/sessions/rcw-01mthkqtqiy7lgch7nzbeqr8/mnt/Biology_VR/3д/Github_VR/Biology_VR_App",
+  "passed": true,
+  "verified_copies": 997,
+  "source_files": 995,
+  "source_bytes": 54093858,
+  "release_files": [
+    {
+      "file": "BiologyVR2_Pico4_v0.12.0.apk",
+      "bytes": 70396291,
+      "sha256": "b0e74c101094a785e31b1f626373d5a5316357dc306d08cb54170e7991ea6d72",
+      "version": "0.12.0",
+      "version_code": 13,
+      "application_id": "com.biologyvr.biologyvr2",
+      "device": "PICO 4 / PICO 4 Enterprise",
+      "tag": "v0.12.0",
+      "headset_verified": false
+    },
+    {
+      "file": "BiologyVR2_MetaQuest_v0.12.0.apk",
+      "bytes": 69512076,
+      "sha256": "925c5434bdfeb2611ce4b5b5f6feb3f1a30a4cc085c01a4e5b58be2095b3a1c8",
+      "version": "0.12.0",
+      "version_code": 13,
+      "application_id": "com.biologyvr.biologyvr2",
+      "device": "Meta Quest 2 / Pro / 3 / 3S",
+      "tag": "v0.12.0",
+      "headset_verified": false
+    }
+  ],
+  "mismatches": [],
+  "oversized": [],
+  "forbidden": [],
+  "committed": false,
+  "pushed": false,
+  "headset_verified": false
+}

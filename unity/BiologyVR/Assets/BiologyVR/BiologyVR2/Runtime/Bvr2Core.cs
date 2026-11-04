@@ -19,6 +19,7 @@ namespace BiologyVR.V2
 
         public static void Tick()
         {
+            if (Bvr2Pause.Active) { holdUntil += Time.unscaledDeltaTime; return; } // slow-motion keeps its remaining time
             float goal = Time.unscaledTime < holdUntil ? target : 1f;
             Scale = Mathf.MoveTowards(Scale, goal, Time.unscaledDeltaTime * (goal < Scale ? 6f : 1.6f));
             Now += Delta;

@@ -36,13 +36,14 @@ namespace BiologyVR.V2
             immune = owner; vessel = owner.vessel; organism = owner.organism;
             s = s0; angle = angle0; r01 = r0; seek = seekSpeed; infectTime = infectSeconds;
             targetS = s0 + Random.Range(-4f, 8f); targetAngle = angle0 + Random.Range(-50f, 50f);
-            tag = 0; TaggedAt = -1; InfectProgress = 0; Engulfer = null; absorbInto = null; Current = State.Free; phase = Random.value * 10f; anchored = false; Neutralized = false; neutralT = 0;
+            tag = 0; TaggedAt = -1; InfectProgress = 0; Engulfer = null; knock = Vector3.zero; absorbInto = null; Current = State.Free; phase = Random.value * 10f; anchored = false; Neutralized = false; neutralT = 0;
             transform.localScale = Vector3.one * radius; spin = Random.Range(20f, 60f);
             transform.position = vessel.PointAt(s, vessel.Radius(s) * r01, angle);
             if (antibodies) for (int i = 0; i < antibodies.childCount; i++) antibodies.GetChild(i).gameObject.SetActive(false);
             gameObject.SetActive(true);
         }
 
+        Vector3 knock;
         void Awake() { mpb = new MaterialPropertyBlock(); }
 
         /// <summary>Debris: placed at a point, drifts only a little; phagocytes take it only after a Signal.</summary>
@@ -92,6 +93,9 @@ namespace BiologyVR.V2
             absorbInto = into; Current = State.Engulfed; engulfT = 0; engulfTime = 0.35f; escapeRoll = false;
         }
 
+        /// <summary>A push (an armoured virion bouncing off a hand cell); decays in about a second.</summary>
+        public void Knock(Vector3 push) { knock += push; }
+
         public void Kill(bool byPlayer)
         {
             if (Current == State.Dead) return;
@@ -134,7 +138,8 @@ namespace BiologyVR.V2
                     phase += dt;
                     wobble = new Vector3(Mathf.Sin(phase * 1.7f), Mathf.Sin(phase * 1.3f + 1f), Mathf.Sin(phase * 2.1f + 2f)) * 0.15f;
                     float rr = Mathf.Min(R * r01, vessel.FreeRadius(s, angle) - radius * 0.6f);
-                    transform.position = vessel.PointAt(s, rr, angle) + wobble;
+                    knock = Vector3.Lerp(knock, Vector3.zero, 1f - Mathf.Exp(-dt * 2.5f));
+                    transform.position = vessel.PointAt(s, rr, angle) + wobble + knock;
                     if (rr >= vessel.FreeRadius(s, angle) - radius * 0.65f) { Current = State.Infecting; InfectProgress = 0; immune.NotifyLanded(this); }
                     break;
                 }

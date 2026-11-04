@@ -12,6 +12,9 @@ namespace BiologyVR.V2
     {
         public Bvr2Rig rig; public Bvr2Input input; public Bvr2Blood blood; public Bvr2Audio audioDirector; public Bvr2Fx fx;
         public Transform tip; public Renderer emitterGlow;
+        /// <summary>Model effects: the coils turn (faster while pulling), the core pulses, the emitter crystal spins.</summary>
+        public Transform[] coilSpinners; public Transform emitterSpin; public Renderer core;
+        float coilSpeed = 60f; MaterialPropertyBlock coreBlock;
         public Mesh redMesh, whiteMesh, plateletMesh;
         public Material redMaterial, whiteMaterial, plateletMaterial;
         public float range = 20f, cone = 4.5f, pullSpeed = 9f;
@@ -29,7 +32,7 @@ namespace BiologyVR.V2
 
         int cellIndex = -1; Transform proxy; Vector3 proxyVel; float holdTime; Bvr2Fx.Beam beam; MaterialPropertyBlock mpb;
 
-        void Awake() { mpb = new MaterialPropertyBlock(); }
+        void Awake() { mpb = new MaterialPropertyBlock(); coreBlock = new MaterialPropertyBlock(); }
 
         /// <summary>Test / autopilot hook.</summary>
         public void ForceSample(CellKind kind, Vector3 at) => OnSample?.Invoke(kind, at);
@@ -76,8 +79,25 @@ namespace BiologyVR.V2
                     break;
                 }
             }
-            if (emitterGlow) { mpb.SetColor("_Color", Bvr2Style.Ally * glow); emitterGlow.SetPropertyBlock(mpb); }
+            if (emitterGlow) { var ec = Bvr2Style.Ally * (0.35f + 0.9f * glow); ec.a = 1f; mpb.SetColor("_Color", ec); emitterGlow.SetPropertyBlock(mpb); } // rgb only: alpha is opacity in the glow shader
+            ModelFx(glow, held);
             if (audioDirector) audioDirector.FieldLevel = Current == State.Idle ? 0 : 0.6f;
+        }
+
+        void ModelFx(float glow, bool held)
+        {
+            float want = Current != State.Idle ? 720f : held ? 300f : 50f;
+            coilSpeed = Mathf.Lerp(coilSpeed, want, 1f - Mathf.Exp(-Time.deltaTime * 4f));
+            if (coilSpinners != null)
+                for (int i = 0; i < coilSpinners.Length; i++)
+                    if (coilSpinners[i]) coilSpinners[i].Rotate(transform.forward, coilSpeed * Time.deltaTime * (i % 2 == 0 ? 1f : -1.3f), Space.World);
+            if (emitterSpin) emitterSpin.Rotate(transform.forward, coilSpeed * 0.5f * Time.deltaTime, Space.World);
+            if (core)
+            {
+                float beat = 0.75f + 0.25f * Mathf.Sin(Time.time * (Current != State.Idle ? 22f : 3f));
+                var cc = Bvr2Style.Ally * (0.6f + glow) * beat; cc.a = 1f;
+                core.GetPropertyBlock(coreBlock); coreBlock.SetColor("_Color", cc); core.SetPropertyBlock(coreBlock);
+            }
         }
 
         void StartPull(int idx, CellKind kind)

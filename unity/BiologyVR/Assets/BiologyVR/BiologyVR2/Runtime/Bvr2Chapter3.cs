@@ -8,8 +8,9 @@ namespace BiologyVR.V2
     /// Chapter 3 «Первый контакт» (scenes 08–09 of the script): a virus in the blood → scan it → open the
     /// capsid with both hands in slow motion → scan the spike (antigen) → predict → antibodies (left hand)
     /// tag viruses → macrophages arrive, the Signal (right hand) sends them to the tagged ones →
-    /// climax: three waves under an accelerating heartbeat; infected wall cells release new viruses and the
-    /// temperature rises (fever) → Synchronisation: the player becomes a macrophage → debrief.
+    /// climax: synchronised with a macrophage, three waves under an accelerating heartbeat are fought with the
+    /// hands (swing through virions, combos; gold = antibody-tagged, caught from farther); infected wall cells
+    /// release new viruses and the temperature rises (fever) → clean-up of the stragglers → debrief.
     /// </summary>
     public sealed class Bvr2Chapter3 : Bvr2ChapterBase
     {
@@ -23,7 +24,8 @@ namespace BiologyVR.V2
         public float PeakLoad { get; private set; }
         public int Wave { get; private set; }
         public int SyncEaten { get; private set; }
-        public override string StatusLine => base.StatusLine + $" · wave {Wave} · alive {(game.immune ? game.immune.Alive : 0)} · killed {(game.immune ? game.immune.Killed : 0)} · load {game.organism.viralLoad:F2} · t {game.organism.temperature:F1}";
+        public int BestCombo { get; private set; }
+        public override string StatusLine => base.StatusLine + $" · wave {Wave} · alive {(game.immune ? game.immune.Alive : 0)} · killed {(game.immune ? game.immune.Killed : 0)} · eaten {(game.sync ? game.sync.Eaten : 0)} · combo {BestCombo} · load {game.organism.viralLoad:F2} · t {game.organism.temperature:F1}";
 
         Bvr2Immune Imm => game.immune;
         Transform board; Vector3 halfARest, halfBRest; bool restSaved;
@@ -39,7 +41,8 @@ namespace BiologyVR.V2
             if (board) Destroy(board.gameObject);
             if (game.abilities) { game.abilities.signalUnlocked = false; game.abilities.SetMode(Bvr2Abilities.Mode.Attract, false); }
             game.bioTool.locked = false;
-            PeakLoad = 0; Wave = 0; SyncEaten = 0;
+            PeakLoad = 0; Wave = 0; SyncEaten = 0; BestCombo = 0;
+            if (game.sync && game.sync.Active) game.sync.End();
         }
 
         void Update()
@@ -231,49 +234,63 @@ namespace BiologyVR.V2
             yield return Say("Помеченный вирус съедается в разы быстрее — это опсонизация. А непомеченный может и вырваться.", Mood.Neutral);
         }
 
+        /// <summary>
+        /// The battle (reworked 02.11): instead of juggling antibodies and the Signal under fire, the player is
+        /// synchronised with a macrophage for all three waves — the hands are phagocytes and every virion is
+        /// engulfed by swinging through it (mini slasher, combos). Antibodies arrive with the blood: gold
+        /// virions are already tagged and are caught from twice as far (opsonisation). Infection and fever still
+        /// rise when virions reach the wall, but more slowly than before.
+        /// </summary>
         IEnumerator Waves()
         {
             Beat = 5;
-            var o = game.organism; var sw = game.swimmer;
+            var o = game.organism; var sw = game.swimmer; var sync = game.sync;
             if (Mathf.Abs(game.PlayerS - arenaS) > 30f) Arrive(arenaS - 4f, 0.8f);
             float centre = game.PlayerS + 4f;
             sw.regionMin = centre - 20f; sw.regionMax = centre + 24f;
-            Imm.replicate = true;
             game.sound.Mood("tension");
-            yield return Say("Это была разведка. Сейчас пойдёт волна! Левая рука — метить, правая — направлять макрофагов. Не дай им сесть на стенку!", Mood.Surprised);
-            int[] counts = { 7, 10, 14 }; float[] seek = { 0.7f, 0.9f, 1.1f }, infect = { 8f, 7f, 6f }, stress = { 8f, 22f, 36f };
+            if (!game.codex.Has("macrophage")) { game.Reveal("macrophage", game.Head + game.rig.head.transform.forward * 2f); yield return WaitKnowledge(); }
+            yield return Say("Это была разведка — сейчас пойдёт волна. Подключаю тебя к макрофагу: теперь твои руки — фагоциты!", Mood.Surprised);
+            BeginHunt();
+            yield return Say("Проводи руками сквозь вирусы, как клинком. Быстрый взмах — сильнее. Не дай им сесть на стенку!", Mood.Smile);
+            Imm.replicate = true;
+            int[] counts = { 8, 12, 16 }; float[] seek = { 0.42f, 0.52f, 0.62f }, infect = { 11f, 10f, 9f }, stress = { 8f, 22f, 36f }, tagged = { 0f, 0.35f, 0.4f };
             for (int w = 0; w < counts.Length; w++)
             {
                 Wave = w + 1; Step = $"волна {Wave}";
                 o.stressDrive = stress[w];
-                Hud.Toast($"ВОЛНА {Wave}", Bvr2Style.Danger, 1.8f); game.sound.Play("BVR2_Alarm", 0.7f);
+                Hud.Toast($"ВОЛНА {Wave}", Bvr2Style.Danger, 1.8f); game.sound.Play("BVR2_Alarm", 0.6f);
+                if (w == 1) Prof.Say("Золотые вирусы уже помечены антителами — их поймать легче. Это опсонизация.", Mood.Smile);
                 float t = 0, spawned = 0, auto = 0;
                 while (true)
                 {
                     float dt = Time.unscaledDeltaTime; t += dt;
-                    // viruses arrive over a few seconds from around the arena
-                    while (spawned < counts[w] && t > spawned * 0.55f)
+                    // virions arrive in front of you, a few at a time
+                    while (spawned < counts[w] && t > spawned * 0.9f)
                     {
-                        Imm.Spawn(centre + Random.Range(-14f, 18f), Random.Range(0f, 360f), Random.Range(0.15f, 0.55f), seek[w], infect[w]);
+                        var v = Imm.Spawn(game.PlayerS + Random.Range(5f, 14f), Random.Range(0f, 360f), Random.Range(0.1f, 0.45f), seek[w], infect[w]);
+                        if (v && Random.value < tagged[w]) v.AddTag(1f);
                         spawned++;
                     }
                     int alive = Imm.Alive, pending = Imm.PendingReleases;
-                    Hud.SetObjective($"Волна {Wave}/3  ·  вирусов {alive + pending}  ·  заражение {Mathf.RoundToInt(o.viralLoad * 100)} %  ·  {o.temperature:0.0}°");
+                    Hud.SetObjective($"Волна {Wave}/3  ·  вирусов {alive + pending}  ·  заражение {Mathf.RoundToInt(o.viralLoad * 100)} %  ·  {o.temperature:0.0}°" + (sync.Combo >= 2 ? $"  ·  комбо ×{sync.Combo}" : ""));
                     var near = Imm.NearestVirus(game.Head, 40f, false);
                     Hud.SetCompass(near && Vector3.Angle(game.rig.head.transform.forward, near.transform.position - game.Head) > 40f ? near.transform.position : (Vector3?)null, "вирус");
                     if (o.temperature >= 37.6f && !game.codex.Has("fever")) game.Reveal("fever", game.Head + game.rig.head.transform.forward * 2f);
                     if (autoplay)
                     {
                         auto += dt;
-                        if (auto > 0.25f)
+                        if (auto > 0.35f)
                         {
                             auto = 0;
-                            foreach (var v in Imm.viruses) if (v.gameObject.activeSelf && v.Alive && !v.Tagged) { v.AddTag(1f); Imm.Signal(v.transform.position, Imm.OnTheBeat); break; }
+                            // a "weak player": catches most, lets some land
+                            var v = Imm.NearestVirus(game.Head, 60f, false);
+                            if (v && (Random.value < 0.75f || v.Current == Bvr2Virus.State.Infecting)) sync.ForceEat(v, Random.value < 0.6f);
                         }
                         if (w == 1 && !game.codex.Has("fever")) game.Reveal("fever", game.Head + game.rig.head.transform.forward * 2f);
                     }
                     if (spawned >= counts[w] && alive == 0 && pending == 0 && !game.KnowledgeBusy) break;
-                    if (t > 95f) { Imm.ClearSpots(); foreach (var v in Imm.viruses) if (v.gameObject.activeSelf && v.Alive) v.Kill(false); }
+                    if (t > 110f) { Imm.ClearSpots(); foreach (var v in Imm.viruses) if (v.gameObject.activeSelf && v.Alive) v.Kill(false); }
                     yield return null;
                 }
                 Hud.SetCompass(null, null);
@@ -283,41 +300,57 @@ namespace BiologyVR.V2
                     Imm.ClearSpots();
                     if (w == 0) Hud.Toast($"ПУЛЬС {Mathf.RoundToInt(o.heartRate)} УД/МИН", Bvr2Style.Danger, 3f);
                     yield return Say(w == 0 ? "Волна отбита! Сердце бьётся всё чаще — организм мобилизуется. Следующая будет сильнее." : "Держись! Последняя волна — самая большая.", Mood.Serious);
-                    yield return Wait(1.5f);
+                    yield return Wait(1.2f);
                 }
             }
             Imm.ClearSpots();
         }
 
+        void BeginHunt()
+        {
+            var sync = game.sync;
+            if (sync.Active) return;
+            sync.tKiller = false; sync.Begin(0f); Step = "синхронизация";
+            Hud.Title("СИНХРОНИЗАЦИЯ", "ты — макрофаг", 2.5f);
+            Prompt("Проводи руками сквозь вирусы · быстрый взмах — сильнее", "Подплывай к вирусам — они поглощаются");
+            sync.OnComboMilestone -= ComboToast; sync.OnComboMilestone += ComboToast;
+        }
+
+        void ComboToast(int n) { if (Running) Hud.Toast($"КОМБО ×{n}!", Bvr2Style.Knowledge, 1.2f); }
+
+        /// <summary>The last stragglers hide at the walls: a short clean-up while still synchronised, then the results.</summary>
         IEnumerator Synchronise()
         {
             Beat = 6;
             var sync = game.sync;
-            game.Reveal("macrophage", game.Head + game.rig.head.transform.forward * 2f);
-            yield return WaitKnowledge();
-            yield return Say("Остатки прячутся у стенок. Подключаю тебя к макрофагу — ненадолго!", Mood.Surprised);
+            if (!sync.Active)
+            {
+                if (!game.codex.Has("macrophage")) { game.Reveal("macrophage", game.Head + game.rig.head.transform.forward * 2f); yield return WaitKnowledge(); }
+                BeginHunt();
+            }
+            yield return Say("Последние вирусы прячутся у стенок. Добей их — пока ты ещё макрофаг!", Mood.Surprised);
             Imm.replicate = false;
             float centre = game.PlayerS;
-            for (int i = 0; i < 12; i++) Imm.Spawn(centre + Random.Range(-10f, 16f), Random.Range(0f, 360f), Random.Range(0.2f, 0.6f), 0.35f, 30f);
-            sync.Begin(autoplay ? 3f : 25f); Step = "синхронизация";
-            Hud.Title("СИНХРОНИЗАЦИЯ", "ты — макрофаг", 2.5f);
-            Prompt("Плыви к вирусам и хватай их руками", "Подплывай к вирусам — они поглощаются");
-            int autoN = 0;
-            while (sync.Active)
+            for (int i = 0; i < 10; i++) Imm.Spawn(centre + Random.Range(-4f, 14f), Random.Range(0f, 360f), Random.Range(0.35f, 0.7f), 0.3f, 30f);
+            float left = autoplay ? 3f : 22f; int autoN = 0;
+            while (left > 0 && Imm.Alive > 0)
             {
-                Hud.SetObjective($"Синхронизация: {Mathf.CeilToInt(sync.TimeLeft)} с  ·  поглощено {sync.Eaten}");
+                left -= Time.unscaledDeltaTime;
+                Hud.SetObjective($"Добей остатки: {Mathf.CeilToInt(left)} с  ·  вирусов {Imm.Alive}  ·  поглощено {sync.Eaten}" + (sync.Combo >= 2 ? $"  ·  комбо ×{sync.Combo}" : ""));
                 var near = Imm.NearestVirus(game.Head, 40f, false);
                 Hud.SetCompass(near ? near.transform.position : (Vector3?)null, "вирус");
-                if (autoplay && near && autoN++ % 10 == 0) near.Absorb(game.rig.rightHand);
+                if (autoplay && near && autoN++ % 10 == 0) sync.ForceEat(near);
                 yield return null;
             }
-            SyncEaten = sync.Eaten;
+            SyncEaten = sync.Eaten; BestCombo = sync.BestCombo;
+            sync.OnComboMilestone -= ComboToast;
+            sync.End();
             Hud.SetCompass(null, null); NoPrompt();
             Imm.DismissPhagocytes();
             foreach (var v in Imm.viruses) if (v.gameObject.activeSelf && v.Alive) v.Kill(false);
             game.sound.Mood("recovery"); game.organism.stressDrive = 0;
             game.swimmer.regionMin = game.swimmer.regionMax = 0;
-            Hud.Toast($"ПОГЛОЩЕНО ВИРУСОВ: {SyncEaten}", Bvr2Style.Good, 3f);
+            Hud.Toast($"ПОГЛОЩЕНО ВИРУСОВ: {SyncEaten}  ·  ЛУЧШЕЕ КОМБО ×{BestCombo}", Bvr2Style.Good, 3f);
             yield return Say("Синхронизация завершена — отличная охота! Температура скоро спадёт.", Mood.Smile);
         }
 
@@ -326,14 +359,14 @@ namespace BiologyVR.V2
             Beat = 7;
             Objective("Глава 3 пройдена");
             bool loadStar = PeakLoad < 0.45f;
-            bool skillStar = SyncEaten >= 8 || Imm.BestCombo >= 5;
+            bool skillStar = SyncEaten >= 30 || BestCombo >= 8;
             Stars = 1 + (loadStar ? 1 : 0) + (skillStar ? 1 : 0);
             string[] heads = { "ВИРУС", "АНТИТЕЛА И ФАГОЦИТОЗ", "ЛИХОРАДКА" };
             string[] bodies = {
                 "белковая оболочка + генетическая программа\nшипы на оболочке — антигены\nразмножается только внутри клеток",
                 "антитело подходит к антигену,\nкак ключ к замку, и метит вирус\nмакрофаг поглощает и переваривает\nпомеченного — быстрее",
                 "иммунитет поднимает температуру\nвирусам хуже, иммунитету легче\nвыше 38,5 °C — к врачу" };
-            string why = $"★ глава пройдена   {(loadStar ? "★" : "☆")} заражение не выше 45 % (было {Mathf.RoundToInt(PeakLoad * 100)} %)   {(skillStar ? "★" : "☆")} синхронизация ≥ 8 или комбо ≥ 5";
+            string why = $"★ глава пройдена   {(loadStar ? "★" : "☆")} заражение не выше 45 % (было {Mathf.RoundToInt(PeakLoad * 100)} %)   {(skillStar ? "★" : "☆")} поглощено ≥ 30 или комбо ≥ 8 (было {SyncEaten}, ×{BestCombo})";
             board = ShowBoard("ГЛАВА 3 · ПЕРВЫЙ КОНТАКТ — ПРОЙДЕНА", Stars, heads, bodies, why);
             yield return BoardIn(board);
             yield return Say(Stars == 3 ? "Великолепно! Иммунитет гордился бы тобой." : "Хорошо отбились! Пройди ещё раз, чтобы собрать все звёзды.", Mood.Smile);

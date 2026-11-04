@@ -1,4 +1,4 @@
-"""Professor voice bank (usage: python gen_voice.py [lines.json] [out_dir]): every line from lines.json -> Piper ru_RU-ruslan (mature male) -> a touch deeper and
+"""Professor voice bank (usage: python gen_voice.py [lines.json] [out_dir] [--all]; incremental unless --all): every line from lines.json -> Piper ru_RU-ruslan (mature male) -> a touch deeper and
 warmer (Praat), trimmed, loudness-matched, + viseme curves (mouth open / round / wide at 50 fps) for lip sync.
 Writes out/voice/VO_*.wav and out/voice/voice_manifest.json."""
 import json, re, wave, hashlib, sys, os, io, numpy as np, parselmouth
@@ -73,12 +73,20 @@ def visemes(y):
     q = lambda a: [int(round(float(x) * 255)) for x in np.clip(a, 0, 1)]
     return q(sm), q(rnd), q(wid)
 lines = json.load(open(LINES, encoding='utf-8'))
-man = []; counts = {}
+# incremental: lines whose text already has a recording (in the existing manifest) keep their file — only new or
+# changed lines are synthesised, and a live recording dropped in under the same file name is never overwritten
+old_path = os.path.join(OUT, "voice_manifest.json")
+old = {m["text"]: m for m in json.load(open(old_path, encoding="utf-8"))["lines"]} if os.path.exists(old_path) and "--all" not in sys.argv else {}
+man = []; counts = {}; made = 0
 for k, item in enumerate(lines):
     text = item["text"]; src = item["src"].split(":")[0].replace("Bvr2", "").replace(".cs", "")
     counts[src] = counts.get(src, 0) + 1
     h = hashlib.md5(text.encode("utf-8")).hexdigest()[:8]
+    if text in old and os.path.exists(os.path.join(OUT, old[text]["file"])):
+        man.append(old[text]); continue
     name = f"VO_{src}_{counts[src]:03d}_{h}.wav"
+    while os.path.exists(os.path.join(OUT, name[:-4] + ".ogg")) or os.path.exists(os.path.join(OUT, name)): name = name[:-4] + "b.wav"
+    made += 1
     y = process(synth(spoken(text)))
     wavfile.write(f"{OUT}/{name}", SR, (np.clip(y, -1, 1) * 32767).astype(np.int16))
     if FFMPEG:  # Unity re-encodes anyway; OGG keeps the project small
@@ -89,4 +97,4 @@ for k, item in enumerate(lines):
     man.append({"text": text, "spoken": spoken(text), "file": name, "seconds": round(len(y) / SR, 3), "fps": FPS, "open": o, "round": r, "wide": w})
     if k % 20 == 0: print(k, name, round(len(y) / SR, 2), flush=True)
 json.dump({"voice": "piper ru_RU-ruslan-medium + Praat (formants 0.965, F0 104 Hz)", "lines": man}, open(os.path.join(OUT, "voice_manifest.json"), "w", encoding="utf-8"), ensure_ascii=False)
-print("done", len(man), "lines", round(sum(m["seconds"] for m in man) / 60, 1), "min")
+print("done", len(man), "lines (", made, "new )", round(sum(m["seconds"] for m in man) / 60, 1), "min")

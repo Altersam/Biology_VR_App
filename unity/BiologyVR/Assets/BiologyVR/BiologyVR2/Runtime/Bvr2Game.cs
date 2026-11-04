@@ -22,6 +22,13 @@ namespace BiologyVR.V2
         public string LastScanned { get; private set; } = "";
         public int ScanCount { get; private set; }
 
+        /// <summary>Test / screenshot hook: hold the scan and / or tool trigger (virtual input) until called again with false.</summary>
+        public void DebugHold(bool scan, bool tool)
+        {
+            if (!input) return;
+            var v = input.Virtual; v.active = scan || tool || v.move != Vector2.zero; v.scan = scan; v.tool = tool; input.Virtual = v;
+        }
+
         void Awake()
         {
             Instance = this;

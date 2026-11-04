@@ -112,6 +112,8 @@ namespace BiologyVR.V2
 
         void Update()
         {
+            // pause menu: the line, the linger and gestures keep their remaining time
+            if (Bvr2Pause.Active) { float p = Time.unscaledDeltaTime; speakUntil += p; lingerUntil += p; presentUntil += p; pointUntil += p; return; }
             float dt = Time.unscaledDeltaTime, now = Time.unscaledTime;
             if (!Speaking && queue.Count > 0)
             {
@@ -169,7 +171,7 @@ namespace BiologyVR.V2
         {
             if (!voiceSource) return;
             voiceSource.spatialBlend = stage ? 0.85f : 0f;
-            if (headPivot) voiceSource.transform.position = headPivot.position + Vector3.up * 0.1f;
+            if (headPivot) voiceSource.transform.position = headPivot.position + headPivot.up * 0.17f;
             bool comm = !stage;
             if (comm != commFilters) { commFilters = comm; if (commHigh) commHigh.enabled = comm; if (commLow) commLow.enabled = comm; }
         }
@@ -244,7 +246,7 @@ namespace BiologyVR.V2
                     : presenting && Mathf.Repeat(now, 5f) < 1.6f ? Vector3.Lerp(head.position, presentAt.Value, 0.5f) : head.position;
                 Quaternion want = Quaternion.LookRotation(lookTarget - headPivot.position, body * Vector3.up);
                 Quaternion local = Quaternion.Inverse(body) * want;
-                var e = local.eulerAngles; float yaw = Mathf.Clamp(Mathf.DeltaAngle(0, e.y), -55, 55), pitch = Mathf.Clamp(Mathf.DeltaAngle(0, e.x), -25, 25);
+                var e = local.eulerAngles; float yaw = Mathf.Clamp(Mathf.DeltaAngle(0, e.y), -45, 45), pitch = Mathf.Clamp(Mathf.DeltaAngle(0, e.x), -6, 10); // the neck bends at its base: small angles; looking up stays small so the nape stays clear of the coat collar
                 float nod = Speaking ? Mathf.Sin(now * 2.1f) * 1.6f + emphasis * 4f : Mathf.Sin(now * 0.7f) * 1.5f;
                 headPivot.localRotation = Bvr2Math.Damp(headPivot.localRotation, headRest * Quaternion.Euler(pitch + nod, yaw, Mathf.Sin(now * 0.9f) * 2f), 6f, dt);
             }
