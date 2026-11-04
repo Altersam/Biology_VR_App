@@ -24,6 +24,14 @@ namespace BiologyVR.V2.Editor
     {
         const string RepoSlug = "Altersam/Biology_VR_App";
         static readonly string Tag = "v" + Bvr2AndroidBuild.Version;
+        // what this release brings (commit message of the kit); update together with the version
+        const string ReleaseHeadline = "artery wall cut in the real wall, reachable virus battles, game renamed to Biology VR";
+        const string ReleaseBody =
+            "Chapter 1: the wall layers are studied in a cut opened in the real artery wall in front of the player,\n" +
+            "with a glowing ring on each layer to scan (the next one pulses, the scanned one gets a label).\n" +
+            "Chapters 3 and 5: the virus battle stays in a bounded arena around the player, virions spawn ahead,\n" +
+            "a hand assist pulls near virions within reach and infecting ones can be grabbed off the wall.\n" +
+            "The game is called Biology VR on the headset, the title screen and the release (package id unchanged).\n";
         static readonly string Under = Bvr2AndroidBuild.Version.Replace('.', '_');
         static readonly string SumsFile = "ReleaseFiles/SHA256SUMS_" + Under + ".txt";
         static readonly string NotesFile = "unity/BiologyVR/RELEASE_" + Under + "_BVR2_RU.md";
@@ -91,15 +99,11 @@ namespace BiologyVR.V2.Editor
                 if (staged.Count > 0)
                 {
                     string message = Path.Combine(Path.GetTempPath(), "bvr2_commit_message.txt");
-                    File.WriteAllText(message, $"Biology VR 2 {Bvr2AndroidBuild.Version}: main menu, patient hologram, new tools\n\n" +
-                        "Title screen and main menu (continue, new game, chapters, settings, about, exit) on a holographic stage;\n" +
-                        "pause menu in the chapters; saved progress (chapters, stars) and settings (volumes, subtitles, turning, comfort).\n" +
-                        "Patient hologram with the circulatory system, a beating heart and a live ECG; new scanner and BioTool models\n" +
-                        "with turning rings and coils; lab effects (dust, light shafts, bubbles); professor head and neck fixes.\n" +
+                    File.WriteAllText(message, $"Biology VR {Bvr2AndroidBuild.Version}: " + ReleaseHeadline + "\n\n" + ReleaseBody +
                         $"PICO 4 and Meta Quest APKs {Bvr2AndroidBuild.Version} (versionCode {Bvr2AndroidBuild.AndroidCode}) attached to release {Tag}.\n" +
                         "Editor autoplay of prologue and chapters 1-6 passed; not yet verified on a headset.\n\n" +
                         "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n" +
-                        "Claude-Session: https://claude.ai/code/session_01MTHkqtqiy7lgch7nzbeqr8\n", new UTF8Encoding(false));
+                        "Claude-Session: https://claude.ai/code/session_01MTHkqtqiY7LGCh7nZBeqr8\n", new UTF8Encoding(false));
                     Do("commit", "git", $"commit -q -F \"{message}\"", repo);
                 }
                 Do("push", "git", "push origin HEAD:main", repo);
@@ -107,7 +111,7 @@ namespace BiologyVR.V2.Editor
                 string assets = $"\"ReleaseFiles/BiologyVR2_Pico4_v{Bvr2AndroidBuild.Version}.apk\" \"ReleaseFiles/BiologyVR2_MetaQuest_v{Bvr2AndroidBuild.Version}.apk\" \"{SumsFile}\"";
                 var exists = Do("release-exists", python, $"Tools/github_cli.py release view {Tag} --repo {RepoSlug} --json tagName", project, false);
                 if (exists.exit != 0)
-                    Do("release", python, $"Tools/github_cli.py release create {Tag} {assets} --repo {RepoSlug} --target main --prerelease --title \"Biology VR 2 — {Bvr2AndroidBuild.Version} (предпросмотр)\" --notes-file \"{NotesFile}\"", project);
+                    Do("release", python, $"Tools/github_cli.py release create {Tag} {assets} --repo {RepoSlug} --target main --prerelease --title \"Biology VR — {Bvr2AndroidBuild.Version} (предпросмотр)\" --notes-file \"{NotesFile}\"", project);
                 else
                     Do("upload", python, $"Tools/github_cli.py release upload {Tag} {assets} --repo {RepoSlug} --clobber", project);
                 Do("verify", python, $"Tools/github_cli.py release view {Tag} --repo {RepoSlug} --json url,isPrerelease,tagName,assets", project);

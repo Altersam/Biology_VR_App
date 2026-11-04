@@ -39,7 +39,7 @@ namespace BiologyVR.V2
         public float FieldDelta { get; private set; }
         public int SnapTurn { get; private set; }
 
-        // ---- menus (Bvr2Menu) ----
+        // ---- menus (Bvr2MainMenu) ----
         /// <summary>While a menu is open the game sees no buttons and no movement; the menu reads the Ui* values.</summary>
         public bool Captured;
         /// <summary>Confirm: either trigger, Enter / Space; UiHandLeft tells which trigger (the pointer follows that hand).</summary>

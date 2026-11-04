@@ -1,19 +1,19 @@
 {
-  "utc": "2026-11-04T07:30:44.920741+00:00",
-  "version": "0.13.0",
-  "version_code": 14,
+  "utc": "2026-11-04T16:35:27.093540+00:00",
+  "version": "0.14.0",
+  "version_code": 15,
   "application_id": "com.biologyvr.biologyvr2",
-  "tools": "androguard 4.1 (manifest), apksigtool (APK Signature Scheme v2), zip listing (one scene: level0, zip CRC), IL2CPP metadata (main menu code present)",
+  "tools": "androguard 4.1 (manifest, label «Biology VR»), apksigtool (APK Signature Scheme v2), zip listing (one scene: level0, zip CRC), IL2CPP metadata (wall cut, main menu, virus reach code present)",
   "passed": true,
   "apks": [
     {
-      "file": "BiologyVR2_Pico4_v0.13.0.apk",
-      "bytes": 71421121,
-      "sha256": "355229769384137f88d76ae5ff65a8202f443cbe62e20e5eec89f98f1207ad87",
+      "file": "BiologyVR2_Pico4_v0.14.0.apk",
+      "bytes": 71425589,
+      "sha256": "ba71a92e8c0582645f018bc4f2f6b46729c6737992b659013a5d27aac1e06769",
       "package": "com.biologyvr.biologyvr2",
-      "versionName": "0.13.0",
-      "versionCode": "14",
-      "label": "Biology VR 2",
+      "versionName": "0.14.0",
+      "versionCode": "15",
+      "label": "Biology VR",
       "minSdk": "29",
       "targetSdk": "34",
       "native": [
@@ -51,25 +51,21 @@
         "signed_v2_or_v3": true,
         "pico_vr_manifest": true,
         "pico_sdk_manifest": true,
-        "one_scene": true,
-        "menu_code": true,
-        "zip_integrity": true,
-        "apksigtool_verify": true
+        "zip_crc": true,
+        "one_scene_level0": true,
+        "signature_v2_apksigtool": true,
+        "new_code_present": true
       },
-      "passed": true,
-      "scenes": [
-        "level0"
-      ],
-      "apksigtool": "v2 verified\nWARNING: THIS IS A PROTOTYPE; DO NOT USE IN PRODUCTION!"
+      "passed": true
     },
     {
-      "file": "BiologyVR2_MetaQuest_v0.13.0.apk",
-      "bytes": 70536898,
-      "sha256": "29e8040e689fc8c16d1dd54abf48170b0ac5974bcf3126d50c0a08ece702b4e2",
+      "file": "BiologyVR2_MetaQuest_v0.14.0.apk",
+      "bytes": 70541454,
+      "sha256": "92b365ce5ac25370404efaa984b3349e93dd01534c972bceca85781bb74f7f5c",
       "package": "com.biologyvr.biologyvr2",
-      "versionName": "0.13.0",
-      "versionCode": "14",
-      "label": "Biology VR 2",
+      "versionName": "0.14.0",
+      "versionCode": "15",
+      "label": "Biology VR",
       "minSdk": "29",
       "targetSdk": "34",
       "native": [
@@ -102,16 +98,12 @@
         "quest_devices_manifest": true,
         "quest_vr_category": true,
         "no_pico_plugins": true,
-        "one_scene": true,
-        "menu_code": true,
-        "zip_integrity": true,
-        "apksigtool_verify": true
+        "zip_crc": true,
+        "one_scene_level0": true,
+        "signature_v2_apksigtool": true,
+        "new_code_present": true
       },
-      "passed": true,
-      "scenes": [
-        "level0"
-      ],
-      "apksigtool": "v2 verified\nWARNING: THIS IS A PROTOTYPE; DO NOT USE IN PRODUCTION!"
+      "passed": true
     }
   ],
   "headset_verified": false

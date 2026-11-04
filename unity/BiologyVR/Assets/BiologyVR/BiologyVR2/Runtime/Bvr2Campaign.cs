@@ -6,7 +6,7 @@ namespace BiologyVR.V2
 {
     /// <summary>
     /// Runs the chapters in one scene (one long artery, each chapter further downstream).
-    /// At start: the title screen and the main menu (<see cref="Bvr2Menu"/>: continue, new game, chapters,
+    /// At start: the title screen and the main menu (<see cref="Bvr2MainMenu"/>: continue, new game, chapters,
     /// settings), unless a chapter was requested from the editor menu (PlayerPrefs "BVR2_StartChapter").
     /// Without a menu object the old in-artery chapter choice is used.
     /// </summary>
@@ -16,7 +16,7 @@ namespace BiologyVR.V2
         public Bvr2Game game;
         public List<Bvr2ChapterBase> chapters = new List<Bvr2ChapterBase>();
         public bool chapterMenu = true;
-        public Bvr2Menu menu;
+        public Bvr2MainMenu menu;
         public Bvr2ChapterBase Current { get; private set; }
 
         IEnumerator Start()

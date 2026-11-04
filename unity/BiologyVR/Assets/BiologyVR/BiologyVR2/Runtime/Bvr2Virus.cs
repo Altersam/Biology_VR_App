@@ -135,6 +135,8 @@ namespace BiologyVR.V2
                     angle = Mathf.MoveTowardsAngle(angle, targetAngle, seek * dt * 12f);
                     targetS += vessel.FlowAt(s, R * r01, mean).magnitude * 0.22f * dt; // the spot it aims at moves on with it
                     s = Mathf.MoveTowards(s, targetS, seek * 0.5f * dt);
+                    // a battle arena keeps the virions where the player can reach them (Bvr2Immune.sMin/sMax)
+                    if (immune.sMax > immune.sMin) { s = Mathf.Clamp(s, immune.sMin, immune.sMax); targetS = Mathf.Clamp(targetS, immune.sMin, immune.sMax); }
                     phase += dt;
                     wobble = new Vector3(Mathf.Sin(phase * 1.7f), Mathf.Sin(phase * 1.3f + 1f), Mathf.Sin(phase * 2.1f + 2f)) * 0.15f;
                     float rr = Mathf.Min(R * r01, vessel.FreeRadius(s, angle) - radius * 0.6f);
@@ -188,6 +190,24 @@ namespace BiologyVR.V2
                 body.SetPropertyBlock(mpb);
             }
         }
+
+        /// <summary>
+        /// Drawn towards a point (a phagocyte hand reaching for it, Bvr2Sync): moves in world space and back into
+        /// vessel coordinates; a virion that was settling on the wall is lifted off it.
+        /// </summary>
+        public void PullToward(Vector3 target, float step)
+        {
+            if (!Alive || anchored || debris || step <= 0f || !vessel) return;
+            Vector3 np = Vector3.MoveTowards(transform.position, target, step);
+            float ns = vessel.Locate(np, ref pullHint, out var radial);
+            float R = Mathf.Max(vessel.Radius(ns), 0.01f);
+            s = ns; targetS = ns; angle = vessel.AngleOf(ns, radial); targetAngle = angle;
+            r01 = Mathf.Clamp(radial.magnitude / R, 0f, 0.95f);
+            if (Current == State.Infecting) { Current = State.Free; InfectProgress = 0f; transform.localScale = Vector3.one * radius; }
+            knock = Vector3.zero;
+            transform.position = np;
+        }
+        int pullHint = -1;
 
         /// <summary>Vessel coordinates (for the wall spot when it infects).</summary>
         public float S => s;

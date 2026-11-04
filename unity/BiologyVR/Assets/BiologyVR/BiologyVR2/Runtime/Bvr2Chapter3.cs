@@ -247,7 +247,10 @@ namespace BiologyVR.V2
             var o = game.organism; var sw = game.swimmer; var sync = game.sync;
             if (Mathf.Abs(game.PlayerS - arenaS) > 30f) Arrive(arenaS - 4f, 0.8f);
             float centre = game.PlayerS + 4f;
-            sw.regionMin = centre - 20f; sw.regionMax = centre + 24f;
+            // the battle stays in a stretch of artery the player can cover; the virions are kept inside it too
+            sw.regionMin = centre - 26f; sw.regionMax = centre + 30f;
+            Imm.sMin = sw.regionMin + 2f; Imm.sMax = sw.regionMax - 3f;
+            float edgeToastAt = -10f;
             game.sound.Mood("tension");
             if (!game.codex.Has("macrophage")) { game.Reveal("macrophage", game.Head + game.rig.head.transform.forward * 2f); yield return WaitKnowledge(); }
             yield return Say("Это была разведка — сейчас пойдёт волна. Подключаю тебя к макрофагу: теперь твои руки — фагоциты!", Mood.Surprised);
@@ -268,7 +271,9 @@ namespace BiologyVR.V2
                     // virions arrive in front of you, a few at a time
                     while (spawned < counts[w] && t > spawned * 0.9f)
                     {
-                        var v = Imm.Spawn(game.PlayerS + Random.Range(5f, 14f), Random.Range(0f, 360f), Random.Range(0.1f, 0.45f), seek[w], infect[w]);
+                        // in front of the player, within the arena, mostly near the middle of the vessel where the hands reach
+                        float sv = Mathf.Clamp(game.PlayerS + Random.Range(4f, 11f), Imm.sMin + 1f, Imm.sMax - 4f);
+                        var v = Imm.Spawn(sv, Random.Range(0f, 360f), Random.Range(0.05f, 0.35f), seek[w], infect[w]);
                         if (v && Random.value < tagged[w]) v.AddTag(1f);
                         spawned++;
                     }
@@ -276,6 +281,8 @@ namespace BiologyVR.V2
                     Hud.SetObjective($"Волна {Wave}/3  ·  вирусов {alive + pending}  ·  заражение {Mathf.RoundToInt(o.viralLoad * 100)} %  ·  {o.temperature:0.0}°" + (sync.Combo >= 2 ? $"  ·  комбо ×{sync.Combo}" : ""));
                     var near = Imm.NearestVirus(game.Head, 40f, false);
                     Hud.SetCompass(near && Vector3.Angle(game.rig.head.transform.forward, near.transform.position - game.Head) > 40f ? near.transform.position : (Vector3?)null, "вирус");
+                    if ((game.PlayerS < sw.regionMin + 1f || game.PlayerS > sw.regionMax - 1f) && Time.unscaledTime - edgeToastAt > 4f)
+                    { edgeToastAt = Time.unscaledTime; Hud.Toast("БОЙ ЗДЕСЬ — разворачивайся к вирусам", Bvr2Style.Knowledge, 2f); }
                     if (o.temperature >= 37.6f && !game.codex.Has("fever")) game.Reveal("fever", game.Head + game.rig.head.transform.forward * 2f);
                     if (autoplay)
                     {
@@ -331,7 +338,8 @@ namespace BiologyVR.V2
             yield return Say("Последние вирусы прячутся у стенок. Добей их — пока ты ещё макрофаг!", Mood.Surprised);
             Imm.replicate = false;
             float centre = game.PlayerS;
-            for (int i = 0; i < 10; i++) Imm.Spawn(centre + Random.Range(-4f, 14f), Random.Range(0f, 360f), Random.Range(0.35f, 0.7f), 0.3f, 30f);
+            if (Imm.sMax <= Imm.sMin) { Imm.sMin = (game.swimmer.regionMax > game.swimmer.regionMin ? game.swimmer.regionMin : centre - 26f) + 2f; Imm.sMax = (game.swimmer.regionMax > game.swimmer.regionMin ? game.swimmer.regionMax : centre + 30f) - 3f; }
+            for (int i = 0; i < 10; i++) Imm.Spawn(Mathf.Clamp(centre + Random.Range(-4f, 12f), Imm.sMin + 1f, Imm.sMax - 2f), Random.Range(0f, 360f), Random.Range(0.35f, 0.7f), 0.3f, 30f);
             float left = autoplay ? 3f : 22f; int autoN = 0;
             while (left > 0 && Imm.Alive > 0)
             {
@@ -349,7 +357,7 @@ namespace BiologyVR.V2
             Imm.DismissPhagocytes();
             foreach (var v in Imm.viruses) if (v.gameObject.activeSelf && v.Alive) v.Kill(false);
             game.sound.Mood("recovery"); game.organism.stressDrive = 0;
-            game.swimmer.regionMin = game.swimmer.regionMax = 0;
+            game.swimmer.regionMin = game.swimmer.regionMax = 0; Imm.sMin = Imm.sMax = 0;
             Hud.Toast($"ПОГЛОЩЕНО ВИРУСОВ: {SyncEaten}  ·  ЛУЧШЕЕ КОМБО ×{BestCombo}", Bvr2Style.Good, 3f);
             yield return Say("Синхронизация завершена — отличная охота! Температура скоро спадёт.", Mood.Smile);
         }

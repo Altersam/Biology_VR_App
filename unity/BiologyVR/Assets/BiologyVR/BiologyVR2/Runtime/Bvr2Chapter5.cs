@@ -191,6 +191,7 @@ namespace BiologyVR.V2
         {
             Beat = 2; Phase = 1;
             var sw = game.swimmer; sw.regionMin = arenaS - 24f; sw.regionMax = arenaS + 22f;
+            Imm.sMin = sw.regionMin + 1.5f; Imm.sMax = sw.regionMax - 1.5f; // virions stay where the player can reach them
             var sync = game.sync;
             if (Imm.phagocytes.Count > 0 && !Imm.phagocytes[0].gameObject.activeSelf) DeployAllies();
             game.Reveal("neutrophil", game.Head + game.rig.head.transform.forward * 2.2f);
@@ -455,7 +456,7 @@ namespace BiologyVR.V2
             yield return WaitKnowledge();
             foreach (var k in killers) if (k) k.gameObject.SetActive(false);
             Imm.DismissPhagocytes();
-            game.swimmer.regionMin = game.swimmer.regionMax = 0;
+            game.swimmer.regionMin = game.swimmer.regionMax = 0; Imm.sMin = Imm.sMax = 0;
             yield return Say("Температура уже снижается. Иммунитет победил — и запомнил этот вирус.", Mood.Smile);
         }
 

@@ -27,6 +27,7 @@ namespace BiologyVR.V2
         public string TargetId { get; private set; } = "";
         public float Progress { get; private set; }
         public Vector3 TargetPoint { get; private set; }
+        Vector3 thingHit;
         /// <summary>id, world point, first time.</summary>
         public event Action<string, Vector3, bool> OnScan;
 
@@ -53,11 +54,12 @@ namespace BiologyVR.V2
             else if (TargetKind == Kind.Thing && thing)
             {
                 if (!Physics.Raycast(ray, out var hit, range * 1.3f) || hit.collider.GetComponentInParent<Bvr2Scannable>() != thing) SetNone();
+                else thingHit = hit.point;
             }
             if (TargetKind == Kind.None || TargetKind == Kind.Plasma)
             {
                 if (Physics.Raycast(ray, out var hit, range) && hit.collider.GetComponentInParent<Bvr2Scannable>() is Bvr2Scannable s && s.scannable)
-                { if (thing != s) { thing = s; cellIndex = -1; TargetKind = Kind.Thing; TargetId = s.codexId; Progress = 0; } }
+                { if (thing != s) { thing = s; cellIndex = -1; TargetKind = Kind.Thing; TargetId = s.codexId; Progress = 0; } thingHit = hit.point; }
                 else if (blood && blood.Pick(ray, range, cellCone, out int idx, out var kind, out _))
                 { cellIndex = idx; thing = null; TargetKind = Kind.Cell; TargetId = CellId(kind); Progress = 0; }
                 else if (allowPlasma)
@@ -69,7 +71,7 @@ namespace BiologyVR.V2
             float seconds = TargetKind == Kind.Cell ? 0.85f : TargetKind == Kind.Thing ? (thing ? thing.scanSeconds : 1.1f) : 1.6f;
             if (TargetKind != Kind.None)
             {
-                TargetPoint = TargetKind == Kind.Cell ? blood.PositionOf(cellIndex) : TargetKind == Kind.Thing ? thing.transform.position : origin + dir * 3.5f;
+                TargetPoint = TargetKind == Kind.Cell ? blood.PositionOf(cellIndex) : TargetKind == Kind.Thing ? thingHit : origin + dir * 3.5f; // the point hit on the thing (big things: wall layers)
                 if (TargetKind == Kind.Cell) blood.Highlight(cellIndex, 1f);
                 Progress += Time.unscaledDeltaTime / seconds;
                 if (Progress >= 1f) Complete();

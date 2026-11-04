@@ -1,10 +1,10 @@
 {
-  "utc": "2026-11-04T06:28:11.5630628Z",
+  "utc": "2026-11-04T12:35:59.9728659Z",
   "running": false,
   "passed": true,
   "note": "simulated input in the editor; not a headset test",
   "log": [
-    "fps(editor, first 6 s) ≈ 385; cells drawn 262",
+    "fps(editor, first 6 s) ≈ 391; cells drawn 278",
     "0,0s beat 0 · ",
     "0,5s beat 1 · Возьми приборы со стола",
     "0,7s beat 2 · Отсканируй голограмму пациента",
@@ -12,7 +12,7 @@
     "7,3s beat 3 · Уменьшение",
     "8,3s beat 3 · ",
     "finished: stars 0, predictions 0, knowledge 1/1 · ch0 beat 3 ·  · s=14 · flow=1,00 · stars 0 · tools True · room False",
-    "swim test: moved 11,2 m in 2.5 s; speed over wall 5,2 m/s; inside lumen r=0,0 of R=6,1",
+    "swim test: moved 11,2 m in 2.5 s; speed over wall 5,3 m/s; inside lumen r=0,0 of R=6,1",
     "result: ok"
   ],
   "errors": [

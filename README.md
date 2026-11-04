@@ -1,17 +1,17 @@
-# Biology VR App — 0.13.0 · Biology VR 2 (предпросмотр)
+# Biology VR App — 0.14.0 · Biology VR (предпросмотр)
 
 Учебная VR-игра о крови и сосудах для 8–9 классов. Рабочий проект — **bio_0.3**, Unity **6000.1.9f1**.
 
-[PICO APK](https://github.com/Altersam/Biology_VR_App/releases/download/v0.13.0/BiologyVR2_Pico4_v0.13.0.apk) · [Quest / Oculus APK](https://github.com/Altersam/Biology_VR_App/releases/download/v0.13.0/BiologyVR2_MetaQuest_v0.13.0.apk) · [Релиз v0.13.0](https://github.com/Altersam/Biology_VR_App/releases/tag/v0.13.0) · [Прошлый релиз v0.12.0](https://github.com/Altersam/Biology_VR_App/releases/tag/v0.12.0) · [Прежняя игра 0.10.0](https://github.com/Altersam/Biology_VR_App/releases/tag/v0.10.0)
+[PICO APK](https://github.com/Altersam/Biology_VR_App/releases/download/v0.14.0/BiologyVR2_Pico4_v0.14.0.apk) · [Quest / Oculus APK](https://github.com/Altersam/Biology_VR_App/releases/download/v0.14.0/BiologyVR2_MetaQuest_v0.14.0.apk) · [Релиз v0.14.0](https://github.com/Altersam/Biology_VR_App/releases/tag/v0.14.0) · [Прошлый релиз v0.13.0](https://github.com/Altersam/Biology_VR_App/releases/tag/v0.13.0) · [Прежняя игра 0.10.0](https://github.com/Altersam/Biology_VR_App/releases/tag/v0.10.0)
 
-## Biology VR 2 — новая игра
+## Biology VR — новая игра
 
 Полностью переработанная игра: пролог в лаборатории профессора и шесть глав в одной артерии — «Поток», «Бляшка», «Первый контакт», «Прорыв», «Очаг», «Гомеостаз». Свободное плавание, способности BioTool (Притяжение, Импульс, Сигнал, Фактор), опыты с прогнозами, 38 знаний.
 
-**Новое в 0.13.0:** заставка и главное меню (продолжить, новая игра, главы, настройки, об игре), пауза в главах, сохранение прогресса и настроек; голограмма пациента с кровотоком и бьющимся сердцем, живая ЭКГ; новые модели сканера и BioTool с эффектами; обжитая лаборатория по концепту (лампы, стеллажи, растения, пыль, световые конусы, пузырьки); доработанный профессор (голова, шея, воротники, волосы); понятнее эмбол (глава 2) и бой руками-фагоцитами (главы 3 и 5). Подробно — [заметки релиза](unity/BiologyVR/RELEASE_0_13_0_BVR2_RU.md).
+**Новое в 0.14.0:** игра теперь называется Biology VR; в главе 1 оболочки стенки изучаются в окне, открытом прямо в настоящей стенке артерии, с пронумерованными кольцами для сканирования; в боях глав 3 и 5 вирусы держатся внутри участка вокруг игрока, к стенке можно подплыть вплотную, ближние вирусы притягиваются к руке. В 0.13.0 — заставка и главное меню, пауза, сохранение прогресса, голограмма пациента, новые приборы, обжитая лаборатория. Подробно — [заметки релиза](unity/BiologyVR/RELEASE_0_14_0_BVR2_RU.md).
 
-- Отдельное приложение **Biology VR 2** (`com.biologyvr.biologyvr2`): ставится рядом с прежней Biology VR и не заменяет её; 0.13.0 ставится обновлением поверх 0.12.0.
-- APK **0.13.0**, versionCode **14**, ARM64/IL2CPP/OpenXR; PICO 4 / 4 Enterprise и Meta Quest 2 / Pro / 3 / 3S.
+- Новая игра **Biology VR** — отдельное приложение (`com.biologyvr.biologyvr2`): ставится рядом с прежней версией 0.10.0 (`com.biologyvr.arteryjourney`) и не заменяет её; 0.14.0 ставится обновлением поверх 0.13.0.
+- APK **0.14.0**, versionCode **15**, ARM64/IL2CPP/OpenXR; PICO 4 / 4 Enterprise и Meta Quest 2 / Pro / 3 / 3S.
 - **В шлеме ещё не проверялась.** Автопрохождение пролога и глав 1–6 в редакторе (симуляция ввода) прошло; управление реальными контроллерами, комфорт и частота кадров (лаборатория ≈0,5 млн треугольников) — на проверке.
 - Исходники: `unity/BiologyVR/Assets/BiologyVR/BiologyVR2/`, сцена `Scenes/BiologyVR2.unity` (меню `Biology VR 2/Build Scene`); скрипты озвучки и модели профессора — `unity/BiologyVR/Tools/`; описание — [BIOLOGY_VR2_RU.md](unity/BiologyVR/BIOLOGY_VR2_RU.md). Комната лаборатории (пакет SecVarLab) и ассет Sci-Fi Hologram Screen Shader в репозиторий не входят — без них билдер собирает простую лабораторию и доски без фона.
 

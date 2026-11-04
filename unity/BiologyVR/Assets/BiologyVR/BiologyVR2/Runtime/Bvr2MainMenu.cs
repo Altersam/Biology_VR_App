@@ -14,8 +14,10 @@ namespace BiologyVR.V2
     /// settings, chapters and the main menu. Pointing: the hand ray in VR (the hand whose trigger was pressed
     /// last, with a laser), the screen centre on a PC; the stick / arrows and Enter work too; B / Esc — back.
     /// Progress and settings are kept by <see cref="Bvr2Save"/>.
+    /// Was Bvr2Menu.cs until 04.11: Yandex Disk kept turning every new write of that path into conflict copies
+    /// («Bvr2Menu (2).cs» …) — duplicate classes broke compilation, so the class and file were renamed.
     /// </summary>
-    public sealed class Bvr2Menu : MonoBehaviour
+    public sealed class Bvr2MainMenu : MonoBehaviour
     {
         public Bvr2Game game;
         [Header("Stage (Bvr2HoloFx.MenuStage)")]
@@ -182,7 +184,7 @@ namespace BiologyVR.V2
 
         void BuildTitle()
         {
-            var t = Txt(canvas, $"BIOLOGY VR <color=#{Bvr2Ui.Hex(Bvr2Style.Knowledge)}>2</color>", 150, Bvr2Style.Text, new Vector2(0, 200), new Vector2(1400, 190), TextAnchor.MiddleCenter, FontStyle.Bold);
+            var t = Txt(canvas, "BIOLOGY VR", 150, Bvr2Style.Text, new Vector2(0, 200), new Vector2(1400, 190), TextAnchor.MiddleCenter, FontStyle.Bold);
             Txt(canvas, "Путешествие внутри артерии", 58, Bvr2Style.AllySoft, new Vector2(0, 70), new Vector2(1300, 80));
             Line(canvas, new Vector2(0, 10), 620);
             Txt(canvas, "Учебная VR-игра по биологии · 8–9 класс\nкровь, сосуды, иммунитет, гомеостаз", 34, Bvr2Style.TextDim, new Vector2(0, -60), new Vector2(1300, 100));
@@ -193,7 +195,7 @@ namespace BiologyVR.V2
 
         void BuildMain()
         {
-            Header("BIOLOGY VR <color=#" + Bvr2Ui.Hex(Bvr2Style.Knowledge) + ">2</color>", "главное меню");
+            Header("BIOLOGY VR", "главное меню");
             float x = -330, y = 228, step = 116; var size = new Vector2(640, 102);
             int cont = Bvr2Save.ContinueChapter;
             var b = Button(canvas, "Продолжить", Bvr2Save.HasProgress ? ChapterName(cont) : "сохранённого прогресса пока нет", new Vector2(x, y), size, () => StartChapter(cont));
@@ -275,7 +277,7 @@ namespace BiologyVR.V2
 
         void BuildAbout()
         {
-            Header("ОБ ИГРЕ", "Biology VR 2 · версия " + version);
+            Header("ОБ ИГРЕ", "Biology VR · версия " + version);
             string body =
                 "Учебная VR-игра о крови и сосудах для 8–9 классов. Пролог в лаборатории профессора и шесть глав внутри одной артерии: " +
                 "«Поток», «Бляшка», «Первый контакт», «Прорыв», «Очаг», «Гомеостаз». Наблюдай, предсказывай, проверяй: сканер собирает знания, " +

@@ -1,10 +1,10 @@
 {
-  "version": "0.13.0",
+  "version": "0.14.0",
   "unity": "6000.1.9f1",
-  "art": "Biology VR 2: title screen and main menu with pause and saved progress; lab prologue (SecVarLab room, patient hologram, new tools) + six chapters in one artery (flow, plaque, first contact, wound, focus, homeostasis); voiced professor with subtitles and lip sync",
-  "updated_utc": "2026-11-04T07:39:18.193278+00:00",
+  "art": "Biology VR: title screen and main menu with pause and saved progress; lab prologue (SecVarLab room, patient hologram, new tools) + six chapters in one artery (flow, plaque, first contact, wound, focus, homeostasis); voiced professor with subtitles and lip sync",
+  "updated_utc": "2026-11-04T16:36:33.651966+00:00",
   "webgl_version": "0.10.0",
-  "android_release_version": "0.13.0",
+  "android_release_version": "0.14.0",
   "releases": [
     {
       "file": "BiologyVR_MetaQuest.apk",
@@ -169,12 +169,34 @@
       "device": "Meta Quest 2 / Pro / 3 / 3S",
       "tag": "v0.13.0",
       "headset_verified": false
+    },
+    {
+      "file": "BiologyVR2_Pico4_v0.14.0.apk",
+      "bytes": 71425589,
+      "sha256": "ba71a92e8c0582645f018bc4f2f6b46729c6737992b659013a5d27aac1e06769",
+      "version": "0.14.0",
+      "version_code": 15,
+      "application_id": "com.biologyvr.biologyvr2",
+      "device": "PICO 4 / PICO 4 Enterprise",
+      "tag": "v0.14.0",
+      "headset_verified": false
+    },
+    {
+      "file": "BiologyVR2_MetaQuest_v0.14.0.apk",
+      "bytes": 70541454,
+      "sha256": "92b365ce5ac25370404efaa984b3349e93dd01534c972bceca85781bb74f7f5c",
+      "version": "0.14.0",
+      "version_code": 15,
+      "application_id": "com.biologyvr.biologyvr2",
+      "device": "Meta Quest 2 / Pro / 3 / 3S",
+      "tag": "v0.14.0",
+      "headset_verified": false
     }
   ],
-  "pico_release_version": "0.13.0",
-  "quest_release_version": "0.13.0",
-  "android_version_code": 14,
-  "product": "Biology VR 2",
+  "pico_release_version": "0.14.0",
+  "quest_release_version": "0.14.0",
+  "android_version_code": 15,
+  "product": "Biology VR",
   "android_application_id": "com.biologyvr.biologyvr2",
   "previous_android_application_id": "com.biologyvr.arteryjourney",
   "headset_verified": false

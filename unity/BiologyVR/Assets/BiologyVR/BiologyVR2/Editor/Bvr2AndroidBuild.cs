@@ -23,17 +23,17 @@ namespace BiologyVR.V2.Editor
     /// configuration (UniversalMobileBuild.ConfigurePico / MetaQuestBuild.Configure: OpenXR
     /// features, ARM64, IL2CPP, GLES3, SDK 29/34, mobile URP) and then builds ONLY the new scene,
     /// passed explicitly — Build Settings are not touched.
-    /// Biology VR 2 is a separate app (own package id and name), so it installs next to the
-    /// working version instead of replacing it. Player settings changed for the build
+    /// The new game is a separate app (own package id; since 04.11 its name on the headset is
+    /// "Biology VR" too, without "2"), so it installs next to the working version instead of replacing it. Player settings changed for the build
     /// (name, id, version) are restored afterwards; the old release pipeline keeps its values.
     /// Android builds need the ASCII path: Biology VR/Reopen At ASCII Build Alias.
     /// </summary>
     public static class Bvr2AndroidBuild
     {
-        public const string Version = "0.13.0";
-        public const int AndroidCode = 14;
+        public const string Version = "0.14.0";
+        public const int AndroidCode = 15;
         public const string AppId = "com.biologyvr.biologyvr2";
-        public const string ProductName = "Biology VR 2";
+        public const string ProductName = "Biology VR"; // the game's name on the headset (04.11: without "2"); the package id stays
         const string MobileUrp = "Assets/BiologyVR/ArteryJourney/Generated/ArteryQuestPico_URP.asset";
         const string Reports = Bvr2SceneBuilder.Root + "/Reports";
         static bool running;
@@ -158,9 +158,10 @@ namespace BiologyVR.V2.Editor
             EditorApplication.delayCall += () =>
             {
                 if (BuildPipeline.isBuildingPlayer || running) return;
-                if (PlayerSettings.productName != ProductName && PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android) != AppId) return;
+                // the working app is also called "Biology VR" now: only the package id tells the two apart
+                if (PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android) != AppId) return;
                 RestoreWorkingApp();
-                Debug.LogWarning("[BVR2] Player settings still had Biology VR 2 values after an interrupted build — restored the working version (Biology VR, com.biologyvr.arteryjourney, " + BiologyReleaseVersion.Version + ").");
+                Debug.LogWarning("[BVR2] Player settings still had the new game's values after an interrupted build — restored the working version (Biology VR, com.biologyvr.arteryjourney, " + BiologyReleaseVersion.Version + ").");
             };
         }
 

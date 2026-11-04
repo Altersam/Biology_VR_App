@@ -21,6 +21,11 @@ namespace BiologyVR.V2
         [Header("Phagocyte hands")]
         public float cellRadius = 0.085f, reachHand = 0.45f, reachHead = 0.5f, taggedReach = 1.8f, slashSpeed = 1.6f, comboWindow = 1.8f;
         public int stomach = 8; public float digestSeconds = 1.3f;
+        [Header("Reach assist (04.11)")]
+        [Tooltip("Virions this close in front of a hand are drawn to it (VR / PC).")] public float assistRange = 1.5f, assistRangeDesktop = 2.6f;
+        public float assistSpeed = 2.8f;
+        [Tooltip("While synchronised the player may come this close to the wall (virions settle there).")] public float wallMarginSynced = 0.5f;
+        float wallMarginBefore = -1f;
         [Tooltip("Chapter 5: the player becomes a T-killer — faster, kills infected cells (the chapter handles the touch), does not eat virions.")]
         public bool tKiller;
         public bool Active { get; private set; }
@@ -31,6 +36,30 @@ namespace BiologyVR.V2
         public int Combo { get; private set; }
         public int BestCombo { get; private set; }
         public int Bounces { get; private set; }
+        /// <summary>Test probe: are the living virions where a player can get at them? A virion is out of reach when it
+        /// lies outside the swim region or deeper in the wall than the closest swim point plus an arm and the hand reach.</summary>
+        public string ReachReport
+        {
+            get
+            {
+                if (!immune || !swimmer || !swimmer.vessel) return "";
+                var vessel = swimmer.vessel; int alive = 0, outside = 0, deep = 0; float worst = 0f;
+                bool region = swimmer.regionMax > swimmer.regionMin;
+                foreach (var v in immune.viruses)
+                {
+                    if (!v || !v.gameObject.activeSelf || !v.Alive) continue;
+                    alive++;
+                    float sv = vessel.Locate(v.transform.position, ref probeHint, out var radial);
+                    if (region && (sv < swimmer.regionMin - 0.6f || sv > swimmer.regionMax + 0.6f)) outside++;
+                    float limit = vessel.FreeRadius(sv, vessel.AngleOf(sv, radial)) - swimmer.wallMargin;
+                    float gap = radial.magnitude - limit;
+                    if (gap > 0.6f + reachHand) deep++;
+                    worst = Mathf.Max(worst, gap);
+                }
+                return $"alive {alive} · outside region {outside} · beyond arm {deep} · worst {worst:F2} m · margin {swimmer.wallMargin:F2}";
+            }
+        }
+        int probeHint = -1;
         /// <summary>A virion was engulfed: (virus, it was a fast slash, by the left hand).</summary>
         public event Action<Bvr2Virus, bool, bool> OnEat;
         public event Action<Bvr2Virus> OnBounce;
@@ -71,7 +100,7 @@ namespace BiologyVR.V2
             Active = true; Endless = seconds <= 0; TimeLeft = Endless ? 0 : seconds; Eaten = 0; Slashes = 0; Combo = 0; BestCombo = 0; Bounces = 0; lastEat = -10f; bounced.Clear();
             foreach (var g in hideWhileSynced) if (g) g.SetActive(false);
             foreach (var h in hands) { h.blob.gameObject.SetActive(true); h.fill = 0; h.digest = 0; h.hasPrev = false; if (h.trail) { h.trail.Clear(); h.trail.emitting = false; } }
-            if (swimmer) { maxSwimBefore = swimmer.maxSwim; swimmer.maxSwim *= tKiller ? 1.5f : 0.95f; }
+            if (swimmer) { maxSwimBefore = swimmer.maxSwim; swimmer.maxSwim *= tKiller ? 1.5f : 0.95f; wallMarginBefore = swimmer.wallMargin; swimmer.wallMargin = Mathf.Min(swimmer.wallMargin, wallMarginSynced); }
             rig.Fade(Color.white, 0.9f, 50f); rig.FadeTo(Color.white, 0f, 1.2f);
             audioDirector?.Play("BVR2_Sync", 1f);
         }
@@ -83,6 +112,7 @@ namespace BiologyVR.V2
             foreach (var g in hideWhileSynced) if (g) g.SetActive(true);
             foreach (var h in hands) if (h != null) { if (h.trail) { h.trail.emitting = false; h.trail.Clear(); } h.blob.gameObject.SetActive(false); }
             if (swimmer && maxSwimBefore > 0) swimmer.maxSwim = maxSwimBefore;
+            if (swimmer && wallMarginBefore > 0) { swimmer.wallMargin = wallMarginBefore; wallMarginBefore = -1f; }
             rig.SetOverlay(Color.clear, 0f);
             rig.Fade(Color.white, 0.8f, 50f); rig.FadeTo(Color.white, 0f, 1.5f);
         }
@@ -126,15 +156,40 @@ namespace BiologyVR.V2
                     g.SetKeys(new[] { new GradientColorKey(c, 0), new GradientColorKey(c, 1) }, g.alphaKeys); h.trail.colorGradient = g;
                 }
             }
-            if (!tKiller) Engulf();
+            if (!tKiller) { Assist(dt); Engulf(); }
             foreach (var h in hands) { h.prev = h.blob.position; h.hasPrev = true; }
             if (Combo > 0 && Time.time - lastEat > comboWindow) Combo = 0;
             if (!Endless && TimeLeft <= 0) End();
         }
 
+        /// <summary>
+        /// Reach assist: a virion close in front of a free hand is drawn to it (the phagocyte's pseudopodia), and one
+        /// settling on the wall is pulled off it — the player does not have to hit it to the centimetre or squeeze
+        /// against the wall. Bare armoured hedgehogs are not drawn (they must be tagged first).
+        /// </summary>
+        void Assist(float dt)
+        {
+            bool xr = UnityEngine.XR.XRSettings.isDeviceActive;
+            float range = xr ? assistRange : assistRangeDesktop;
+            if (range <= 0f) return;
+            var head = rig.head.transform;
+            foreach (var v in immune.viruses)
+            {
+                if (!v || !v.gameObject.activeSelf || !v.Alive || v.Engulfer || v.debris || (v.armored && !v.Neutralized)) continue;
+                Vector3 p = v.transform.position;
+                if (Vector3.Angle(head.forward, p - head.position) > 80f) continue; // only what the player is facing
+                Hand best = null; float bd = range * (v.Current == Bvr2Virus.State.Infecting ? 1.3f : 1f);
+                foreach (var h in hands) { if (h == null || h.digest > 0) continue; float d = Vector3.Distance(p, h.blob.position); if (d < bd) { bd = d; best = h; } }
+                if (best == null) continue;
+                float k = 1f - Mathf.Clamp01(bd / range);
+                v.PullToward(best.blob.position, assistSpeed * dt * (0.35f + 0.65f * k));
+            }
+        }
+
         void Engulf()
         {
             Vector3 head = rig.head.transform.position;
+            bool xrNow = UnityEngine.XR.XRSettings.isDeviceActive;
             var list = immune.viruses;
             for (int i = 0; i < list.Count; i++)
             {
@@ -148,10 +203,11 @@ namespace BiologyVR.V2
                     // swept test along the hand's path this frame: a fast swing cannot pass through a virion
                     Vector3 a = h.hasPrev ? h.prev : h.blob.position, b = h.blob.position;
                     float d = DistanceToSegment(p, a, b);
-                    float reach = (reachHand + v.radius * 0.5f) * (v.Tagged ? taggedReach : 1f);
+                    float reach = (reachHand + v.radius * 0.5f) * (v.Tagged ? taggedReach : 1f) * (v.Current == Bvr2Virus.State.Infecting ? 1.4f : 1f);
                     if (d < reach && d < best) { best = d; by = h; }
                 }
-                if (by == null && (p - head).sqrMagnitude < reachHead * reachHead) by = hands[1].digest > 0 ? (hands[0].digest > 0 ? null : hands[0]) : hands[1];
+                float rh = xrNow ? reachHead : Mathf.Max(reachHead, 0.9f); // PC: the hands sit under the camera
+                if (by == null && (p - head).sqrMagnitude < rh * rh) by = hands[1].digest > 0 ? (hands[0].digest > 0 ? null : hands[0]) : hands[1];
                 if (by == null) continue;
                 if (v.armored && !v.Neutralized) { Bounce(v, by); continue; }
                 Eat(v, by, by.vel.magnitude > slashSpeed);

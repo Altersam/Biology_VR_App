@@ -268,7 +268,7 @@ namespace BiologyVR.V2.Editor
         /// hologram human on a projector on the left, the scanner and the BioTool turning over a projector on the
         /// right, two halo rings behind the menu panel and drifting motes. Inactive until the menu opens it.
         /// </summary>
-        public static string MenuStage(Bvr2Menu menu, Material device, Material dark, Material glow)
+        public static string MenuStage(Bvr2MainMenu menu, Material device, Material dark, Material glow)
         {
             var root = new GameObject("Menu Stage").transform; root.SetParent(menu.transform, false);
             root.position = new Vector3(0, 1500, 0); root.rotation = Quaternion.identity;

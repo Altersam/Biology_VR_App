@@ -228,7 +228,7 @@ namespace BiologyVR.V2.Editor
             for (int i = 0; i < 6; i++) chapter.tutorialGates.Add(Gate("Tutorial Gate " + (i + 1), torus, disc, gateMat, gateInner, props));
             for (int i = 0; i < 5; i++) chapter.raceGates.Add(Gate("Spasm Gate " + (i + 1), torus, disc, gateMat, gateInner, props));
             chapter.anchorPad = AnchorPad(sphere, torus, glowMat, device, props);
-            chapter.exhibit = Exhibit(vessel.baseRadius, intimaMat, media, adv, props, out chapter.intima, out chapter.media, out chapter.adventitia);
+            chapter.exhibit = WallCut(vessel, intimaMat, media, adv, glowMat, torus, props, out chapter.intima, out chapter.media, out chapter.adventitia, out chapter.layerMarkers);
 
             // chapter 2 props
             var ch2 = Child<Bvr2Chapter2>(gameGo, "Chapter 2 · Бляшка"); ch2.game = game;
@@ -310,7 +310,7 @@ namespace BiologyVR.V2.Editor
             campaign.chapters = new List<Bvr2ChapterBase> { ch0, chapter, ch2, ch3, ch4, ch5, ch6 };
             ch6.campaign = campaign;
             // title screen, main menu and pause menu (04.11) on a holographic stage far above the lab
-            var menu = Child<Bvr2Menu>(gameGo, "Menu"); menu.game = game; menu.version = Bvr2AndroidBuild.Version; campaign.menu = menu;
+            var menu = Child<Bvr2MainMenu>(gameGo, "Menu"); menu.game = game; menu.version = Bvr2AndroidBuild.Version; campaign.menu = menu;
             Debug.Log("[BVR2] " + Bvr2HoloFx.MenuStage(menu, device, deviceDark, glowMat));
 
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -605,20 +605,70 @@ namespace BiologyVR.V2.Editor
             return go.transform;
         }
 
-        static Transform Exhibit(float R, Material intimaMat, Material mediaMat, Material advMat, Transform parent, out Bvr2Scannable intima, out Bvr2Scannable media, out Bvr2Scannable adventitia)
+        /// <summary>
+        /// The wall-layer study in the real wall (04.11): when the player anchors at the beacon, the endothelium opens
+        /// a window (environment cut-away) and behind it the three layers sit at real scale around the vessel axis —
+        /// a staircase: the intima ends first, the media further on, the adventitia closes the bottom of the window.
+        /// Root: the vessel centre at the study point, Z = downstream, X = towards the window (Bvr2WallCut keeps it
+        /// in step with the wall's pulse). A glowing ring marks each layer until it is scanned.
+        /// </summary>
+        static Transform WallCut(Bvr2Vessel vessel, Material intimaMat, Material mediaMat, Material advMat, Material glow, Mesh torus, Transform parent,
+            out Bvr2Scannable intima, out Bvr2Scannable media, out Bvr2Scannable adventitia, out Transform[] markers)
         {
-            var root = new GameObject("Wall Layers Exhibit"); root.transform.SetParent(parent, false);
-            // staircase cut-away: intima shortest (nearest), media longer, adventitia the full window.
-            // a small exploded slice (≈ 0.7 m), shown in front of the anchored player
-            intima = Layer("Внутренняя оболочка", "intima", 0.60f, 0.645f, 0.24f, -0.23f, intimaMat, root.transform);
-            media = Layer("Средняя оболочка", "media", 0.66f, 0.83f, 0.47f, -0.115f, mediaMat, root.transform);
-            adventitia = Layer("Наружная оболочка", "adventitia", 0.845f, 0.97f, 0.70f, 0f, advMat, root.transform);
+            float R = vessel.baseRadius;
+            var root = new GameObject("Wall Cut (layers)"); root.transform.SetParent(parent, false);
+            root.AddComponent<Bvr2WallCut>().vessel = vessel;
+            // materials: the same tissue colours, lit like the artery but readable through the lumen haze
+            Material Cut(string name, Material src) { var m = Mat(name, "BVR2/Tissue"); m.CopyPropertiesFromMaterial(src); m.SetFloat("_Studio", 0.55f); m.SetFloat("_Unfogged", 1f); return m; }
+            var ci = Cut("Cut_Intima", intimaMat); var cm = Cut("Cut_Media", mediaMat); var ca = Cut("Cut_Adventitia", advMat);
+            const float A = 17f; // the shells reach under the endothelium beyond the ±12° window
+            intima = Layer("Внутренняя оболочка", "intima", R + 0.02f, R + 0.16f, 1.95f, -1.675f, A, ci, root.transform);   // z −2.65 … −0.7
+            media = Layer("Средняя оболочка", "media", R + 0.16f, R + 0.80f, 3.35f, -0.975f, A, cm, root.transform);        // z −2.65 … +0.7
+            adventitia = Layer("Наружная оболочка", "adventitia", R + 0.80f, R + 1.25f, 5.3f, 0f, A, ca, root.transform);   // z −2.65 … +2.65
+            // closing faces: the far end and the sides of the hole below the endothelium (no view into the void)
+            Face("End Wall", R + 0.005f, R + 0.80f, 2.15f, A, cm, root.transform);
+            foreach (float side in new[] { -A + 0.5f, A - 0.5f })
+            {
+                SideWall("Side Wall Media", R + 0.02f, R + 0.80f, side, -2.65f, 2.65f, cm, root.transform);
+                SideWall("Side Wall Adventitia", R + 0.80f, R + 1.25f, side, -2.65f, 2.65f, ca, root.transform);
+            }
+            // a pulsing ring in front of each layer's visible step (removed once that layer is scanned)
+            var ringMat = Mat("Cut_Marker", "BVR2/Glow"); ringMat.SetColor("_Color", Bvr2Style.Knowledge); ringMat.SetFloat("_Intensity", 1.8f); ringMat.SetFloat("_Core", 0.9f);
+            float[] rr = { R + 0.02f, R + 0.16f, R + 0.80f }, zz = { -1.35f, 0f, 1.35f };
+            markers = new Transform[3];
+            for (int i = 0; i < 3; i++)
+            {
+                var m = GlowObject("Marker " + (i + 1), torus, ringMat, root.transform);
+                m.transform.localPosition = new Vector3(rr[i] - 0.08f, 0, zz[i]); m.transform.localRotation = Quaternion.Euler(0, 90, 0); m.transform.localScale = Vector3.one * 0.32f;
+                markers[i] = m.transform;
+            }
+            root.SetActive(false);
             return root.transform;
         }
 
-        static Bvr2Scannable Layer(string title, string id, float r0, float r1, float length, float zCentre, Material mat, Transform parent)
+        /// <summary>An annulus sector across the vessel (a wall of the cut at z).</summary>
+        static void Face(string name, float r0, float r1, float z, float halfAngle, Material mat, Transform parent)
         {
-            var mesh = SaveMesh(Bvr2Meshes.Shell(r0, r1, length, -32, 32, 28, "BVR2_Layer_" + id), "Layer_" + id);
+            var mesh = SaveMesh(Bvr2Meshes.Shell(r0, r1, 0.02f, -halfAngle, halfAngle, 16, "BVR2_CutFace"), "CutFace");
+            var go = GlowObject(name, mesh, mat, parent); go.transform.localPosition = new Vector3(0, 0, z);
+        }
+
+        /// <summary>A radial strip along the vessel (a side of the cut) at the given angle, double-sided.</summary>
+        static void SideWall(string name, float r0, float r1, float angleDeg, float z0, float z1, Material mat, Transform parent)
+        {
+            float a = angleDeg * Mathf.Deg2Rad; var d = new Vector3(Mathf.Cos(a), Mathf.Sin(a), 0);
+            var m = new Mesh { name = "BVR2_CutSide" };
+            m.vertices = new[] { d * r0 + Vector3.forward * z0, d * r1 + Vector3.forward * z0, d * r1 + Vector3.forward * z1, d * r0 + Vector3.forward * z1 };
+            m.uv = new[] { new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, z1 - z0), new Vector2(0, z1 - z0) };
+            m.triangles = new[] { 0, 1, 2, 0, 2, 3, 0, 2, 1, 0, 3, 2 };
+            m.RecalculateNormals(); m.RecalculateBounds();
+            var mesh = SaveMesh(m, "CutSide_" + (angleDeg > 0 ? "P" : "N") + "_" + Mathf.RoundToInt(r0 * 100));
+            GlowObject(name, mesh, mat, parent);
+        }
+
+        static Bvr2Scannable Layer(string title, string id, float r0, float r1, float length, float zCentre, float halfAngle, Material mat, Transform parent)
+        {
+            var mesh = SaveMesh(Bvr2Meshes.Shell(r0, r1, length, -halfAngle, halfAngle, 28, "BVR2_CutLayer_" + id), "CutLayer_" + id); // new asset names: the old exhibit meshes are not rewritten in place
             var go = GlowObject(title, mesh, mat, parent); go.transform.localPosition = new Vector3(0, 0, zCentre);
             go.AddComponent<MeshCollider>().sharedMesh = mesh;
             var s = go.AddComponent<Bvr2Scannable>(); s.codexId = id; s.displayName = title; s.scanSeconds = 1.0f; s.highlight = go.GetComponent<Renderer>();

@@ -1,0 +1,70 @@
+{
+  "utc": "2026-11-04T07:40:09.3862322Z",
+  "tag": "v0.13.0",
+  "repository": "Altersam/Biology_VR_App",
+  "result": "Succeeded",
+  "reason": null,
+  "steps": [
+    {
+      "name": "remote",
+      "exit": 0,
+      "output": "https://github.com/Altersam/Biology_VR_App.git"
+    },
+    {
+      "name": "fetch",
+      "exit": 0,
+      "output": "From https://github.com/Altersam/Biology_VR_App\n * branch            main       -> FETCH_HEAD"
+    },
+    {
+      "name": "head",
+      "exit": 0,
+      "output": "55c96205aafff72eb77b59a894136ff5df573c1a"
+    },
+    {
+      "name": "origin/main",
+      "exit": 0,
+      "output": "55c96205aafff72eb77b59a894136ff5df573c1a"
+    },
+    {
+      "name": "ahead",
+      "exit": 0,
+      "output": "0"
+    },
+    {
+      "name": "add",
+      "exit": 0,
+      "output": "warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/Antibody.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/Cone.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/Debris.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/Disc.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/Hedgehog.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/Layer_adventitia.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/Layer_intima.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/Layer_media.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/Platelet.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/Quad.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/RedCell.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/RedCell_Low.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/Ring.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/Sphere.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/ToolBody.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/Torus.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/TorusThick.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/Virus.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/VirusHalfA.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/VirusHalfB.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/Wall_00.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/Wall_01.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Meshes/Wall_02.asset', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'unity/B…"
+    },
+    {
+      "name": "staged",
+      "exit": 0,
+      "output": "README.md\nVERSION.json\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Art/Holo.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Art/Holo/Patient.fbx\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Art/Holo/Patient.fbx.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Art/Holo/Tools.fbx\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Art/Holo/Tools.fbx.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Art/Professor/Professor.fbx\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Art/Professor/Textures/Prof_Collar_BaseColor.png\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Art/Professor/Textures/Prof_Collar_BaseColor.png.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Art/Professor/Textures/Prof_HairCap_BaseColor.png\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Art/Professor/Textures/Prof_HairLocks_BaseColor.png\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Art/Professor/Textures/Prof_HairLocks_BaseColor.png.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Art/Professor/Textures/Prof_Hair_BaseColor.png\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Art/Professor/Textures/Prof_ShirtCollar_BaseColor.png\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Art/Professor/Textures/Prof_ShirtCollar_BaseColor.png.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Art/Professor/Textures/Prof_Strap_BaseColor.png\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Art/Professor/Textures/Prof_Strap_BaseColor.png.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/BVR2_Clang.wav\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/BVR2_Clang.wav.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/BVR2_Combo.wav\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/BVR2_Combo.wav.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/BVR2_Swish.wav\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/BVR2_Swish.wav.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/Voice/VO_Chapter2_023_d718f68b.ogg\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/Voice/VO_Chapter2_023_d718f68b.ogg.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/Voice/VO_Chapter3_011_c98480dd.ogg\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/Voice/VO_Chapter3_011_c98480dd.ogg.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/Voice/VO_Chapter3_012_1b252c79.ogg\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/Voice/VO_Chapter3_012_1b252c79.ogg.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/Voice/VO_Chapter3_013_ec4ae260.ogg\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/Voice/VO_Chapter3_013_ec4ae260.ogg.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/Voice/VO_Chapter3_016_9f0da8f9.ogg\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/Voice/VO_Chapter3_016_9f0da8f9.ogg.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/Voice/VO_Chapter5_005_621712b0.ogg\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/Voice/VO_Chapter5_005_621712b0.ogg.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/Voice/VO_Chapter5_006_fca70b57.ogg\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/Voice/VO_Chapter5_006_fca70b57.ogg.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/Voice/VO_Chapter5_013_28238011.ogg\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/Voice/VO_Chapter5_013_28238011.ogg.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Audio/Voice/voice_manifest.json\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Editor/Bvr2AndroidBuild.cs\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Editor/Bvr2GitHubPublish.cs\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Editor/Bvr2HoloFx.cs\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Editor/Bvr2HoloFx.cs.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Editor/Bvr2LabDressing.cs\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Editor/Bvr2LabDressing.cs.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Editor/Bvr2LabProbe.cs\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Editor/Bvr2LabProbe.cs.meta\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Editor/Bvr2SceneBuilder.cs\nunity/BiologyVR/Assets/BiologyVR/BiologyVR2/Generated/Holo.meta\nunity/BiologyVR/Assets/BiologyVR/Biology…"
+    },
+    {
+      "name": "commit",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "name": "push",
+      "exit": 0,
+      "output": "Uploading LFS objects: 100% (20/20), 3.3 MB | 1.1 MB/s, done.\nTo https://github.com/Altersam/Biology_VR_App.git\n   55c9620..a947d29  HEAD -> main"
+    },
+    {
+      "name": "release-exists",
+      "exit": 1,
+      "output": "release not found"
+    },
+    {
+      "name": "release",
+      "exit": 0,
+      "output": "https://github.com/Altersam/Biology_VR_App/releases/tag/v0.13.0"
+    },
+    {
+      "name": "verify",
+      "exit": 0,
+      "output": "{\"assets\":[{\"apiUrl\":\"https://api.github.com/repos/Altersam/Biology_VR_App/releases/assets/708677327\",\"contentType\":\"application/vnd.android.package-archive\",\"createdAt\":\"2026-11-04T07:40:03Z\",\"digest\":\"sha256:29e8040e689fc8c16d1dd54abf48170b0ac5974bcf3126d50c0a08ece702b4e2\",\"downloadCount\":0,\"id\":\"RA_kwDOVBZKxs4qPY7P\",\"label\":\"\",\"name\":\"BiologyVR2_MetaQuest_v0.13.0.apk\",\"size\":70536898,\"state\":\"uploaded\",\"updatedAt\":\"2026-11-04T07:40:07Z\",\"url\":\"https://github.com/Altersam/Biology_VR_App/releases/download/v0.13.0/BiologyVR2_MetaQuest_v0.13.0.apk\"},{\"apiUrl\":\"https://api.github.com/repos/Altersam/Biology_VR_App/releases/assets/708677328\",\"contentType\":\"application/vnd.android.package-archive\",\"createdAt\":\"2026-11-04T07:40:03Z\",\"digest\":\"sha256:355229769384137f88d76ae5ff65a8202f443cbe62e20e5eec89f98f1207ad87\",\"downloadCount\":0,\"id\":\"RA_kwDOVBZKxs4qPY7Q\",\"label\":\"\",\"name\":\"BiologyVR2_Pico4_v0.13.0.apk\",\"size\":71421121,\"state\":\"uploaded\",\"updatedAt\":\"2026-11-04T07:40:07Z\",\"url\":\"https://github.com/Altersam/Biology_VR_App/releases/download/v0.13.0/BiologyVR2_Pico4_v0.13.0.apk\"},{\"apiUrl\":\"https://api.github.com/repos/Altersam/Biology_VR_App/releases/assets/708677331\",\"contentType\":\"text/plain; charset=utf-8\",\"createdAt\":\"2026-11-04T07:40:03Z\",\"digest\":\"sha256:89a2b381c8af29c41591114f10407a6ec0c5a42e2fa2f22a7875060dc98afc1d\",\"downloadCount\":0,\"id\":\"RA_kwDOVBZKxs4qPY7T\",\"label\":\"\",\"name\":\"SHA256SUMS_0_13_0.txt\",\"size\":196,\"state\":\"uploaded\",\"updatedAt\":\"2026-11-04T07:40:03Z\",\"url\":\"https://github.com/Altersam/Biology_VR_App/releases/download/v0.13.0/SHA256SUMS_0_13_0.txt\"}],\"isPrerelease\":true,\"tagName\":\"v0.13.0\",\"url\":\"https://github.com/Altersam/Biology_VR_App/releases/tag/v0.13.0\"}"
+    }
+  ],
+  "headsetVerified": false
+}

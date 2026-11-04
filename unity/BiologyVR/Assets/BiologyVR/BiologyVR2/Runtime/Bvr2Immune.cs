@@ -122,8 +122,12 @@ namespace BiologyVR.V2
             }
         }
 
+        /// <summary>Battle arena along the vessel: free virions stay between these (0/0 = anywhere).</summary>
+        public float sMin, sMax;
+
         public void ResetAll()
         {
+            sMin = sMax = 0;
             foreach (var v in viruses) if (v) v.gameObject.SetActive(false);
             foreach (var s in spots) if (s.t) Destroy(s.t.gameObject);
             spots.Clear();

@@ -20,6 +20,8 @@ namespace BiologyVR.V2
         public List<Bvr2Gate> raceGates = new List<Bvr2Gate>();
         public Transform anchorPad, exhibit, endBeacon;
         public Bvr2Scannable intima, media, adventitia;
+        /// <summary>Rings marking each layer's step in the wall cut (intima, media, adventitia).</summary>
+        public Transform[] layerMarkers;
         public float startS = 14f;
         public float SpasmGoodShare { get; private set; }
 
@@ -67,22 +69,23 @@ namespace BiologyVR.V2
 
         void LayerLabel(Bvr2Scannable layer)
         {
-            var mf = layer.GetComponent<MeshFilter>(); if (!mf || !mf.sharedMesh) return;
-            var b = mf.sharedMesh.bounds; var lp = layer.transform.localPosition;
             int idx = layer == intima ? 0 : layer == media ? 1 : 2;
+            var marker = layerMarkers != null && idx < layerMarkers.Length ? layerMarkers[idx] : layer.transform;
             var head = game.rig.head.transform;
-            var canvas = Bvr2Ui.Canvas("Label " + layer.codexId, exhibit, new Vector2(460, 84), 0.00072f / Mathf.Max(exhibit.lossyScale.x, 0.01f), 88);
-            canvas.position = exhibit.TransformPoint(new Vector3(b.center.x, b.min.y - 0.07f - idx * 0.11f, lp.z + b.max.z - 0.07f));
-            canvas.rotation = Quaternion.LookRotation(canvas.position - head.position, Vector3.up);
+            // the name sits on the layer's step, a little towards the player, and turns to face them
+            Vector3 at = marker.position + (head.position - marker.position).normalized * 0.35f;
+            var canvas = Bvr2Ui.Canvas("Label " + layer.codexId, exhibit, new Vector2(640, 104), 0.0017f / Mathf.Max(exhibit.lossyScale.y, 0.01f), 88);
+            canvas.position = at; canvas.rotation = Quaternion.LookRotation(at - head.position, Vector3.up);
             Bvr2Ui.Panel(canvas, Bvr2Style.Panel, "Back", Bvr2Ui.Rounded);
             var e = game.codex.Get(layer.codexId);
             var col = e != null ? e.color : Bvr2Style.Text;
             var bar = Bvr2Ui.Rect(canvas, "Bar", new Vector2(0, 0), new Vector2(0, 1), new Vector2(0, 8), new Vector2(10, -8));
             Bvr2Ui.Panel(bar, col, "Fill");
-            var t = Bvr2Ui.Label(canvas, e != null ? e.title : layer.displayName, 40, col, TextAnchor.MiddleCenter, FontStyle.Bold);
+            var t = Bvr2Ui.Label(canvas, "✓ " + (e != null ? e.title : layer.displayName), 50, col, TextAnchor.MiddleCenter, FontStyle.Bold);
             t.rectTransform.offsetMin = new Vector2(18, 0);
+            t.resizeTextForBestFit = true; t.resizeTextMinSize = 28; t.resizeTextMaxSize = 50; // shrinks to fit the plate
             labels.Add(canvas.gameObject);
-            StartCoroutine(Flash(layer.GetComponent<Renderer>(), col, 6f));
+            if (marker != layer.transform) marker.gameObject.SetActive(false);
         }
 
         IEnumerator Flash(Renderer r, Color c, float seconds)
@@ -288,29 +291,42 @@ namespace BiologyVR.V2
             Hud.SetCompass(null, null); NoPrompt();
             for (float t = 0; t < 0.9f && !autoplay; t += Time.unscaledDeltaTime) yield return null; // let the magnet glide settle
             anchorPad.gameObject.SetActive(false);
-            // a slice of the wall, exploded like a textbook figure, floats in front of the player
-            PresentExhibit(alpha);
-            exhibit.gameObject.SetActive(true);
-            game.fx.Shock(exhibit.position, -game.rig.head.transform.forward, Bvr2Style.Ally, 0.2f, 1.6f, 0.7f);
-            game.fx.Burst(exhibit.position + (exhibit.position - game.Head).normalized * 0.8f, Bvr2Style.Ally, 40, 1.5f, 0.04f, 0.9f);
+            // the wall right in front opens: behind the endothelium the three layers step down like a textbook cut
+            OpenWallCut(sEx, alpha);
+            game.fx.Burst(game.vessel.PointAt(sEx, game.vessel.Radius(sEx) - 0.3f, alpha), Bvr2Style.Ally, 40, 1.5f, 0.04f, 0.9f);
             game.sound.Play("SFX_Reveal", 0.9f);
             var labelled = new HashSet<string>();
             Objective("Отсканируй три оболочки стенки");
-            Prompt("Левый курок — сканировать слой", "ПКМ / F — сканировать слой");
+            Prompt("Левый курок на кольцо — сканировать слой", "ПКМ / F на кольцо — сканировать слой");
             yield return Say("Я вырезал для тебя кусочек стенки. Стенка артерии — три слоя. Изучи каждый.", Mood.Smile);
             bool unlockedField = false;
+            var layers = new[] { intima, media, adventitia };
             while (!(game.codex.Has("intima") && game.codex.Has("media") && game.codex.Has("adventitia")))
             {
-                Hud.SetObjective($"Оболочки стенки: {(game.codex.Has("intima") ? "✓" : "○")} внутренняя  {(game.codex.Has("media") ? "✓" : "○")} средняя  {(game.codex.Has("adventitia") ? "✓" : "○")} наружная");
+                Hud.SetObjective($"Оболочки стенки: {(game.codex.Has("intima") ? "✓" : "1")} внутренняя  {(game.codex.Has("media") ? "✓" : "2")} средняя  {(game.codex.Has("adventitia") ? "✓" : "3")} наружная");
                 if (autoplay)
                 {
-                    foreach (var s in new[] { intima, media, adventitia }) if (!game.codex.Has(s.codexId)) { game.scanner.ForceScan(s.codexId, s.transform.position); break; }
+                    for (int i = 0; i < layers.Length; i++) if (!game.codex.Has(layers[i].codexId)) { game.scanner.ForceScan(layers[i].codexId, layerMarkers != null && i < layerMarkers.Length && layerMarkers[i] ? layerMarkers[i].position : layers[i].transform.position); break; }
                 }
                 if (game.codex.Has("media") && !unlockedField) { unlockedField = true; }
-                foreach (var l in new[] { intima, media, adventitia }) if (game.codex.Has(l.codexId) && labelled.Add(l.codexId)) LayerLabel(l);
+                // the marker of the next layer pulses brighter; the compass points at it if it is out of view
+                Transform next = null;
+                for (int i = 0; i < layers.Length; i++)
+                {
+                    if (game.codex.Has(layers[i].codexId)) continue;
+                    var m = layerMarkers != null && i < layerMarkers.Length ? layerMarkers[i] : null;
+                    if (!m) continue;
+                    if (!next) next = m;
+                    float pulse = 1f + 0.18f * Mathf.Sin(Time.unscaledTime * 5f + i) + (m == next ? 0.15f : 0f);
+                    m.localScale = Vector3.one * 0.32f * pulse;
+                }
+                Hud.SetCompass(next && Vector3.Angle(game.rig.head.transform.forward, next.position - game.Head) > 45f ? next.position : (Vector3?)null, "слой");
+                foreach (var l in layers) if (game.codex.Has(l.codexId) && labelled.Add(l.codexId)) LayerLabel(l);
                 yield return null;
                 if (game.KnowledgeBusy) yield return WaitKnowledge();
             }
+            foreach (var l in layers) if (labelled.Add(l.codexId)) LayerLabel(l);
+            Hud.SetCompass(null, null);
             yield return WaitKnowledge();
             game.field.unlocked = true;
             Hud.Toast("+ СПОСОБНОСТЬ · СОСУДИСТОЕ ПОЛЕ", Bvr2Style.Ally, 2.8f);
@@ -321,28 +337,59 @@ namespace BiologyVR.V2
             NoPrompt();
         }
 
+        /// <summary>Opens the endothelium at (s, angle) and puts the layer cut behind it, flush with the real wall.</summary>
+        void OpenWallCut(float s, float alpha)
+        {
+            if (!exhibitHome) exhibitHome = exhibit.parent;
+            exhibit.SetParent(exhibitHome, true);
+            var cut = exhibit.GetComponent<Bvr2WallCut>();
+            if (cut) cut.Place(game.vessel, game.organism, s, alpha);
+            exhibit.gameObject.SetActive(true);
+            if (layerMarkers != null)
+                for (int i = 0; i < layerMarkers.Length; i++)
+                {
+                    var m = layerMarkers[i]; if (!m) continue;
+                    m.gameObject.SetActive(true); m.localScale = Vector3.one * 0.32f;
+                    // the ring's number (1 inner, 2 middle, 3 outer — as in the objective line), turned to the player
+                    var num = m.Find("Number");
+                    if (!num)
+                    {
+                        num = Bvr2Ui.Canvas("Number", m, new Vector2(120, 120), 0.0024f / 0.32f, 87);
+                        Bvr2Ui.Label(num, (i + 1).ToString(), 92, Bvr2Style.Knowledge, TextAnchor.MiddleCenter, FontStyle.Bold);
+                    }
+                    num.localPosition = Vector3.zero;
+                    var head = game.rig.head.transform;
+                    num.rotation = Quaternion.LookRotation(num.position - head.position, head.up);
+                }
+            var env = game.environment;
+            env.windowOn = true; env.windowS = s; env.windowAngle01 = Mathf.Repeat(alpha, 360f) / 360f;
+            env.windowRagged = 0f; env.windowSlit = false; env.windowEdge = new Color(0.45f, 0.93f, 1f, 1f);
+            if (windowAnim != null) StopCoroutine(windowAnim);
+            windowAnim = StartCoroutine(AnimateWindow(true));
+        }
+
+        Coroutine windowAnim;
+        IEnumerator AnimateWindow(bool open)
+        {
+            var env = game.environment;
+            for (float t = 0; t < 1f; t += Time.unscaledDeltaTime / 0.8f)
+            {
+                float k = Mathf.SmoothStep(0, 1, open ? t : 1f - t);
+                env.windowHalfLength = WindowHalfLength * Mathf.Max(k, 0.02f); env.windowHalfAngle01 = WindowHalfAngle / 360f * Mathf.Max(k, 0.02f);
+                yield return null;
+            }
+            env.windowHalfLength = WindowHalfLength; env.windowHalfAngle01 = WindowHalfAngle / 360f;
+            if (!open) { env.windowOn = false; if (exhibit) exhibit.gameObject.SetActive(false); }
+            windowAnim = null;
+        }
+
+        const float WindowHalfLength = 2.0f, WindowHalfAngle = 12f;
+
         void PlaceExhibit(float sEx, float alpha)
         {
             var v = game.vessel; float R = v.BaseRadius(sEx);
-            anchorPad.position = v.PointAt(sEx, R - 2.2f, alpha);
+            anchorPad.position = v.PointAt(sEx, R - 1.5f, alpha);
             anchorPad.rotation = Quaternion.LookRotation(v.PointAt(sEx, R, alpha) - anchorPad.position);
-        }
-
-        void PresentExhibit(float alpha)
-        {
-            var head = game.rig.head.transform; var v = game.vessel; float s = game.PlayerS;
-            Vector3 f = (v.PointAt(s, v.Radius(s), alpha) - head.position); f = Vector3.ProjectOnPlane(f, Vector3.up);
-            if (f.sqrMagnitude < 0.01f) f = Vector3.ProjectOnPlane(head.forward, Vector3.up); f.Normalize();
-            Vector3 up = Vector3.up, z = Vector3.Cross(f, up);
-            // turned 30° so the stepped end (cut faces = layer thickness) faces the player
-            const float k = 0.65f;
-            exhibit.SetParent(exhibitHome ? exhibitHome : exhibit.parent, true);
-            exhibit.localScale = Vector3.one * k;
-            exhibit.rotation = Quaternion.AngleAxis(-30f, up) * Quaternion.LookRotation(z, up);
-            Vector3 sliceCentre = head.position + f * 1.3f - up * 0.06f;
-            exhibit.position = sliceCentre - exhibit.rotation * new Vector3(0.78f * k, 0, 0);
-            if (!exhibitHome) exhibitHome = exhibit.parent;
-            exhibit.SetParent(game.rig.transform, true); // rides with the player (magnet glide, snap turns)
         }
 
         Transform exhibitHome;
@@ -350,7 +397,12 @@ namespace BiologyVR.V2
         {
             if (!exhibit) return;
             foreach (var l in labels) if (l) Destroy(l); labels.Clear();
-            exhibit.gameObject.SetActive(false);
+            if (exhibit.gameObject.activeSelf && game.environment.windowOn && Running && gameObject.activeInHierarchy)
+            {
+                if (windowAnim != null) StopCoroutine(windowAnim);
+                windowAnim = StartCoroutine(AnimateWindow(false)); // the wall closes again, then the cut is hidden
+            }
+            else { exhibit.gameObject.SetActive(false); }
             if (exhibitHome) exhibit.SetParent(exhibitHome, true);
         }
 
@@ -363,6 +415,8 @@ namespace BiologyVR.V2
         }
         int dbgHint = -1;
         public void DebugScan(string id) { game.scanner.ForceScan(id, game.Head + game.rig.head.transform.forward * 2f); }
+        /// <summary>Turns the view (and so the desktop hands) to the scan ring of layer i — then Bvr2Game.DebugHold(true, false) scans it with the real ray.</summary>
+        public void DebugAimLayer(int i) { if (layerMarkers != null && i >= 0 && i < layerMarkers.Length && layerMarkers[i]) game.rig.LookAt(layerMarkers[i].position); }
         public void DebugChoose(int option) { game.question.ForcedChoice = option; }
         public void DebugField(float factor, bool grab) { game.field.SetFactor(factor); game.field.debugGrab = grab; }
         public void DebugFieldPreview(float factor) { game.field.unlocked = true; game.field.Activate(game.PlayerS + 7f, 10f); game.field.SetFactor(factor); game.field.debugGrab = true; }
